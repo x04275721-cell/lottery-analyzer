@@ -131,13 +131,14 @@
                 if (!response.ok) throw new Error('数据加载失败');
                 
                 const data = await response.json();
+                console.log('数据加载成功:', data);
                 renderRecommendation(data);
                 updateStatus(data.generated_at);
                 
             } catch (error) {
                 console.error('加载失败:', error);
-                showError('pl3Container', '数据加载失败');
-                showError('fc3dContainer', '数据加载失败');
+                showError('pl3Container', '数据加载失败，请稍后刷新');
+                showError('fc3dContainer', '数据加载失败，请稍后刷新');
             }
         }
 
