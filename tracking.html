@@ -247,6 +247,30 @@
             border-top: 1px solid rgba(255,255,255,0.1);
         }
 
+        /* 导航菜单 */
+        .nav-menu {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .nav-item {
+            padding: 10px 20px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 20px;
+            color: white;
+            text-decoration: none;
+            transition: all 0.3s;
+            font-size: 0.9em;
+        }
+        .nav-item:hover {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .nav-item.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
         /* 响应式 */
         @media (max-width: 768px) {
             .tabs { flex-direction: column; }
@@ -260,6 +284,12 @@
     <div class="container">
         <h1>📊 彩票回溯系统</h1>
         <div class="subtitle">历史查询 · 推荐对比 · 战绩统计</div>
+
+        <!-- 导航菜单 -->
+        <div class="nav-menu">
+            <a href="index.html" class="nav-item">📊 今日分析</a>
+            <a href="tracking.html" class="nav-item active">📈 回溯系统</a>
+        </div>
 
         <!-- 标签页 -->
         <div class="tabs">
@@ -306,7 +336,7 @@
         <!-- 每日推荐 -->
         <div id="daily" class="tab-content">
             <div class="card">
-                <div class="card-title">📅 今日推荐（2026081期）</div>
+                <div class="card-title">📅 今日推荐（2026081期）- 真实记录始于2026年4月1日</div>
                 <div style="margin-bottom: 15px;">
                     <button class="btn btn-primary" onclick="lockRecommendation()">🔒 锁定推荐</button>
                     <span style="margin-left: 10px; color: rgba(255,255,255,0.7); font-size: 0.9em;">
@@ -485,9 +515,11 @@
             ]
         };
 
+        // 真实推荐记录（从2026年4月1日开始）
         const recommendationHistory = [
-            { date: '2026-03-31', period: '2026080', game: '排列三', rec: '638,071', result: '770', status: '未中' },
-            { date: '2026-03-31', period: '2026080', game: '福彩3D', rec: '735,301', result: '802', status: '未中' },
+            // 第一期：2026年4月1日 2026081期
+            { date: '2026-04-01', period: '2026081', game: '排列三', rec: '710,105', result: '待开奖', status: '进行中' },
+            { date: '2026-04-01', period: '2026081', game: '福彩3D', rec: '253,492', result: '待开奖', status: '进行中' },
         ];
 
         // 切换标签页
@@ -576,20 +608,35 @@
             const tbody = document.getElementById('recommendationHistory');
             let html = '';
             
-            recommendationHistory.forEach(item => {
-                const statusClass = item.status === '命中' ? 'success' : 
-                                   item.status === '组中' ? 'warning' : 'danger';
+            recommendationHistory.forEach((item, index) => {
+                let statusColor = '#f87171'; // 默认红色（未中）
+                if (item.status === '直中') statusColor = '#4ade80'; // 绿色
+                if (item.status === '组中') statusColor = '#fbbf24'; // 黄色
+                if (item.status === '进行中') statusColor = '#667eea'; // 蓝色
+                
                 html += `<tr>
                     <td>${item.date}</td>
                     <td>${item.period}</td>
                     <td>${item.game}</td>
                     <td>${item.rec}</td>
                     <td>${item.result}</td>
-                    <td style="color: ${statusClass === 'success' ? '#4ade80' : statusClass === 'warning' ? '#fbbf24' : '#f87171'}">${item.status}</td>
+                    <td style="color: ${statusColor}; font-weight: bold;">${item.status}</td>
                 </tr>`;
             });
             
             tbody.innerHTML = html;
+        }
+
+        // 更新开奖结果（管理员功能）
+        function updateResult(period, game, result, status) {
+            const record = recommendationHistory.find(r => r.period === period && r.game === game);
+            if (record) {
+                record.result = result;
+                record.status = status;
+                loadRecommendationHistory();
+                loadStats();
+                alert(`已更新：${game} ${period}期 结果：${result} 状态：${status}`);
+            }
         }
 
         // 对比号码
@@ -649,23 +696,43 @@
             resultDiv.innerHTML = html;
         }
 
-        // 加载统计
+        // 加载统计（从2026年4月1日开始计算真实战绩）
         function loadStats() {
-            // 模拟数据
-            document.getElementById('totalPredictions').textContent = '156';
-            document.getElementById('directHits').textContent = '12';
-            document.getElementById('groupHits').textContent = '28';
-            document.getElementById('hitRate').textContent = '25.6%';
+            // 计算真实战绩
+            const total = recommendationHistory.length;
+            const directHits = recommendationHistory.filter(r => r.status === '直中').length;
+            const groupHits = recommendationHistory.filter(r => r.status === '组中').length;
+            const completed = recommendationHistory.filter(r => r.status !== '进行中').length;
+            const hitRate = completed > 0 ? ((directHits + groupHits) / completed * 100).toFixed(1) : '0.0';
             
-            document.getElementById('pl3-total').textContent = '78';
-            document.getElementById('pl3-direct').textContent = '6';
-            document.getElementById('pl3-group').textContent = '14';
-            document.getElementById('pl3-rate').textContent = '25.6%';
+            document.getElementById('totalPredictions').textContent = total;
+            document.getElementById('directHits').textContent = directHits;
+            document.getElementById('groupHits').textContent = groupHits;
+            document.getElementById('hitRate').textContent = hitRate + '%';
             
-            document.getElementById('fc3d-total').textContent = '78';
-            document.getElementById('fc3d-direct').textContent = '6';
-            document.getElementById('fc3d-group').textContent = '14';
-            document.getElementById('fc3d-rate').textContent = '25.6%';
+            // 排列三统计
+            const pl3Records = recommendationHistory.filter(r => r.game === '排列三');
+            const pl3Completed = pl3Records.filter(r => r.status !== '进行中').length;
+            const pl3Direct = pl3Records.filter(r => r.status === '直中').length;
+            const pl3Group = pl3Records.filter(r => r.status === '组中').length;
+            const pl3Rate = pl3Completed > 0 ? ((pl3Direct + pl3Group) / pl3Completed * 100).toFixed(1) : '0.0';
+            
+            document.getElementById('pl3-total').textContent = pl3Records.length;
+            document.getElementById('pl3-direct').textContent = pl3Direct;
+            document.getElementById('pl3-group').textContent = pl3Group;
+            document.getElementById('pl3-rate').textContent = pl3Rate + '%';
+            
+            // 福彩3D统计
+            const fc3dRecords = recommendationHistory.filter(r => r.game === '福彩3D');
+            const fc3dCompleted = fc3dRecords.filter(r => r.status !== '进行中').length;
+            const fc3dDirect = fc3dRecords.filter(r => r.status === '直中').length;
+            const fc3dGroup = fc3dRecords.filter(r => r.status === '组中').length;
+            const fc3dRate = fc3dCompleted > 0 ? ((fc3dDirect + fc3dGroup) / fc3dCompleted * 100).toFixed(1) : '0.0';
+            
+            document.getElementById('fc3d-total').textContent = fc3dRecords.length;
+            document.getElementById('fc3d-direct').textContent = fc3dDirect;
+            document.getElementById('fc3d-group').textContent = fc3dGroup;
+            document.getElementById('fc3d-rate').textContent = fc3dRate + '%';
         }
 
         // 初始化
