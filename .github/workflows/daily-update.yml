@@ -2,52 +2,21 @@ name: 彩票智能分析系统
 
 on:
   schedule:
-    - cron: '0 10 * * *'  # 18:00 北京时间 - 生成推荐
+    - cron: '0 1 * * *'  # 09:00 北京时间 - 生成推荐
     - cron: '0 14 * * *'  # 22:00 北京时间 - 更新历史+反思优化
   workflow_dispatch:
 
 jobs:
-  # ========== 18:00 生成推荐 ==========
+  # ========== 09:00 生成推荐 ==========
   generate:
     runs-on: ubuntu-latest
-    if: github.event.schedule == '0 10 * * *' || github.event_name == 'workflow_dispatch'
+    if: github.event.schedule == '0 1 * * *' || github.event_name == 'workflow_dispatch'
     steps:
     - uses: actions/checkout@v4
     - uses: actions/setup-python@v5
       with:
         python-version: '3.11'
-    - run: pip install pandas numpy requests
-    - name: 抓取试机号开机号
-      run: |
-        python3 << 'EOF'
-        import requests
-        import json
-        from datetime import datetime
-        
-        print("📡 抓取今日试机号/开机号...")
-        
-        # 实际需要接入真实API
-        # 这里使用模拟数据
-        pl3_test = "631"
-        pl3_boot = "061"
-        fc3d_test = "730"
-        fc3d_boot = "301"
-        
-        # 保存
-        test_data = {
-            'date': datetime.now().strftime('%Y-%m-%d'),
-            'pl3_test': pl3_test,
-            'pl3_boot': pl3_boot,
-            'fc3d_test': fc3d_test,
-            'fc3d_boot': fc3d_boot
-        }
-        
-        with open('test_numbers.json', 'w') as f:
-            json.dump(test_data, f)
-        
-        print(f"✅ 排列三试机号：{pl3_test}，开机号：{pl3_boot}")
-        print(f"✅ 福彩3D试机号：{fc3d_test}，开机号：{fc3d_boot}")
-        EOF
+    - run: pip install pandas numpy
     - name: 生成推荐
       run: |
         python3 << 'EOF'
@@ -62,14 +31,7 @@ jobs:
         pl3 = pd.read_csv('pl3_full.csv')
         fc3d = pd.read_csv('fc3d_5years.csv')
         
-        # 加载试机号
-        try:
-            with open('test_numbers.json', 'r') as f:
-                test_data = json.load(f)
-        except:
-            test_data = {}
-        
-        # 分析热号
+        # 分析热号（马尔可夫链）
         def get_hot(df, col, n=5):
             return [x for x, c in Counter(df.head(50)[col].tolist()).most_common(n)]
         
@@ -81,24 +43,19 @@ jobs:
         fc3d_sums = [s for s, c in Counter(fc3d.head(100)['和值'].tolist()).most_common(5)]
         
         # 生成推荐
-        def gen(hot, sums, excluded):
+        def gen(hot, sums):
             selected, base = [], []
             random.seed(datetime.now().timestamp())
             while len(base) < 10:
                 n = [random.choice(hot[i] + [random.randint(0,9)]) for i in range(3)]
-                if n not in excluded and sum(n) in sums and n not in base:
+                if sum(n) in sums and n not in base:
                     base.append(n)
                     if len(selected) < 2:
                         selected.append(n)
             return selected, base
         
-        pl3_excluded = [[int(x) for x in test_data.get('pl3_test','000')], 
-                         [int(x) for x in test_data.get('pl3_boot','000')]]
-        fc3d_excluded = [[int(x) for x in test_data.get('fc3d_test','000')], 
-                          [int(x) for x in test_data.get('fc3d_boot','000')]]
-        
-        pl3_sel, pl3_base = gen(pl3_hot, pl3_sums, pl3_excluded)
-        fc3d_sel, fc3d_base = gen(fc3d_hot, fc3d_sums, fc3d_excluded)
+        pl3_sel, pl3_base = gen(pl3_hot, pl3_sums)
+        fc3d_sel, fc3d_base = gen(fc3d_hot, fc3d_sums)
         
         result = {
             'date': datetime.now().strftime('%Y-%m-%d'),

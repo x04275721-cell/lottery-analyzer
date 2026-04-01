@@ -165,16 +165,16 @@
             let html = `
                 <div class="info-grid">
                     <div class="info-box">
-                        <div class="info-label">试机号</div>
-                        <div class="info-value highlight">${gameData.test || '---'}</div>
-                    </div>
-                    <div class="info-box">
-                        <div class="info-label">开机号</div>
-                        <div class="info-value highlight">${gameData.boot || '---'}</div>
-                    </div>
-                    <div class="info-box">
                         <div class="info-label">重点和值</div>
-                        <div class="info-value">${(gameData.key_sum || []).join(',')}</div>
+                        <div class="info-value highlight">${(gameData.key_sum || []).join(',')}</div>
+                    </div>
+                    <div class="info-box">
+                        <div class="info-label">分析期数</div>
+                        <div class="info-value">${gameName === '排列三' ? '1000期' : '2000期'}</div>
+                    </div>
+                    <div class="info-box">
+                        <div class="info-label">预测方法</div>
+                        <div class="info-value">马尔可夫链</div>
                     </div>
                 </div>
                 
@@ -195,7 +195,7 @@
                 </div>
                 
                 <div class="tip-box">
-                    <strong>💡 选号原则：</strong>精选2注和十注大底的和值均从重点和值中产生，已排除试机号和开机号
+                    <strong>💡 选号原则：</strong>基于马尔可夫链分析历史数据，精选和值范围内的号码组合
                 </div>
             `;
             
