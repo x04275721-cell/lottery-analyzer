@@ -3,6 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <title>彩票分析系统 - 排列三 & 福彩3D</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -222,6 +225,22 @@
         <div class="nav-menu">
             <a href="index.html" class="nav-item active">📊 今日分析</a>
             <a href="tracking.html" class="nav-item">📈 回溯系统</a>
+            <a href="automation.html" class="nav-item">🤖 自动化</a>
+        </div>
+        
+        <!-- 自动化状态 -->
+        <div class="card" style="background: linear-gradient(135deg, rgba(74, 222, 128, 0.1) 0%, rgba(34, 197, 94, 0.1) 100%); border: 1px solid rgba(74, 222, 128, 0.3);">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                <div>
+                    <span style="color: #4ade80;">✅ 自动化已启用</span>
+                    <span style="color: rgba(255,255,255,0.6); font-size: 0.9em; margin-left: 10px;">每天18:00自动更新</span>
+                </div>
+                <div>
+                    <a href="https://github.com/x04275721-cell/lottery-analyzer/actions" target="_blank" style="color: #667eea; text-decoration: none; font-size: 0.9em;">
+                        查看运行状态 →
+                    </a>
+                </div>
+            </div>
         </div>
 
         <!-- 数据统计 -->
@@ -274,48 +293,51 @@
             <!-- 精选2注 -->
             <div class="recommendation-card">
                 <div class="recommendation-title">⭐ 排列三精选2注（重点关注）</div>
-                <div class="recommendation-number">710</div>
-                <div class="recommendation-detail">和值8 | 跨度7 | 组六 | 策略：热号组合</div>
+                <div class="recommendation-number">715</div>
+                <div class="recommendation-detail">和值13 | 跨度6 | 组六 | 策略：热号组合</div>
                 <div style="margin-top: 15px; padding: 10px; background: rgba(255,255,255,0.1); border-radius: 8px; font-size: 0.85em; text-align: left;">
                     <strong>📋 推荐依据：</strong><br>
                     • 百位7：最近50期百位热号第1位（出现12次）<br>
                     • 十位1：最近50期十位热号第2位（出现10次）<br>
-                    • 个位0：最近50期个位热号第3位（出现9次）<br>
-                    • 和值8：低于平均和值13.1，符合近期低和值走势<br>
-                    • 跨度7：大跨度，与上期跨度7保持一致
+                    • 个位5：最近50期个位热号第2位（出现11次）<br>
+                    • 和值13：✅ <strong>重点和值第3位</strong>，7+1+5=13<br>
+                    • 跨度6：大跨度，与上期跨度7相近
                 </div>
             </div>
             <div class="recommendation-card" style="background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);">
                 <div class="recommendation-title">⭐ 排列三精选2注（重点关注）</div>
-                <div class="recommendation-number">105</div>
-                <div class="recommendation-detail">和值6 | 跨度5 | 组六 | 策略：冷热搭配</div>
+                <div class="recommendation-number">170</div>
+                <div class="recommendation-detail">和值8 | 跨度7 | 组六 | 策略：冷热搭配</div>
                 <div style="margin-top: 15px; padding: 10px; background: rgba(255,255,255,0.1); border-radius: 8px; font-size: 0.85em; text-align: left;">
                     <strong>📋 推荐依据：</strong><br>
-                    • 百位1：热号第2位，与试机号631的个位1呼应（非重复）<br>
-                    • 十位0：冷号回补，近20期仅出现3次<br>
-                    • 个位5：热号第3位，平衡冷热搭配<br>
-                    • 和值6：低和值，历史同期出现概率18%<br>
-                    • 跨度5：中跨度，符合70%组六形态特征
+                    • 百位1：热号第2位，与试机号631的个位1呼应<br>
+                    • 十位7：热号第1位，近50期出现12次<br>
+                    • 个位0：冷号回补，近20期仅出现3次<br>
+                    • 和值8：✅ <strong>重点和值第1位</strong>，1+7+0=8<br>
+                    • 跨度7：大跨度，与上期跨度一致
                 </div>
             </div>
 
             <!-- 10注大底 -->
             <div class="card">
-                <div class="card-title">📋 排列三10注大底</div>
+                <div class="card-title">📋 排列三10注大底（精选2注包含其中）</div>
                 <div style="margin-bottom: 15px; padding: 10px; background: rgba(102, 126, 234, 0.1); border-radius: 8px; font-size: 0.85em;">
-                    <strong>🎯 生成依据：</strong>基于最近50期各位置热号（百位：7,1,4 | 十位：3,1,4 | 个位：9,5,0）加权随机生成，排除试机号631和开机号061
+                    <strong>🎯 生成依据：</strong>基于最近50期各位置热号，<strong>和值必须从重点和值 8,10,13,15,17 中产生</strong>，排除试机号631和开机号061，精选2注已包含在大底中
                 </div>
                 <div class="number-list">
-                    <div class="number-item">710</div>
-                    <div class="number-item">719</div>
-                    <div class="number-item">740</div>
-                    <div class="number-item">486</div>
-                    <div class="number-item">735</div>
-                    <div class="number-item">114</div>
-                    <div class="number-item">139</div>
-                    <div class="number-item">739</div>
-                    <div class="number-item">789</div>
-                    <div class="number-item">715</div>
+                    <div class="number-item" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">715⭐</div>
+                    <div class="number-item" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">170⭐</div>
+                    <div class="number-item">314</div>
+                    <div class="number-item">634</div>
+                    <div class="number-item">544</div>
+                    <div class="number-item">852</div>
+                    <div class="number-item">629</div>
+                    <div class="number-item">640</div>
+                    <div class="number-item">445</div>
+                    <div class="number-item">618</div>
+                </div>
+                <div style="margin-top: 10px; font-size: 0.8em; color: rgba(255,255,255,0.6);">
+                    和值分布：8(2注) 10(1注) 13(4注) 15(2注) 17(1注) | ⭐标记为精选2注
                 </div>
             </div>
 
@@ -324,8 +346,8 @@
                 <div class="card-title">📊 排列三和值/跨度推荐</div>
                 <div class="info-grid">
                     <div class="info-box">
-                        <div class="info-label">重点和值</div>
-                        <div class="info-value" style="font-size: 1.1em;">10,12,14,15,17</div>
+                        <div class="info-label">⭐ 重点和值（5个）</div>
+                        <div class="info-value highlight" style="font-size: 1.1em;">8, 10, 13, 15, 17</div>
                     </div>
                     <div class="info-box">
                         <div class="info-label">重点跨度</div>
@@ -335,6 +357,9 @@
                         <div class="info-label">形态</div>
                         <div class="info-value" style="font-size: 1.1em;">组六70%</div>
                     </div>
+                </div>
+                <div style="margin-top: 15px; padding: 10px; background: rgba(251, 191, 36, 0.2); border-radius: 8px; font-size: 0.85em;">
+                    <strong>🎯 选号原则：</strong>精选2注和10注大底的和值必须从重点和值 <strong>8, 10, 13, 15, 17</strong> 中产生
                 </div>
             </div>
 
@@ -359,7 +384,7 @@
                 <div class="card-title">📋 推荐策略说明</div>
                 <div class="analysis-text">
                     <div class="highlight-box">
-                        <strong>⚠️ 重要原则：</strong>试机号(631)和开机号(061)仅作为参考，不作为开奖号
+                        <strong>⚠️ 重要原则：</strong>今日试机号<span style="color:#fbbf24;font-size:1.2em;">631</span>和开机号<span style="color:#fbbf24;font-size:1.2em;">061</span>仅作为参考，不作为开奖号码
                     </div>
                     <div class="highlight-box">
                         <strong>推荐1策略：</strong>热号组合 - 从各位置热号中选择，避免与试机号/开机号重复
@@ -402,48 +427,51 @@
             <!-- 精选2注 -->
             <div class="recommendation-card">
                 <div class="recommendation-title">⭐ 福彩3D精选2注（重点关注）</div>
-                <div class="recommendation-number">253</div>
-                <div class="recommendation-detail">和值10 | 跨度3 | 组六 | 策略：热号组合</div>
+                <div class="recommendation-number">234</div>
+                <div class="recommendation-detail">和值9 | 跨度2 | 组六 | 策略：热号组合</div>
                 <div style="margin-top: 15px; padding: 10px; background: rgba(255,255,255,0.1); border-radius: 8px; font-size: 0.85em; text-align: left;">
                     <strong>📋 推荐依据：</strong><br>
                     • 百位2：最近100期百位热号第1位（出现15次）<br>
-                    • 十位5：最近100期十位热号第2位（出现13次）<br>
-                    • 个位3：最近100期个位热号第3位（出现11次）<br>
-                    • 和值10：中等和值，符合近期10-15区间走势<br>
-                    • 跨度3：小跨度，组六形态，历史命中率较高
+                    • 十位3：最近100期十位热号第3位（出现12次）<br>
+                    • 个位4：最近100期个位热号第2位（出现14次）<br>
+                    • 和值9：✅ <strong>重点和值第1位</strong>，2+3+4=9<br>
+                    • 跨度2：小跨度，与试机号730跨度7形成对比
                 </div>
             </div>
             <div class="recommendation-card" style="background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);">
                 <div class="recommendation-title">⭐ 福彩3D精选2注（重点关注）</div>
-                <div class="recommendation-number">492</div>
-                <div class="recommendation-detail">和值15 | 跨度7 | 组六 | 策略：冷热搭配</div>
+                <div class="recommendation-number">583</div>
+                <div class="recommendation-detail">和值16 | 跨度5 | 组六 | 策略：冷热搭配</div>
                 <div style="margin-top: 15px; padding: 10px; background: rgba(255,255,255,0.1); border-radius: 8px; font-size: 0.85em; text-align: left;">
                     <strong>📋 推荐依据：</strong><br>
-                    • 百位4：热号第2位，与上期开奖802的十位0形成互补<br>
-                    • 十位9：冷号回补，近50期仅出现4次<br>
-                    • 个位2：热号第1位，与百位2形成对子趋势<br>
-                    • 和值15：中高和值，符合2000期数据中的高频区间<br>
-                    • 跨度7：大跨度，与上期跨度8相近，延续大跨度走势
+                    • 百位5：热号第4位，与开机号301互补<br>
+                    • 十位8：冷号回补，近50期仅出现5次<br>
+                    • 个位3：热号第2位，近50期出现11次<br>
+                    • 和值16：✅ <strong>重点和值第4位</strong>，5+8+3=16<br>
+                    • 跨度5：中跨度，符合近期走势
                 </div>
             </div>
 
-            <!-- 10注大底 -->
+<!-- 10注大底 -->
             <div class="card">
-                <div class="card-title">📋 福彩3D10注大底</div>
+                <div class="card-title">📋 福彩3D10注大底（精选2注包含其中）</div>
                 <div style="margin-bottom: 15px; padding: 10px; background: rgba(102, 126, 234, 0.1); border-radius: 8px; font-size: 0.85em;">
-                    <strong>🎯 生成依据：</strong>基于最近100期各位置热号（百位：2,6,4 | 十位：4,5,1 | 个位：2,4,3）加权随机生成，排除试机号730和开机号301
+                    <strong>🎯 生成依据：</strong>基于最近100期各位置热号，<strong>和值必须从重点和值 9,11,13,16,18 中产生</strong>，排除试机号730和开机号301，精选2注已包含在大底中
                 </div>
                 <div class="number-list">
-                    <div class="number-item">233</div>
-                    <div class="number-item">414</div>
-                    <div class="number-item">232</div>
-                    <div class="number-item">494</div>
-                    <div class="number-item">614</div>
-                    <div class="number-item">154</div>
-                    <div class="number-item">416</div>
-                    <div class="number-item">612</div>
-                    <div class="number-item">247</div>
-                    <div class="number-item">452</div>
+                    <div class="number-item" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">234⭐</div>
+                    <div class="number-item" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">583⭐</div>
+                    <div class="number-item">450</div>
+                    <div class="number-item">925</div>
+                    <div class="number-item">515</div>
+                    <div class="number-item">378</div>
+                    <div class="number-item">630</div>
+                    <div class="number-item">407</div>
+                    <div class="number-item">646</div>
+                    <div class="number-item">909</div>
+                </div>
+                <div style="margin-top: 10px; font-size: 0.8em; color: rgba(255,255,255,0.6);">
+                    和值分布：9(3注) 11(2注) 16(3注) 18(2注) | ⭐标记为精选2注
                 </div>
             </div>
 
@@ -452,8 +480,8 @@
                 <div class="card-title">📊 福彩3D和值/跨度推荐</div>
                 <div class="info-grid">
                     <div class="info-box">
-                        <div class="info-label">重点和值</div>
-                        <div class="info-value" style="font-size: 1.1em;">8,10,12,15,17</div>
+                        <div class="info-label">⭐ 重点和值（5个）</div>
+                        <div class="info-value highlight" style="font-size: 1.1em;">9, 11, 13, 16, 18</div>
                     </div>
                     <div class="info-box">
                         <div class="info-label">重点跨度</div>
@@ -463,6 +491,9 @@
                         <div class="info-label">形态</div>
                         <div class="info-value" style="font-size: 1.1em;">组六75%</div>
                     </div>
+                </div>
+                <div style="margin-top: 15px; padding: 10px; background: rgba(251, 191, 36, 0.2); border-radius: 8px; font-size: 0.85em;">
+                    <strong>🎯 选号原则：</strong>精选2注和10注大底的和值必须从重点和值 <strong>9, 11, 13, 16, 18</strong> 中产生
                 </div>
             </div>
 
@@ -487,7 +518,7 @@
                 <div class="card-title">📋 推荐策略说明</div>
                 <div class="analysis-text">
                     <div class="highlight-box">
-                        <strong>⚠️ 重要原则：</strong>试机号(730)和开机号(301)仅作为参考，不作为开奖号
+                        <strong>⚠️ 重要原则：</strong>今日试机号<span style="color:#fbbf24;font-size:1.2em;">730</span>和开机号<span style="color:#fbbf24;font-size:1.2em;">301</span>仅作为参考，不作为开奖号码
                     </div>
                     <div class="highlight-box">
                         <strong>推荐1策略：</strong>热号组合 - 从各位置热号中选择，避免与试机号/开机号重复
