@@ -233,11 +233,11 @@
 
         // 获取推荐状态
         function getRecommendationStatus() {
-            if (hour < 18) {
+            if (hour < 9) {
                 return {
                     status: 'pending',
                     label: '⏳ 待生成推荐',
-                    countdown: getCountdownToTime(18, 0),
+                    countdown: getCountdownToTime(9, 0),
                     message: '今日推荐将于09:00生成'
                 };
             } else if (hour < 22) {

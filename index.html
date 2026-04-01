@@ -244,22 +244,72 @@
             loadReflection();
         }
         
-        // 加载反思内容
+// 加载反思内容
         async function loadReflection() {
             const container = document.getElementById('reflectionContainer');
             
             try {
-                // 尝试加载优化建议
-                const response = await fetch('optimization_suggestions.json?t=' + Date.now());
-                if (response.ok) {
-                    const suggestions = await response.json();
-                    renderReflection(suggestions);
-                } else {
-                    renderReflection(null);
+                // 加载历史记录
+                const histResponse = await fetch('history_records.json?t=' + Date.now());
+                let historyData = [];
+                if (histResponse.ok) {
+                    historyData = await histResponse.json();
                 }
+                
+                // 渲染反思
+                renderReflectionWithHistory(historyData);
             } catch (e) {
-                renderReflection(null);
+                renderReflectionWithHistory([]);
             }
+        }
+        
+        // 渲染反思内容（带历史分析）
+        function renderReflectionWithHistory(historyData) {
+            const container = document.getElementById('reflectionContainer');
+            
+            if (historyData.length === 0) {
+                container.innerHTML = `
+                    <div class="tip-box" style="background:rgba(102,126,234,0.1);border-color:#667eea;">
+                        <strong>💡 系统说明：</strong><br>
+                        • 每天09:00自动生成推荐（基于马尔可夫链分析）<br>
+                        • 每天22:00开奖后自动更新历史记录<br>
+                        • 系统会根据历史结果自动优化下期推荐
+                    </div>
+                `;
+                return;
+            }
+            
+            // 分析最近一期结果
+            const latest = historyData[historyData.length - 1];
+            const pl3Record = historyData.filter(r => r.game === '排列三');
+            const fc3dRecord = historyData.filter(r => r.game === '福彩3D');
+            
+            // 计算命中率
+            const pl3Hits = pl3Record.filter(r => r.status === '直中' || r.status === '组中').length;
+            const fc3dHits = fc3dRecord.filter(r => r.status === '直中' || r.status === '组中').length;
+            
+            container.innerHTML = `
+                <div class="info-grid">
+                    <div class="info-box">
+                        <div class="info-label">最近期号</div>
+                        <div class="info-value">${latest.period || '--'}</div>
+                    </div>
+                    <div class="info-box">
+                        <div class="info-label">排列三状态</div>
+                        <div class="info-value" style="color:${latest.game === '排列三' && latest.status === '未中' ? '#f87171' : '#4ade80'};">${pl3Record.length > 0 ? pl3Record[pl3Record.length-1].status : '--'}</div>
+                    </div>
+                    <div class="info-box">
+                        <div class="info-label">3D状态</div>
+                        <div class="info-value" style="color:${latest.game === '福彩3D' && latest.status === '未中' ? '#f87171' : '#4ade80'};">${fc3dRecord.length > 0 ? fc3dRecord[fc3dRecord.length-1].status : '--'}</div>
+                    </div>
+                </div>
+                <div class="tip-box" style="background:rgba(251,191,36,0.1);border-color:#fbbf24;">
+                    <strong>📊 上期分析：</strong><br>
+                    ${latest.game === '排列三' || latest.game === '福彩3D' ? 
+                        `推荐：${latest.recommendation} → 开奖：${latest.result} → ${latest.status === '未中' ? '下期将调整和值范围' : '保持当前策略'}` : 
+                        '等待开奖数据'}
+                </div>
+            `;
         }
         
         // 渲染反思内容
