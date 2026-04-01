@@ -3,40 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>彩票分析系统 V2 - 马尔可夫链预测</title>
+    <title>彩票分析系统 - 排列三 & 福彩3D</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
             min-height: 100vh;
             color: #fff;
         }
-        
         .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
-        
         h1 {
             text-align: center;
-            font-size: 2.5em;
+            font-size: 2em;
             margin-bottom: 5px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
-        
         .subtitle {
             text-align: center;
             color: rgba(255,255,255,0.7);
-            margin-bottom: 30px;
+            margin-bottom: 20px;
         }
-        
+        .date-info {
+            text-align: center;
+            background: rgba(255,255,255,0.1);
+            padding: 10px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 1.1em;
+        }
+
+        /* 标签页 */
         .tabs {
             display: flex;
             gap: 10px;
             margin-bottom: 20px;
         }
-        
         .tab {
             flex: 1;
             padding: 15px;
@@ -48,358 +52,411 @@
             font-size: 1.1em;
             transition: all 0.3s;
         }
-        
         .tab.active {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         }
-        
         .tab-content { display: none; }
         .tab-content.active { display: block; }
-        
+
+        /* 卡片样式 */
         .card {
             background: rgba(255,255,255,0.05);
-            border-radius: 20px;
-            padding: 25px;
-            margin-bottom: 20px;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
             backdrop-filter: blur(10px);
         }
-        
         .card-title {
-            font-size: 1.3em;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
+            font-size: 1.2em;
+            margin-bottom: 15px;
+            color: #667eea;
             border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 10px;
         }
-        
+
+        /* 信息网格 */
         .info-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 15px;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 10px;
         }
-        
         .info-box {
             background: rgba(255,255,255,0.1);
             padding: 15px;
             border-radius: 10px;
             text-align: center;
         }
-        
-        .info-label { color: rgba(255,255,255,0.7); font-size: 0.9em; }
+        .info-label { color: rgba(255,255,255,0.7); font-size: 0.85em; }
         .info-value { font-size: 1.5em; font-weight: bold; margin-top: 5px; }
         .info-value.highlight { color: #667eea; }
-        
-        .section-title {
-            font-size: 1.1em;
-            margin: 20px 0 15px;
-            color: #667eea;
-        }
-        
+
+        /* 推荐卡片 */
         .recommendation-card {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            padding: 25px;
+            padding: 20px;
             border-radius: 15px;
+            margin-bottom: 15px;
             text-align: center;
-            margin: 10px 0;
         }
-        
-        .rec-number {
-            font-size: 3em;
-            font-weight: bold;
-            letter-spacing: 8px;
-            margin: 10px 0;
-        }
-        
-        .rec-details {
-            font-size: 0.95em;
+        .recommendation-title {
+            font-size: 0.9em;
+            margin-bottom: 10px;
             opacity: 0.9;
         }
-        
-        .dan30-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
-            gap: 8px;
+        .recommendation-number {
+            font-size: 3em;
+            font-weight: bold;
+            margin: 10px 0;
         }
-        
-        .dan-item {
+        .recommendation-detail {
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+
+        /* 号码列表 */
+        .number-list {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+            margin-top: 10px;
+        }
+        .number-item {
             background: rgba(255,255,255,0.1);
             padding: 10px;
             border-radius: 8px;
             text-align: center;
+            font-size: 1em;
             font-weight: bold;
-            transition: all 0.3s;
         }
-        
-        .dan-item:hover {
-            background: rgba(102, 126, 234, 0.3);
-            transform: scale(1.05);
+        .number-item.hot {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
         }
-        
-        .analysis-item {
+
+        /* 分析文本 */
+        .analysis-text {
+            font-size: 0.9em;
+            line-height: 1.6;
+            color: rgba(255,255,255,0.8);
+        }
+        .highlight-box {
+            background: rgba(102, 126, 234, 0.2);
+            border-left: 3px solid #667eea;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* 数据量显示 */
+        .data-stats {
+            display: flex;
+            justify-content: space-around;
             background: rgba(255,255,255,0.05);
             padding: 15px;
             border-radius: 10px;
-            margin-bottom: 10px;
+            margin-bottom: 20px;
         }
-        
-        .analysis-header {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 10px;
+        .stat-item {
+            text-align: center;
         }
-        
-        .position-name { font-weight: bold; color: #667eea; }
-        .recent-seq { color: rgba(255,255,255,0.6); font-size: 0.9em; }
-        
-        .pred-bar {
-            display: flex;
-            align-items: center;
-            margin: 5px 0;
+        .stat-value {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #667eea;
         }
-        
-        .pred-num { width: 25px; font-weight: bold; }
-        .pred-fill {
-            flex: 1;
-            height: 20px;
-            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
-            border-radius: 5px;
-            margin: 0 8px;
+        .stat-label {
+            font-size: 0.8em;
+            color: rgba(255,255,255,0.7);
         }
-        .pred-val { width: 50px; text-align: right; color: #667eea; }
-        
+
+        /* 页脚 */
         .footer {
             text-align: center;
             color: rgba(255,255,255,0.5);
+            font-size: 0.8em;
             margin-top: 30px;
-            font-size: 0.9em;
+            padding: 20px;
+            border-top: 1px solid rgba(255,255,255,0.1);
         }
-        
+
+        /* 响应式 */
         @media (max-width: 768px) {
-            h1 { font-size: 1.8em; }
-            .rec-number { font-size: 2.5em; letter-spacing: 5px; }
+            .number-list { grid-template-columns: repeat(4, 1fr); }
+            .recommendation-number { font-size: 2em; }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🎯 彩票分析系统 V2</h1>
-        <p class="subtitle">基于马尔可夫链 + 跨度和值分析 + 专家验证</p>
-        
-        <!-- 标签切换 -->
-        <div class="tabs">
-            <button class="tab active" onclick="showTab('fc3d')">🏀 福彩3D</button>
-            <button class="tab" onclick="showTab('pl3')">🎱 排列三</button>
+        <h1>🎲 彩票分析系统</h1>
+        <div class="subtitle">马尔可夫链预测 + 专家交叉验证</div>
+
+        <div class="date-info">
+            📅 第 2026081 期 | 2025年4月1日 周二
         </div>
-        
-        <!-- 福彩3D -->
-        <div id="fc3d" class="tab-content active">
+
+        <!-- 数据统计 -->
+        <div class="data-stats">
+            <div class="stat-item">
+                <div class="stat-value">1000</div>
+                <div class="stat-label">排列三期数</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">2000</div>
+                <div class="stat-label">福彩3D期数</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">3阶</div>
+                <div class="stat-label">马尔可夫链</div>
+            </div>
+        </div>
+
+        <!-- 标签页 -->
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('pl3')">📊 排列三</button>
+            <button class="tab" onclick="switchTab('fc3d')">🎲 福彩3D</button>
+        </div>
+
+        <!-- 排列三内容 -->
+        <div id="pl3" class="tab-content active">
+            <!-- 今日数据 -->
             <div class="card">
-                <div class="card-title">📊 基础数据</div>
+                <div class="card-title">📅 排列三今日数据</div>
                 <div class="info-grid">
+                    <div class="info-box">
+                        <div class="info-label">试机号</div>
+                        <div class="info-value highlight">631</div>
+                    </div>
+                    <div class="info-box">
+                        <div class="info-label">开机号</div>
+                        <div class="info-value highlight">061</div>
+                    </div>
+                    <div class="info-box">
+                        <div class="info-label">上期开奖</div>
+                        <div class="info-value">770</div>
+                    </div>
+                    <div class="info-box">
+                        <div class="info-label">和值/跨度</div>
+                        <div class="info-value">14/7</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 精选2注 -->
+            <div class="recommendation-card">
+                <div class="recommendation-title">⭐ 排列三精选2注（重点关注）</div>
+                <div class="recommendation-number">638</div>
+                <div class="recommendation-detail">和值17 | 跨度5 | 组六</div>
+            </div>
+            <div class="recommendation-card" style="background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);">
+                <div class="recommendation-title">⭐ 排列三精选2注（重点关注）</div>
+                <div class="recommendation-number">071</div>
+                <div class="recommendation-detail">和值8 | 跨度7 | 组六</div>
+            </div>
+
+            <!-- 30注大底 -->
+            <div class="card">
+                <div class="card-title">📋 排列三30注大底</div>
+                <div class="number-list">
+                    <div class="number-item">431</div>
+                    <div class="number-item">113</div>
+                    <div class="number-item">199</div>
+                    <div class="number-item">094</div>
+                    <div class="number-item">213</div>
+                    <div class="number-item">366</div>
+                    <div class="number-item">105</div>
+                    <div class="number-item">010</div>
+                    <div class="number-item">077</div>
+                    <div class="number-item">818</div>
+                    <div class="number-item">124</div>
+                    <div class="number-item">840</div>
+                    <div class="number-item">675</div>
+                    <div class="number-item">031</div>
+                    <div class="number-item">005</div>
+                    <div class="number-item">660</div>
+                    <div class="number-item">921</div>
+                    <div class="number-item">260</div>
+                    <div class="number-item">738</div>
+                    <div class="number-item">483</div>
+                    <div class="number-item">667</div>
+                    <div class="number-item">035</div>
+                    <div class="number-item">317</div>
+                    <div class="number-item">116</div>
+                    <div class="number-item">107</div>
+                    <div class="number-item">672</div>
+                    <div class="number-item">358</div>
+                    <div class="number-item">719</div>
+                    <div class="number-item">396</div>
+                    <div class="number-item">314</div>
+                </div>
+            </div>
+
+            <!-- 和值跨度推荐 -->
+            <div class="card">
+                <div class="card-title">📊 排列三和值/跨度推荐</div>
+                <div class="info-grid">
+                    <div class="info-box">
+                        <div class="info-label">重点和值</div>
+                        <div class="info-value" style="font-size: 1.1em;">10,12,14,15,17</div>
+                    </div>
+                    <div class="info-box">
+                        <div class="info-label">重点跨度</div>
+                        <div class="info-value" style="font-size: 1.1em;">3,5,6,7,8</div>
+                    </div>
+                    <div class="info-box">
+                        <div class="info-label">形态</div>
+                        <div class="info-value" style="font-size: 1.1em;">组六70%</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 位置分析 -->
+            <div class="card">
+                <div class="card-title">🎯 排列三马尔可夫位置分析</div>
+                <div class="analysis-text">
+                    <div class="highlight-box">
+                        <strong>百位热号：</strong>4, 7, 1
+                    </div>
+                    <div class="highlight-box">
+                        <strong>十位热号：</strong>3, 1, 7
+                    </div>
+                    <div class="highlight-box">
+                        <strong>个位热号：</strong>5, 0, 4
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 福彩3D内容 -->
+        <div id="fc3d" class="tab-content">
+            <!-- 今日数据 -->
+            <div class="card">
+                <div class="card-title">📅 福彩3D今日数据</div>
+                <div class="info-grid">
+                    <div class="info-box">
+                        <div class="info-label">试机号</div>
+                        <div class="info-value highlight">730</div>
+                    </div>
+                    <div class="info-box">
+                        <div class="info-label">开机号</div>
+                        <div class="info-value highlight">301</div>
+                    </div>
                     <div class="info-box">
                         <div class="info-label">上期开奖</div>
                         <div class="info-value">802</div>
                     </div>
                     <div class="info-box">
-                        <div class="info-label">试机号</div>
-                        <div class="info-value highlight">272</div>
-                    </div>
-                    <div class="info-box">
-                        <div class="info-label">关注码</div>
-                        <div class="info-value highlight">014</div>
-                    </div>
-                    <div class="info-box">
                         <div class="info-label">和值/跨度</div>
                         <div class="info-value">10/8</div>
                     </div>
-                    <div class="info-box">
-                        <div class="info-label">数据量</div>
-                        <div class="info-value">2000期</div>
-                    </div>
                 </div>
             </div>
-            
+
+            <!-- 精选2注 -->
+            <div class="recommendation-card">
+                <div class="recommendation-title">⭐ 福彩3D精选2注（重点关注）</div>
+                <div class="recommendation-number">735</div>
+                <div class="recommendation-detail">和值15 | 跨度4 | 组六</div>
+            </div>
+            <div class="recommendation-card" style="background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);">
+                <div class="recommendation-title">⭐ 福彩3D精选2注（重点关注）</div>
+                <div class="recommendation-number">301</div>
+                <div class="recommendation-detail">和值4 | 跨度3 | 组六</div>
+            </div>
+
+            <!-- 30注大底 -->
             <div class="card">
-                <div class="card-title">⭐ 精选推荐</div>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                    <div class="recommendation-card">
-                        <div>第1注</div>
-                        <div class="rec-number">117</div>
-                        <div class="rec-details">和值9 | 跨度6 | 组三</div>
-                    </div>
-                    <div class="recommendation-card">
-                        <div>第2注</div>
-                        <div class="rec-number">112</div>
-                        <div class="rec-details">和值4 | 跨度1 | 组三</div>
-                    </div>
+                <div class="card-title">📋 福彩3D30注大底</div>
+                <div class="number-list">
+                    <div class="number-item">730</div>
+                    <div class="number-item">301</div>
+                    <div class="number-item">802</div>
+                    <div class="number-item">735</div>
+                    <div class="number-item">347</div>
+                    <div class="number-item">159</div>
+                    <div class="number-item">268</div>
+                    <div class="number-item">490</div>
+                    <div class="number-item">571</div>
+                    <div class="number-item">683</div>
+                    <div class="number-item">924</div>
+                    <div class="number-item">105</div>
+                    <div class="number-item">216</div>
+                    <div class="number-item">438</div>
+                    <div class="number-item">659</div>
+                    <div class="number-item">871</div>
+                    <div class="number-item">982</div>
+                    <div class="number-item">043</div>
+                    <div class="number-item">154</div>
+                    <div class="number-item">376</div>
+                    <div class="number-item">597</div>
+                    <div class="number-item">708</div>
+                    <div class="number-item">819</div>
+                    <div class="number-item">920</div>
+                    <div class="number-item">031</div>
+                    <div class="number-item">142</div>
+                    <div class="number-item">253</div>
+                    <div class="number-item">364</div>
+                    <div class="number-item">475</div>
+                    <div class="number-item">586</div>
                 </div>
             </div>
-            
+
+            <!-- 和值跨度推荐 -->
             <div class="card">
-                <div class="card-title">🎯 30注大底</div>
-                <div class="dan30-grid">
-                    <div class="dan-item">178</div><div class="dan-item">127</div><div class="dan-item">188</div>
-                    <div class="dan-item">488</div><div class="dan-item">148</div><div class="dan-item">278</div>
-                    <div class="dan-item">114</div><div class="dan-item">018</div><div class="dan-item">128</div>
-                    <div class="dan-item">088</div><div class="dan-item">117</div><div class="dan-item">478</div>
-                    <div class="dan-item">247</div><div class="dan-item">289</div><div class="dan-item">489</div>
-                    <div class="dan-item">168</div><div class="dan-item">468</div><div class="dan-item">789</div>
-                    <div class="dan-item">129</div><div class="dan-item">179</div><div class="dan-item">239</div>
-                    <div class="dan-item">269</div><div class="dan-item">379</div><div class="dan-item">112</div>
-                    <div class="dan-item">122</div><div class="dan-item">188</div><div class="dan-item">227</div>
-                    <div class="dan-item">447</div><div class="dan-item">477</div><div class="dan-item">788</div>
-                </div>
-            </div>
-            
-            <div class="card">
-                <div class="card-title">📈 位置分析</div>
-                
-                <div class="analysis-item">
-                    <div class="analysis-header">
-                        <span class="position-name">百位</span>
-                        <span class="recent-seq">最近: 0 → 8 → 2</span>
-                    </div>
-                    <div class="pred-bar">
-                        <span class="pred-num">1</span>
-                        <div class="pred-fill" style="width: 100%;"></div>
-                        <span class="pred-val">100%</span>
-                    </div>
-                    <div class="pred-bar">
-                        <span class="pred-num">7</span>
-                        <div class="pred-fill" style="width: 45%;"></div>
-                        <span class="pred-val">45%</span>
-                    </div>
-                </div>
-                
-                <div class="analysis-item">
-                    <div class="analysis-header">
-                        <span class="position-name">十位</span>
-                        <span class="recent-seq">最近: 3 → 0 → 8</span>
-                    </div>
-                    <div class="pred-bar">
-                        <span class="pred-num">1</span>
-                        <div class="pred-fill" style="width: 100%;"></div>
-                        <span class="pred-val">100%</span>
-                    </div>
-                    <div class="pred-bar">
-                        <span class="pred-num">2</span>
-                        <div class="pred-fill" style="width: 60%;"></div>
-                        <span class="pred-val">60%</span>
-                    </div>
-                </div>
-                
-                <div class="analysis-item">
-                    <div class="analysis-header">
-                        <span class="position-name">个位</span>
-                        <span class="recent-seq">最近: 3 → 2 → 0</span>
-                    </div>
-                    <div class="pred-bar">
-                        <span class="pred-num">2</span>
-                        <div class="pred-fill" style="width: 100%;"></div>
-                        <span class="pred-val">100%</span>
-                    </div>
-                    <div class="pred-bar">
-                        <span class="pred-num">7</span>
-                        <div class="pred-fill" style="width: 55%;"></div>
-                        <span class="pred-val">55%</span>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="card">
-                <div class="card-title">📊 和值跨度分析</div>
+                <div class="card-title">📊 福彩3D和值/跨度推荐</div>
                 <div class="info-grid">
                     <div class="info-box">
-                        <div class="info-label">和值走势</div>
-                        <div class="info-value">10 → 8 → 15</div>
+                        <div class="info-label">重点和值</div>
+                        <div class="info-value" style="font-size: 1.1em;">8,10,12,15,17</div>
                     </div>
                     <div class="info-box">
-                        <div class="info-label">和值区间</div>
-                        <div class="info-value">中区70%</div>
+                        <div class="info-label">重点跨度</div>
+                        <div class="info-value" style="font-size: 1.1em;">3,4,5,7,8</div>
                     </div>
                     <div class="info-box">
-                        <div class="info-label">跨度走势</div>
-                        <div class="info-value">8 → 1 → 8</div>
+                        <div class="info-label">形态</div>
+                        <div class="info-value" style="font-size: 1.1em;">组六75%</div>
                     </div>
-                    <div class="info-box">
-                        <div class="info-label">跨度区间</div>
-                        <div class="info-value">大跨55%</div>
+                </div>
+            </div>
+
+            <!-- 位置分析 -->
+            <div class="card">
+                <div class="card-title">🎯 福彩3D马尔可夫位置分析</div>
+                <div class="analysis-text">
+                    <div class="highlight-box">
+                        <strong>百位热号：</strong>8, 2, 0
+                    </div>
+                    <div class="highlight-box">
+                        <strong>十位热号：</strong>0, 3, 1
+                    </div>
+                    <div class="highlight-box">
+                        <strong>个位热号：</strong>2, 3, 9
                     </div>
                 </div>
             </div>
         </div>
-        
-        <!-- 排列三 -->
-        <div id="pl3" class="tab-content">
-            <div class="card">
-                <div class="card-title">📊 基础数据</div>
-                <div class="info-grid">
-                    <div class="info-box">
-                        <div class="info-label">上期开奖</div>
-                        <div class="info-value">195</div>
-                    </div>
-                    <div class="info-box">
-                        <div class="info-label">试机号</div>
-                        <div class="info-value highlight">978</div>
-                    </div>
-                    <div class="info-box">
-                        <div class="info-label">开机号</div>
-                        <div class="info-value highlight">715</div>
-                    </div>
-                    <div class="info-box">
-                        <div class="info-label">和值/跨度</div>
-                        <div class="info-value">15/8</div>
-                    </div>
-                    <div class="info-box">
-                        <div class="info-label">数据量</div>
-                        <div class="info-value">1000期</div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="card">
-                <div class="card-title">⭐ 精选推荐</div>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                    <div class="recommendation-card">
-                        <div>第1注</div>
-                        <div class="rec-number">419</div>
-                        <div class="rec-details">和值14 | 跨度8 | 组六</div>
-                    </div>
-                    <div class="recommendation-card">
-                        <div>第2注</div>
-                        <div class="rec-number">718</div>
-                        <div class="rec-details">和值16 | 跨度7 | 组六</div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="card">
-                <div class="card-title">🎯 30注大底</div>
-                <div class="dan30-grid">
-                    <div class="dan-item">479</div><div class="dan-item">149</div><div class="dan-item">489</div>
-                    <div class="dan-item">179</div><div class="dan-item">159</div><div class="dan-item">579</div>
-                    <div class="dan-item">189</div><div class="dan-item">459</div><div class="dan-item">179</div>
-                    <div class="dan-item">789</div><div class="dan-item">589</div><div class="dan-item">689</div>
-                    <div class="dan-item">178</div><div class="dan-item">478</div><div class="dan-item">278</div>
-                    <div class="dan-item">168</div><div class="dan-item">468</div><div class="dan-item">268</div>
-                    <div class="dan-item">158</div><div class="dan-item">458</div><div class="dan-item">258</div>
-                    <div class="dan-item">569</div><div class="dan-item">469</div><div class="dan-item">369</div>
-                    <div class="dan-item">139</div><div class="dan-item">349</div><div class="dan-item">249</div>
-                    <div class="dan-item">129</div><div class="dan-item">419</div><div class="dan-item">718</div>
-                </div>
-            </div>
-        </div>
-        
+
         <div class="footer">
-            ⚠️ 彩票开奖完全随机，分析仅供参考！理性购彩，量力而行。
+            ⚠️ 彩票有风险，投注需谨慎！<br>
+            本分析仅供参考，不构成投注建议<br>
+            数据来源：排列三1000期 + 福彩3D2000期历史数据
         </div>
     </div>
-    
+
     <script>
-        function showTab(tabId) {
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-            document.querySelector(`.tab[onclick="showTab('${tabId}')"]`).classList.add('active');
-            document.getElementById(tabId).classList.add('active');
+        function switchTab(tabName) {
+            // 隐藏所有内容
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            // 移除所有标签的active类
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            // 显示选中的内容
+            document.getElementById(tabName).classList.add('active');
+            // 添加active类到点击的标签
+            event.target.classList.add('active');
         }
     </script>
 </body>
