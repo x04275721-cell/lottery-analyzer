@@ -540,11 +540,31 @@
         };
 
         // 真实推荐记录（从2026年4月1日开始）
-        const recommendationHistory = [
-            // 第一期：2026年4月1日 2026081期
-            { date: '2026-04-01', period: '2026081', game: '排列三', rec: '715,170', result: '待开奖', status: '进行中' },
-            { date: '2026-04-01', period: '2026081', game: '福彩3D', rec: '234,583', result: '待开奖', status: '进行中' },
-        ];
+        let recommendationHistory = [];
+        
+        // 从服务器加载推荐记录
+        async function loadRecommendationHistoryFromServer() {
+            try {
+                const response = await fetch('history_records.json?t=' + Date.now());
+                if (response.ok) {
+                    recommendationHistory = await response.json();
+                    console.log('加载推荐记录成功:', recommendationHistory);
+                } else {
+                    // 如果加载失败，使用默认数据
+                    recommendationHistory = [
+                        { date: '2026-04-01', period: '2026081', game: '排列三', rec: '715,170', result: '690', status: '未中' },
+                        { date: '2026-04-01', period: '2026081', game: '福彩3D', rec: '234,583', result: '827', status: '未中' },
+                    ];
+                }
+            } catch (error) {
+                console.error('加载推荐记录失败:', error);
+                // 使用默认数据
+                recommendationHistory = [
+                    { date: '2026-04-01', period: '2026081', game: '排列三', rec: '715,170', result: '690', status: '未中' },
+                    { date: '2026-04-01', period: '2026081', game: '福彩3D', rec: '234,583', result: '827', status: '未中' },
+                ];
+            }
+        }
 
         // 切换标签页
         function switchTab(tabName) {
@@ -774,8 +794,11 @@
         }
 
         // 初始化
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', async function() {
+            await loadRecommendationHistoryFromServer();
             loadRecentHistory();
+            loadRecommendationHistory();
+            loadStats();
         });
     </script>
 </body>
