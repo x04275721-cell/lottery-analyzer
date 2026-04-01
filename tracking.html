@@ -314,8 +314,9 @@
                 <div id="historyResult"></div>
             </div>
 
+            <!-- 排列三最近记录 -->
             <div class="card">
-                <div class="card-title">📋 最近开奖记录</div>
+                <div class="card-title">📋 排列三最近开奖记录</div>
                 <table class="data-table">
                     <thead>
                         <tr>
@@ -326,7 +327,26 @@
                             <th>形态</th>
                         </tr>
                     </thead>
-                    <tbody id="recentHistory">
+                    <tbody id="recentHistoryPL3">
+                        <!-- 动态填充 -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 福彩3D最近记录 -->
+            <div class="card">
+                <div class="card-title">📋 福彩3D最近开奖记录</div>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>期号</th>
+                            <th>开奖号码</th>
+                            <th>和值</th>
+                            <th>跨度</th>
+                            <th>形态</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recentHistoryFC3D">
                         <!-- 动态填充 -->
                     </tbody>
                 </table>
@@ -541,12 +561,11 @@
 
         // 加载最近历史
         function loadRecentHistory() {
-            const tbody = document.getElementById('recentHistory');
-            let html = '';
-            
-            // 排列三
+            // 加载排列三数据
+            const tbodyPL3 = document.getElementById('recentHistoryPL3');
+            let htmlPL3 = '';
             historyData.pl3.forEach(item => {
-                html += `<tr>
+                htmlPL3 += `<tr>
                     <td>${item.period}</td>
                     <td><div class="number-display">
                         ${item.numbers.map(n => `<div class="number-ball">${n}</div>`).join('')}
@@ -556,8 +575,23 @@
                     <td>${item.form}</td>
                 </tr>`;
             });
-            
-            tbody.innerHTML = html;
+            tbodyPL3.innerHTML = htmlPL3;
+
+            // 加载福彩3D数据
+            const tbodyFC3D = document.getElementById('recentHistoryFC3D');
+            let htmlFC3D = '';
+            historyData.fc3d.forEach(item => {
+                htmlFC3D += `<tr>
+                    <td>${item.period}</td>
+                    <td><div class="number-display">
+                        ${item.numbers.map(n => `<div class="number-ball">${n}</div>`).join('')}
+                    </div></td>
+                    <td>${item.sum}</td>
+                    <td>${item.span}</td>
+                    <td>${item.form}</td>
+                </tr>`;
+            });
+            tbodyFC3D.innerHTML = htmlFC3D;
         }
 
         // 搜索历史
