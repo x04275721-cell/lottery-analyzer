@@ -249,97 +249,110 @@
             const container = document.getElementById('reflectionContainer');
             
             try {
-                // 加载历史记录
-                const histResponse = await fetch('history_records.json?t=' + Date.now());
-                let historyData = [];
-                if (histResponse.ok) {
-                    historyData = await histResponse.json();
+                // 加载优化建议
+                const optResponse = await fetch('optimization_suggestions.json?t=' + Date.now());
+                if (optResponse.ok) {
+                    const suggestions = await optResponse.json();
+                    renderDetailedReflection(suggestions);
+                } else {
+                    showReflectionPlaceholder();
                 }
-                
-                // 渲染反思
-                renderReflectionWithHistory(historyData);
             } catch (e) {
-                renderReflectionWithHistory([]);
+                showReflectionPlaceholder();
             }
         }
         
-        // 渲染反思内容（带历史分析）
-        function renderReflectionWithHistory(historyData) {
+        // 显示占位内容
+        function showReflectionPlaceholder() {
             const container = document.getElementById('reflectionContainer');
-            
-            if (historyData.length === 0) {
-                container.innerHTML = `
-                    <div class="tip-box" style="background:rgba(102,126,234,0.1);border-color:#667eea;">
-                        <strong>💡 系统说明：</strong><br>
-                        • 每天09:00自动生成推荐（基于马尔可夫链分析）<br>
-                        • 每天22:00开奖后自动更新历史记录<br>
-                        • 系统会根据历史结果自动优化下期推荐
-                    </div>
-                `;
-                return;
-            }
-            
-            // 分析最近一期结果
-            const latest = historyData[historyData.length - 1];
-            const pl3Record = historyData.filter(r => r.game === '排列三');
-            const fc3dRecord = historyData.filter(r => r.game === '福彩3D');
-            
-            // 计算命中率
-            const pl3Hits = pl3Record.filter(r => r.status === '直中' || r.status === '组中').length;
-            const fc3dHits = fc3dRecord.filter(r => r.status === '直中' || r.status === '组中').length;
-            
             container.innerHTML = `
-                <div class="info-grid">
-                    <div class="info-box">
-                        <div class="info-label">最近期号</div>
-                        <div class="info-value">${latest.period || '--'}</div>
-                    </div>
-                    <div class="info-box">
-                        <div class="info-label">排列三状态</div>
-                        <div class="info-value" style="color:${latest.game === '排列三' && latest.status === '未中' ? '#f87171' : '#4ade80'};">${pl3Record.length > 0 ? pl3Record[pl3Record.length-1].status : '--'}</div>
-                    </div>
-                    <div class="info-box">
-                        <div class="info-label">3D状态</div>
-                        <div class="info-value" style="color:${latest.game === '福彩3D' && latest.status === '未中' ? '#f87171' : '#4ade80'};">${fc3dRecord.length > 0 ? fc3dRecord[fc3dRecord.length-1].status : '--'}</div>
-                    </div>
-                </div>
-                <div class="tip-box" style="background:rgba(251,191,36,0.1);border-color:#fbbf24;">
-                    <strong>📊 上期分析：</strong><br>
-                    ${latest.game === '排列三' || latest.game === '福彩3D' ? 
-                        `推荐：${latest.recommendation} → 开奖：${latest.result} → ${latest.status === '未中' ? '下期将调整和值范围' : '保持当前策略'}` : 
-                        '等待开奖数据'}
+                <div class="tip-box" style="background:rgba(102,126,234,0.1);border-color:#667eea;">
+                    <strong>⏳ 等待数据：</strong><br>
+                    • 首次开奖后显示反思分析<br>
+                    • 每天22:00更新优化建议<br>
+                    • 系统会自动分析偏差原因
                 </div>
             `;
         }
         
-        // 渲染反思内容
-        function renderReflection(suggestions) {
+        // 渲染详细反思内容
+        function renderDetailedReflection(data) {
             const container = document.getElementById('reflectionContainer');
             
-            if (!suggestions) {
-                container.innerHTML = `
-                    <div class="tip-box" style="background:rgba(102,126,234,0.1);border-color:#667eea;">
-                        <strong>💡 系统说明：</strong><br>
-                        • 每天09:00自动生成推荐（基于马尔可夫链分析）<br>
-                        • 每天22:00开奖后自动更新历史记录<br>
-                        • 系统会根据历史结果自动优化下期推荐
-                    </div>
-                `;
+            if (!data || !data.last_period) {
+                showReflectionPlaceholder();
                 return;
             }
             
+            // 排列三分析
+            const pl3 = data.pl3 || {};
+            const pl3StatusColor = pl3.status === '未中' ? '#f87171' : '#4ade80';
+            
+            // 福彩3D分析
+            const fc3d = data.fc3d || {};
+            const fc3dStatusColor = fc3d.status === '未中' ? '#f87171' : '#4ade80';
+            
             container.innerHTML = `
-                <div class="info-grid">
-                    <div class="info-box">
-                        <div class="info-label">排列三优化</div>
-                        <div class="info-value" style="font-size:0.8em;">${suggestions.pl3?.sum_adjust || '正常'}</div>
-                    </div>
-                    <div class="info-box">
-                        <div class="info-label">3D优化</div>
-                        <div class="info-value" style="font-size:0.8em;">${suggestions.fc3d?.sum_adjust || '正常'}</div>
+                <div style="margin-bottom:15px; padding:10px; background:rgba(102,126,234,0.1); border-radius:10px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                        <span style="font-weight:bold;">📅 第${data.last_period}期反思分析</span>
+                        <span style="font-size:0.8em; color:rgba(255,255,255,0.5);">${data.date}</span>
                     </div>
                 </div>
+                
+                <!-- 排列三分析 -->
+                <div class="game-card" style="border-left:3px solid ${pl3StatusColor}; margin-bottom:12px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                        <span style="font-weight:bold;">🎯 排列三</span>
+                        <span style="color:${pl3StatusColor}; font-weight:bold;">${pl3.status || '--'}</span>
+                    </div>
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; font-size:0.85em;">
+                        <div>
+                            <span style="color:rgba(255,255,255,0.6);">推荐：</span>
+                            <span style="color:#4ade80; font-weight:bold;">${pl3.recommendation || '--'}</span>
+                        </div>
+                        <div>
+                            <span style="color:rgba(255,255,255,0.6);">开奖：</span>
+                            <span style="color:#fbbf24; font-weight:bold;">${pl3.result || '--'}</span>
+                        </div>
+                    </div>
+                    <div style="margin-top:8px; padding:8px; background:rgba(255,255,255,0.05); border-radius:6px; font-size:0.8em;">
+                        <div style="color:#f87171;"><strong>偏差分析：</strong>${pl3.analysis || '无数据'}</div>
+                        <div style="color:#4ade80; margin-top:5px;"><strong>优化建议：</strong>${pl3.suggestion || '无数据'}</div>
+                    </div>
+                </div>
+                
+                <!-- 福彩3D分析 -->
+                <div class="game-card" style="border-left:3px solid ${fc3dStatusColor}; margin-bottom:12px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                        <span style="font-weight:bold;">🎯 福彩3D</span>
+                        <span style="color:${fc3dStatusColor}; font-weight:bold;">${fc3d.status || '--'}</span>
+                    </div>
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; font-size:0.85em;">
+                        <div>
+                            <span style="color:rgba(255,255,255,0.6);">推荐：</span>
+                            <span style="color:#4ade80; font-weight:bold;">${fc3d.recommendation || '--'}</span>
+                        </div>
+                        <div>
+                            <span style="color:rgba(255,255,255,0.6);">开奖：</span>
+                            <span style="color:#fbbf24; font-weight:bold;">${fc3d.result || '--'}</span>
+                        </div>
+                    </div>
+                    <div style="margin-top:8px; padding:8px; background:rgba(255,255,255,0.05); border-radius:6px; font-size:0.8em;">
+                        <div style="color:#f87171;"><strong>偏差分析：</strong>${fc3d.analysis || '无数据'}</div>
+                        <div style="color:#4ade80; margin-top:5px;"><strong>优化建议：</strong>${fc3d.suggestion || '无数据'}</div>
+                    </div>
+                </div>
+                
+                <!-- 下期优化 -->
+                <div class="tip-box" style="background:rgba(251,191,36,0.15);border-color:#fbbf24;">
+                    <strong>💡 下期优化方向：</strong><br>
+                    • 和值调整：${data.optimization?.sum_adjust || '正常'}<br>
+                    • 跨度调整：${data.optimization?.span_adjust || '正常'}<br>
+                    • 下期重点和值：<span style="color:#fbbf24; font-weight:bold;">${data.optimization?.next_key_sums || '待定'}</span>
+                </div>
             `;
+        }
         }
 
         // 计算和值
