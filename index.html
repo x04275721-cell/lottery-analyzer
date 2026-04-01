@@ -29,11 +29,11 @@
         /* 号码球 */
         .number-ball { width: 32px; height: 32px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-weight: bold; margin: 2px; }
         .number-ball.hot { background: linear-gradient(135deg, #f87171 0%, #ef4444 100%); }
-        .number-ball.selected { background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%); transform: scale(1.15); box-shadow: 0 0 10px rgba(74,222,128,0.5); }
+        .number-ball.selected { background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: #000; transform: scale(1.15); box-shadow: 0 0 10px rgba(239,68,68,0.5); }
         
         /* 推荐卡片 */
         .rec-card { background: linear-gradient(135deg, rgba(102,126,234,0.2) 0%, rgba(118,75,162,0.2) 100%); border: 2px solid #667eea; border-radius: 15px; padding: 15px; margin: 10px 0; }
-        .rec-number { font-size: 2em; font-weight: bold; text-align: center; color: #4ade80; margin: 10px 0; }
+        .rec-number { font-size: 2em; font-weight: bold; text-align: center; color: #ef4444; margin: 10px 0; }
         .rec-detail { font-size: 0.85em; color: rgba(255,255,255,0.7); text-align: center; }
         
         /* 信息网格 */
@@ -46,7 +46,7 @@
         /* 大底号码 */
         .base-grid { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin: 10px 0; }
         .base-item { padding: 8px 12px; background: rgba(102,126,234,0.2); border-radius: 8px; font-weight: bold; }
-        .base-item.star { background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%); color: white; }
+        .base-item.star { background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: #000; }
         
         /* 提示框 */
         .tip-box { background: rgba(251,191,36,0.2); border-left: 3px solid #fbbf24; padding: 10px; border-radius: 0 8px 8px 0; margin: 10px 0; font-size: 0.85em; }
@@ -94,6 +94,28 @@
         <div class="card">
             <div class="card-title">🔬 智能分析（基于历史数据）</div>
             <div id="analysisContainer"><div class="loading"><div class="loading-spinner"></div></div></div>
+        </div>
+
+        <!-- 往期查询 -->
+        <div class="card">
+            <div class="card-title">🔍 往期开奖查询</div>
+            <div id="historyQueryContainer">
+                <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                    <select id="historyGameType" class="info-box" style="padding: 10px; border: none; background: rgba(255,255,255,0.1); color: white; border-radius: 8px;">
+                        <option value="pl3">排列三</option>
+                        <option value="fc3d">福彩3D</option>
+                    </select>
+                    <input type="text" id="historyPeriodInput" placeholder="输入期号（如：2026080）" class="info-box" style="padding: 10px; flex: 1; border: none; background: rgba(255,255,255,0.1); color: white; border-radius: 8px;">
+                    <button onclick="queryHistory()" style="padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 8px; cursor: pointer;">查询</button>
+                </div>
+                <div id="historyQueryResult"></div>
+            </div>
+        </div>
+
+        <!-- 反思优化 -->
+        <div class="card">
+            <div class="card-title">💭 智能反思与优化</div>
+            <div id="reflectionContainer"><div class="loading"><div class="loading-spinner"></div></div></div>
         </div>
 
         <div class="footer">
