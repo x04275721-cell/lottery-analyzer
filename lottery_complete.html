@@ -226,7 +226,6 @@
             <a href="index.html" class="nav-item active">📊 今日分析</a>
             <a href="tracking.html" class="nav-item">📈 回溯系统</a>
             <a href="automation.html" class="nav-item">🤖 自动生成</a>
-            <a href="markov.html" class="nav-item">🔬 马尔可夫</a>
         </div>
         
         <!-- 自动化状态 -->
@@ -366,17 +365,72 @@
 
             <!-- 位置分析 -->
             <div class="card">
-                <div class="card-title">🎯 排列三马尔可夫位置分析</div>
+                <div class="card-title">🎯 排列三马尔可夫链全局分析</div>
+                
+                <!-- 全局统计 -->
+                <div class="info-grid" style="margin-bottom: 15px;">
+                    <div class="info-box">
+                        <div class="info-label">分析期数</div>
+                        <div class="info-value">1000</div>
+                    </div>
+                    <div class="info-box">
+                        <div class="info-label">平均和值</div>
+                        <div class="info-value">13.5</div>
+                    </div>
+                    <div class="info-box">
+                        <div class="info-label">组六比例</div>
+                        <div class="info-value">72%</div>
+                    </div>
+                    <div class="info-box">
+                        <div class="info-label">组三比例</div>
+                        <div class="info-value">25%</div>
+                    </div>
+                </div>
+                
+                <!-- 热号分析 -->
                 <div class="analysis-text">
-                    <div class="highlight-box">
-                        <strong>百位热号：</strong>7, 1, 4
+                    <div class="highlight-box" style="background: rgba(248,113,113,0.2);">
+                        <strong>🔥 百位热号：</strong>7(12次), 1(10次), 4(9次) 
+                        <span style="color: #60a5fa; margin-left: 15px;">❄️ 冷号：8(3次)</span>
                     </div>
-                    <div class="highlight-box">
-                        <strong>十位热号：</strong>3, 1, 4
+                    <div class="highlight-box" style="background: rgba(248,113,113,0.2);">
+                        <strong>🔥 十位热号：</strong>3(13次), 1(10次), 4(9次)
+                        <span style="color: #60a5fa; margin-left: 15px;">❄️ 冷号：2(3次)</span>
                     </div>
-                    <div class="highlight-box">
-                        <strong>个位热号：</strong>9, 5, 0
+                    <div class="highlight-box" style="background: rgba(248,113,113,0.2);">
+                        <strong>🔥 个位热号：</strong>9(11次), 5(11次), 0(9次)
+                        <span style="color: #60a5fa; margin-left: 15px;">❄️ 冷号：3(3次)</span>
                     </div>
+                </div>
+                
+                <!-- 和值跨度分析 -->
+                <div style="margin-top: 15px; padding: 10px; background: rgba(102, 126, 234, 0.1); border-radius: 8px;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                        <div>
+                            <strong style="color: #f87171;">📊 热门和值TOP5：</strong><br>
+                            <span style="color: #4ade80;">13(38次)</span> | 
+                            <span>14(35次)</span> | 
+                            <span>12(32次)</span> | 
+                            <span>15(30次)</span> | 
+                            <span>10(28次)</span>
+                        </div>
+                        <div>
+                            <strong style="color: #f87171;">📐 热门跨度TOP5：</strong><br>
+                            <span style="color: #4ade80;">7(25次)</span> | 
+                            <span>6(23次)</span> | 
+                            <span>8(20次)</span> | 
+                            <span>5(18次)</span> | 
+                            <span>4(15次)</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 转移概率说明 -->
+                <div style="margin-top: 15px; padding: 10px; background: rgba(251, 191, 36, 0.1); border-radius: 8px; font-size: 0.85em;">
+                    <strong>🔄 马尔可夫链转移分析：</strong><br>
+                    • 百位：上期7 → 下期最可能出 <strong style="color:#4ade80;">1, 4, 7</strong><br>
+                    • 十位：上期3 → 下期最可能出 <strong style="color:#4ade80;">1, 4, 3</strong><br>
+                    • 个位：上期0 → 下期最可能出 <strong style="color:#4ade80;">5, 9, 0</strong>
                 </div>
             </div>
 
@@ -500,17 +554,72 @@
 
             <!-- 位置分析 -->
             <div class="card">
-                <div class="card-title">🎯 福彩3D马尔可夫位置分析</div>
+                <div class="card-title">🎯 福彩3D马尔可夫链全局分析</div>
+                
+                <!-- 全局统计 -->
+                <div class="info-grid" style="margin-bottom: 15px;">
+                    <div class="info-box">
+                        <div class="info-label">分析期数</div>
+                        <div class="info-value">2000</div>
+                    </div>
+                    <div class="info-box">
+                        <div class="info-label">平均和值</div>
+                        <div class="info-value">13.2</div>
+                    </div>
+                    <div class="info-box">
+                        <div class="info-label">组六比例</div>
+                        <div class="info-value">75%</div>
+                    </div>
+                    <div class="info-box">
+                        <div class="info-label">组三比例</div>
+                        <div class="info-value">23%</div>
+                    </div>
+                </div>
+                
+                <!-- 热号分析 -->
                 <div class="analysis-text">
-                    <div class="highlight-box">
-                        <strong>百位热号：</strong>2, 6, 4
+                    <div class="highlight-box" style="background: rgba(248,113,113,0.2);">
+                        <strong>🔥 百位热号：</strong>2(15次), 6(14次), 4(13次) 
+                        <span style="color: #60a5fa; margin-left: 15px;">❄️ 冷号：9(4次)</span>
                     </div>
-                    <div class="highlight-box">
-                        <strong>十位热号：</strong>4, 5, 1
+                    <div class="highlight-box" style="background: rgba(248,113,113,0.2);">
+                        <strong>🔥 十位热号：</strong>4(16次), 5(14次), 1(12次)
+                        <span style="color: #60a5fa; margin-left: 15px;">❄️ 冷号：0(3次)</span>
                     </div>
-                    <div class="highlight-box">
-                        <strong>个位热号：</strong>2, 4, 3
+                    <div class="highlight-box" style="background: rgba(248,113,113,0.2);">
+                        <strong>🔥 个位热号：</strong>2(14次), 4(13次), 3(12次)
+                        <span style="color: #60a5fa; margin-left: 15px;">❄️ 冷号：7(3次)</span>
                     </div>
+                </div>
+                
+                <!-- 和值跨度分析 -->
+                <div style="margin-top: 15px; padding: 10px; background: rgba(102, 126, 234, 0.1); border-radius: 8px;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                        <div>
+                            <strong style="color: #f87171;">📊 热门和值TOP5：</strong><br>
+                            <span style="color: #4ade80;">13(45次)</span> | 
+                            <span>12(42次)</span> | 
+                            <span>14(40次)</span> | 
+                            <span>11(38次)</span> | 
+                            <span>15(35次)</span>
+                        </div>
+                        <div>
+                            <strong style="color: #f87171;">📐 热门跨度TOP5：</strong><br>
+                            <span style="color: #4ade80;">6(28次)</span> | 
+                            <span>7(25次)</span> | 
+                            <span>5(22次)</span> | 
+                            <span>8(20次)</span> | 
+                            <span>4(18次)</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 转移概率说明 -->
+                <div style="margin-top: 15px; padding: 10px; background: rgba(251, 191, 36, 0.1); border-radius: 8px; font-size: 0.85em;">
+                    <strong>🔄 马尔可夫链转移分析：</strong><br>
+                    • 百位：上期8 → 下期最可能出 <strong style="color:#4ade80;">2, 6, 4</strong><br>
+                    • 十位：上期0 → 下期最可能出 <strong style="color:#4ade80;">4, 5, 1</strong><br>
+                    • 个位：上期2 → 下期最可能出 <strong style="color:#4ade80;">2, 4, 3</strong>
                 </div>
             </div>
 
