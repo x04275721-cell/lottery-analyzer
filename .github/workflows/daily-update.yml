@@ -25,11 +25,65 @@ jobs:
         from datetime import datetime
         from collections import Counter
         import random
+        import numpy as np
         
-        print("🎯 生成今日推荐...")
+        print("🎯 生成今日推荐（全和值智能筛选）...")
         
         pl3 = pd.read_csv('pl3_full.csv')
         fc3d = pd.read_csv('fc3d_5years.csv')
+        
+        # ========== 全和值智能分析（0-27）==========
+        def analyze_all_sums(df, recent_periods=100):
+            """分析所有和值0-27的出现概率"""
+            recent = df.head(recent_periods)
+            
+            # 统计所有和值出现次数
+            sum_counts = Counter(recent['和值'].tolist())
+            
+            # 计算0-27所有和值的概率
+            all_sums_prob = {}
+            for s in range(28):  # 0-27
+                count = sum_counts.get(s, 0)
+                prob = count / recent_periods
+                all_sums_prob[s] = {
+                    'count': count,
+                    'prob': prob,
+                    'hot': prob > 0.05,  # 热号标准
+                    'cold': prob < 0.02  # 冷号标准
+                }
+            
+            # 智能筛选：结合热号+冷号回补+概率分布
+            # 1. 热号（高频）
+            hot_sums = sorted([s for s, info in all_sums_prob.items() if info['hot']], 
+                            key=lambda x: all_sums_prob[x]['count'], reverse=True)[:3]
+            
+            # 2. 冷号回补（低频但可能出现）
+            cold_sums = sorted([s for s, info in all_sums_prob.items() if info['cold']], 
+                              key=lambda x: all_sums_prob[x]['count'])[:1]
+            
+            # 3. 中频稳定
+            mid_sums = sorted([s for s, info in all_sums_prob.items() 
+                              if not info['hot'] and not info['cold']], 
+                             key=lambda x: all_sums_prob[x]['count'], reverse=True)[:1]
+            
+            # 最终重点和值：热号优先+冷号回补
+            key_sums = list(set(hot_sums + cold_sums + mid_sums))[:5]
+            
+            # 如果不够5个，从中高频补充
+            if len(key_sums) < 5:
+                all_sorted = sorted(range(28), key=lambda x: all_sums_prob[x]['count'], reverse=True)
+                for s in all_sorted:
+                    if s not in key_sums:
+                        key_sums.append(s)
+                        if len(key_sums) >= 5:
+                            break
+            
+            print(f"   全和值分析（0-27）：")
+            print(f"   热门和值：{hot_sums}")
+            print(f"   冷号回补：{cold_sums}")
+            print(f"   最终重点：{key_sums}")
+            
+            return key_sums, all_sums_prob
         
         # 分析热号（马尔可夫链）
         def get_hot(df, col, n=5):
@@ -38,24 +92,40 @@ jobs:
         pl3_hot = [get_hot(pl3, c) for c in ['num1', 'num2', 'num3']]
         fc3d_hot = [get_hot(fc3d, c) for c in ['num1', 'num2', 'num3']]
         
-        # 和值
-        pl3_sums = [s for s, c in Counter(pl3.head(50)['和值'].tolist()).most_common(5)]
-        fc3d_sums = [s for s, c in Counter(fc3d.head(100)['和值'].tolist()).most_common(5)]
+        # 全和值分析
+        pl3_sums, pl3_prob = analyze_all_sums(pl3, 100)
+        fc3d_sums, fc3d_prob = analyze_all_sums(fc3d, 200)
         
-        # 生成推荐
-        def gen(hot, sums):
+        # 生成推荐（全和值范围）
+        def gen(hot, sums, all_prob):
             selected, base = [], []
             random.seed(datetime.now().timestamp())
-            while len(base) < 10:
+            attempts = 0
+            while len(base) < 10 and attempts < 1000:
+                attempts += 1
                 n = [random.choice(hot[i] + [random.randint(0,9)]) for i in range(3)]
+                s = sum(n)
+                # 优先选择重点和值，但也接受其他和值（概率加权）
+                if s in sums:
+                    if n not in base:
+                        base.append(n)
+                        if len(selected) < 2:
+                            selected.append(n)
+                elif len(base) >= 8 and n not in base:  # 后2注可以放宽
+                    # 检查是否是冷号回补
+                    if all_prob.get(s, {}).get('cold', False):
+                        base.append(n)
+            
+            # 如果不够10注，从重点和值补充
+            while len(base) < 10:
+                n = [random.randint(0,9) for _ in range(3)]
                 if sum(n) in sums and n not in base:
                     base.append(n)
-                    if len(selected) < 2:
-                        selected.append(n)
+            
             return selected, base
         
-        pl3_sel, pl3_base = gen(pl3_hot, pl3_sums)
-        fc3d_sel, fc3d_base = gen(fc3d_hot, fc3d_sums)
+        pl3_sel, pl3_base = gen(pl3_hot, pl3_sums, pl3_prob)
+        fc3d_sel, fc3d_base = gen(fc3d_hot, fc3d_sums, fc3d_prob)
         
         result = {
             'date': datetime.now().strftime('%Y-%m-%d'),
@@ -63,10 +133,18 @@ jobs:
             'generated_at': datetime.now().isoformat(),
             'locked': True,
             'pl3': {
-                'test': test_data.get('pl3_test', '---'),
-                'boot': test_data.get('pl3_boot', '---'),
                 'key_sum': pl3_sums,
+                'sum_analysis': '全和值0-27智能筛选',
                 'selected_2': [''.join(map(str, n)) for n in pl3_sel],
+                'base_10': [''.join(map(str, n)) for n in pl3_base]
+            },
+            'fc3d': {
+                'key_sum': fc3d_sums,
+                'sum_analysis': '全和值0-27智能筛选',
+                'selected_2': [''.join(map(str, n)) for n in fc3d_sel],
+                'base_10': [''.join(map(str, n)) for n in fc3d_base]
+            }
+        }
                 'base_10': [''.join(map(str, n)) for n in pl3_base]
             },
             'fc3d': {
