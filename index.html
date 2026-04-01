@@ -236,7 +236,58 @@
                     </div>
                 </div>
                 <div class="tip-box">
-                    <strong>📊 马尔可夫链分析：</strong>基于最近1000期历史数据，系统自动识别热号、冷号，并结合本期试机号、开机号进行智能筛选。
+                    <strong>📊 马尔可夫链分析：</strong>基于最近1000期历史数据，系统自动识别热号、冷号进行智能筛选。
+                </div>
+            `;
+            
+            // 加载反思内容
+            loadReflection();
+        }
+        
+        // 加载反思内容
+        async function loadReflection() {
+            const container = document.getElementById('reflectionContainer');
+            
+            try {
+                // 尝试加载优化建议
+                const response = await fetch('optimization_suggestions.json?t=' + Date.now());
+                if (response.ok) {
+                    const suggestions = await response.json();
+                    renderReflection(suggestions);
+                } else {
+                    renderReflection(null);
+                }
+            } catch (e) {
+                renderReflection(null);
+            }
+        }
+        
+        // 渲染反思内容
+        function renderReflection(suggestions) {
+            const container = document.getElementById('reflectionContainer');
+            
+            if (!suggestions) {
+                container.innerHTML = `
+                    <div class="tip-box" style="background:rgba(102,126,234,0.1);border-color:#667eea;">
+                        <strong>💡 系统说明：</strong><br>
+                        • 每天09:00自动生成推荐（基于马尔可夫链分析）<br>
+                        • 每天22:00开奖后自动更新历史记录<br>
+                        • 系统会根据历史结果自动优化下期推荐
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = `
+                <div class="info-grid">
+                    <div class="info-box">
+                        <div class="info-label">排列三优化</div>
+                        <div class="info-value" style="font-size:0.8em;">${suggestions.pl3?.sum_adjust || '正常'}</div>
+                    </div>
+                    <div class="info-box">
+                        <div class="info-label">3D优化</div>
+                        <div class="info-value" style="font-size:0.8em;">${suggestions.fc3d?.sum_adjust || '正常'}</div>
+                    </div>
                 </div>
             `;
         }
