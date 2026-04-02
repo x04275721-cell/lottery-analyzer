@@ -35,12 +35,13 @@ jobs:
         print("🎯 彩票智能分析系统 - 每日推荐生成")
         print("=" * 50)
         
-        # ===== 1. 更新CSV数据 =====
+        # ===== 1. 更新CSV数据（双彩同步）=====
         def update_csv_data():
             """从17500.cn获取最新数据"""
-            print("\n📥 正在获取最新数据...")
+            print("\n📥 正在获取最新数据（双彩同步）...")
+            
+            # 排列三数据更新
             try:
-                # 更新排列三数据
                 pl3_url = "http://data.17500.cn/pl3_asc.txt"
                 resp = requests.get(pl3_url, timeout=10)
                 if resp.status_code == 200:
@@ -48,7 +49,7 @@ jobs:
                     existing = set()
                     try:
                         with open('pl3_full.csv', 'r', encoding='utf-8') as f:
-                            next(f)  # 跳过标题
+                            next(f)
                             for line in f:
                                 parts = line.strip().split(',')
                                 if parts:
@@ -58,7 +59,7 @@ jobs:
                     
                     new_count = 0
                     new_data = []
-                    for line in lines[:200]:  # 只取最新的200条
+                    for line in lines[:200]:
                         parts = line.strip().split()
                         if len(parts) >= 6 and parts[0].startswith('2026'):
                             issue = parts[0]
@@ -75,11 +76,53 @@ jobs:
                         with open('pl3_full.csv', 'a', encoding='utf-8') as f:
                             for line in new_data:
                                 f.write(line + '\n')
-                        print(f"   ✅ 新增 {new_count} 条排列三数据")
+                        print(f"   ✅ 排列三：新增 {new_count} 条")
                     else:
-                        print(f"   ✅ 数据已是最新")
+                        print(f"   ✅ 排列三：已是最新")
             except Exception as e:
-                print(f"   ⚠️ 数据更新失败：{e}")
+                print(f"   ⚠️ 排列三更新失败：{e}")
+            
+            # 3D数据更新
+            try:
+                fc3d_url = "http://data.17500.cn/3d_asc.txt"
+                resp = requests.get(fc3d_url, timeout=10)
+                if resp.status_code == 200:
+                    lines = resp.text.strip().split('\n')
+                    existing = set()
+                    try:
+                        with open('fc3d_5years.csv', 'r', encoding='utf-8') as f:
+                            next(f)
+                            for line in f:
+                                parts = line.strip().split(',')
+                                if parts:
+                                    existing.add(parts[0])
+                    except:
+                        pass
+                    
+                    new_count = 0
+                    new_data = []
+                    for line in lines[:200]:
+                        parts = line.strip().split()
+                        if len(parts) >= 6 and parts[0].startswith('2026'):
+                            issue = parts[0]
+                            if issue not in existing:
+                                n1, n2, n3 = parts[1], parts[2], parts[3]
+                                s = int(n1) + int(n2) + int(n3)
+                                sp = max(int(n1),int(n2),int(n3)) - min(int(n1),int(n2),int(n3))
+                                typ = '豹子' if n1==n2==n3 else ('组三' if n1==n2 or n1==n3 or n2==n3 else '组六')
+                                new_data.append(f"{issue},{n1},{n2},{n3},{s},{sp},{typ}")
+                                new_count += 1
+                    
+                    if new_data:
+                        new_data.reverse()
+                        with open('fc3d_5years.csv', 'a', encoding='utf-8') as f:
+                            for line in new_data:
+                                f.write(line + '\n')
+                        print(f"   ✅ 3D：新增 {new_count} 条")
+                    else:
+                        print(f"   ✅ 3D：已是最新")
+            except Exception as e:
+                print(f"   ⚠️ 3D更新失败：{e}")
         
         # ===== 2. 计算期号 =====
         def calculate_period():
