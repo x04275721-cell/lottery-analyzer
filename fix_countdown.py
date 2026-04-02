@@ -41,9 +41,9 @@ old_js = '''function updateCountdown() {
 new_js = '''function updateCountdown() {
             const now = new Date();
             
-            // 排列三倒计时
+            // 排列三（体彩）倒计时 - 21:25开奖
             let pl3Target = new Date();
-            pl3Target.setHours(21, 15, 0, 0);
+            pl3Target.setHours(21, 25, 0, 0);
             if (now > pl3Target) pl3Target.setDate(pl3Target.getDate() + 1);
             
             let pl3Diff = pl3Target - now;
@@ -56,11 +56,20 @@ new_js = '''function updateCountdown() {
                 pl3Minutes.toString().padStart(2,'0') + ':' +
                 pl3Seconds.toString().padStart(2,'0');
             
-            // 3D倒计时（同时开奖）
+            // 3D（福彩）倒计时 - 21:15开奖
+            let fc3dTarget = new Date();
+            fc3dTarget.setHours(21, 15, 0, 0);
+            if (now > fc3dTarget) fc3dTarget.setDate(fc3dTarget.getDate() + 1);
+            
+            let fc3dDiff = fc3dTarget - now;
+            let fc3dHours = Math.floor(fc3dDiff / 3600000);
+            let fc3dMinutes = Math.floor((fc3dDiff % 3600000) / 60000);
+            let fc3dSeconds = Math.floor((fc3dDiff % 60000) / 1000);
+            
             document.getElementById('fc3dCountdown').textContent = 
-                pl3Hours.toString().padStart(2,'0') + ':' +
-                pl3Minutes.toString().padStart(2,'0') + ':' +
-                pl3Seconds.toString().padStart(2,'0');
+                fc3dHours.toString().padStart(2,'0') + ':' +
+                fc3dMinutes.toString().padStart(2,'0') + ':' +
+                fc3dSeconds.toString().padStart(2,'0');
         }'''
 
 content = content.replace(old_js, new_js)
