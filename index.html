@@ -4,6 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta name="description" content="彩票智能分析系统 - 排列三、福彩3D每日自动分析推荐，基于马尔可夫链和历史数据统计">
+    <meta name="keywords" content="彩票,排列三,3D,智能分析,马尔可夫链,开奖预测">
+    <meta name="author" content="Lottery Analyzer">
+    <meta name="robots" content="index, follow">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <title>📊 今日分析 - 彩票智能分析系统</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -124,21 +129,41 @@
     </div>
 
     <script>
-        // 加载今日推荐
+        // 加载今日推荐（带缓存刷新和错误处理）
         async function loadTodayRecommendation() {
+            const loading = document.getElementById('loadingState');
+            const content = document.getElementById('mainContent');
+            
+            // 生成唯一时间戳绕过GitHub Pages缓存
+            const cacheBuster = '_t=' + Date.now() + Math.random().toString(36).substr(2, 5);
+            
             try {
-                const response = await fetch('today_result.json?t=' + Date.now());
-                if (!response.ok) throw new Error('数据加载失败');
+                const response = await fetch('today_result.json?' + cacheBuster);
+                if (!response.ok) throw new Error('HTTP ' + response.status);
                 
                 const data = await response.json();
-                console.log('数据加载成功:', data);
+                console.log('✅ 数据加载成功:', data);
+                
+                // 显示内容，隐藏加载
+                if (loading) loading.style.display = 'none';
+                if (content) content.style.display = 'block';
+                
                 renderRecommendation(data);
                 updateStatus(data.generated_at);
                 
             } catch (error) {
-                console.error('加载失败:', error);
-                showError('pl3Container', '数据加载失败，请稍后刷新');
-                showError('fc3dContainer', '数据加载失败，请稍后刷新');
+                console.error('❌ 加载失败:', error);
+                // 显示友好错误
+                if (loading) {
+                    loading.innerHTML = `
+                        <div style="text-align:center;padding:30px;">
+                            <div style="font-size:3em;margin-bottom:15px;">😵</div>
+                            <div style="color:#f87171;margin-bottom:10px;">数据加载失败</div>
+                            <div style="color:rgba(255,255,255,0.6);font-size:0.9em;">请检查网络后刷新页面</div>
+                            <button onclick="location.reload()" style="margin-top:15px;padding:10px 25px;background:linear-gradient(135deg,#667eea,#764ba2);border:none;border-radius:8px;color:white;cursor:pointer;">🔄 刷新</button>
+                        </div>
+                    `;
+                }
             }
         }
 
