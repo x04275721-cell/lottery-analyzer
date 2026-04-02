@@ -8,500 +8,337 @@
     <meta name="keywords" content="彩票,排列三,3D,历史记录,回溯追踪">
     <meta name="robots" content="index, follow">
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
-    <title>📈 回溯系统 - 彩票智能分析</title>
+    <title>📈 历史追踪 - 彩票智能分析</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); min-height: 100vh; color: #fff; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            color: #fff;
+        }
         .container { max-width: 900px; margin: 0 auto; padding: 15px; }
-        h1 { text-align: center; font-size: 1.6em; margin-bottom: 10px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        
+        h1 { text-align: center; font-size: 1.5em; margin-bottom: 5px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .subtitle { text-align: center; color: rgba(255,255,255,0.7); margin-bottom: 15px; font-size: 0.8em; }
         
         /* 导航 */
         .nav-menu { display: flex; gap: 8px; margin-bottom: 15px; justify-content: center; flex-wrap: wrap; }
         .nav-item { padding: 8px 15px; background: rgba(255,255,255,0.1); border-radius: 15px; color: white; text-decoration: none; font-size: 0.85em; transition: all 0.3s; }
         .nav-item:hover, .nav-item.active { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
         
-        /* 卡片 */
-        .card { background: rgba(255,255,255,0.05); border-radius: 12px; padding: 15px; margin-bottom: 15px; }
-        .card-title { font-size: 1em; margin-bottom: 12px; color: #667eea; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 8px; }
-        
-        /* 当前推荐状态卡片 */
-        .current-card { 
-            background: linear-gradient(135deg, rgba(102,126,234,0.1) 0%, rgba(118,75,162,0.1) 100%);
-            border: 2px solid #667eea;
-            border-radius: 15px;
-            padding: 15px;
+        /* 统计卡片 */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
             margin-bottom: 15px;
-            position: relative;
-            overflow: hidden;
         }
-        .current-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: linear-gradient(90deg, #667eea, #764ba2, #667eea);
-            background-size: 200% 100%;
-            animation: shimmer 2s infinite;
-        }
-        @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
-        
-        .current-card.recommended { border-color: #4ade80; }
-        .current-card.recommended::before { background: linear-gradient(90deg, #4ade80, #22c55e, #4ade80); }
-        
-        .current-card.completed { border-color: #fbbf24; }
-        .current-card.completed::before { background: linear-gradient(90deg, #fbbf24, #f59e0b, #fbbf24); }
-        
-        /* 状态标签 */
-        .status-badge { 
-            display: inline-block;
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-size: 0.85em;
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
-        .status-pending { background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.6); }
-        .status-active { background: rgba(74,222,128,0.3); color: #4ade80; animation: pulse 2s infinite; }
-        .status-completed { background: rgba(251,191,36,0.3); color: #fbbf24; }
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
-        
-        /* 倒计时 */
-        .countdown { font-size: 1.5em; text-align: center; color: #667eea; margin: 15px 0; }
-        .countdown-label { font-size: 0.85em; color: rgba(255,255,255,0.6); margin-bottom: 5px; }
-        
-        /* 进度条 */
-        .progress-container { margin: 15px 0; }
-        .progress-label { display: flex; justify-content: space-between; font-size: 0.75em; color: rgba(255,255,255,0.5); margin-bottom: 5px; }
-        .progress-bar { height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden; }
-        .progress-fill { height: 100%; background: linear-gradient(90deg, #667eea, #764ba2); transition: width 1s; }
-        
-        /* 号码显示 */
-        .number-display { display: flex; gap: 5px; justify-content: center; margin: 10px 0; }
-        .number-ball { width: 35px; height: 35px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.1em; }
-        .number-ball.placeholder { background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.3); }
-        .number-ball.selected { background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: #000; transform: scale(1.1); }
-        
-        /* 彩种卡片 */
-        .game-card { 
+        .stat-card {
             background: rgba(255,255,255,0.05);
             border-radius: 10px;
             padding: 12px;
-            margin: 10px 0;
+            text-align: center;
         }
-        .game-title { font-size: 0.95em; font-weight: bold; margin-bottom: 8px; }
-        .game-numbers { font-size: 1.2em; text-align: center; padding: 8px; }
-        .game-numbers.pending { color: rgba(255,255,255,0.3); }
-        .game-numbers.active { color: #ef4444; }
-        .game-numbers.completed { color: #fbbf24; }
+        .stat-value { font-size: 1.3em; font-weight: bold; }
+        .stat-value.hit { color: #4ade80; }
+        .stat-value.miss { color: #f87171; }
+        .stat-value.neutral { color: #667eea; }
+        .stat-label { font-size: 0.7em; color: rgba(255,255,255,0.6); margin-top: 3px; }
         
-        /* 历史记录表格 */
-        .history-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        .history-table th, .history-table td { padding: 10px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); }
-        .history-table th { background: rgba(102,126,234,0.2); color: #667eea; font-size: 0.85em; }
-        .history-table td { font-size: 0.85em; }
-        
-        /* 状态标签 */
-        .result-tag { padding: 3px 10px; border-radius: 12px; font-size: 0.75em; font-weight: bold; }
-        .result-hit { background: rgba(74,222,128,0.3); color: #4ade80; }
-        .result-miss { background: rgba(248,113,113,0.3); color: #f87171; }
-        .result-pending { background: rgba(251,191,36,0.3); color: #fbbf24; }
-        
-        /* 统计卡片 */
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); gap: 10px; margin: 10px 0; }
-        .stat-box { background: rgba(255,255,255,0.1); padding: 10px; border-radius: 8px; text-align: center; }
-        .stat-label { font-size: 0.7em; color: rgba(255,255,255,0.5); margin-bottom: 5px; }
-        .stat-value { font-size: 1.2em; font-weight: bold; color: #667eea; }
-        .stat-value.green { color: #4ade80; }
-        .stat-value.red { color: #f87171; }
-        
-        /* 操作按钮 */
-        .action-btn { 
-            display: inline-block;
-            padding: 8px 20px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+        /* 筛选 */
+        .filter-bar {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        .filter-btn {
+            padding: 8px 15px;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid transparent;
             border-radius: 20px;
-            text-decoration: none;
+            color: white;
             font-size: 0.85em;
-            margin-top: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
         }
+        .filter-btn.active {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.3);
+        }
+        .filter-btn:hover { background: rgba(255,255,255,0.15); }
+        
+        /* 历史列表 */
+        .history-list { display: flex; flex-direction: column; gap: 10px; }
+        .history-card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            padding: 15px;
+            border-left: 4px solid #667eea;
+            transition: all 0.2s;
+        }
+        .history-card:hover { background: rgba(255,255,255,0.08); }
+        .history-card.hit { border-left-color: #4ade80; background: rgba(74, 222, 128, 0.1); }
+        .history-card.miss { border-left-color: #f87171; }
+        
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .history-period {
+            font-weight: bold;
+            color: #667eea;
+        }
+        .history-date { font-size: 0.8em; color: rgba(255,255,255,0.6); }
+        
+        .history-status {
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+        .status-hit { background: rgba(74, 222, 128, 0.3); color: #4ade80; }
+        .status-miss { background: rgba(248, 113, 113, 0.3); color: #f87171; }
+        .status-pending { background: rgba(251, 191, 36, 0.3); color: #fbbf24; }
+        
+        .history-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .history-numbers { display: flex; gap: 15px; }
+        .history-game { font-size: 0.85em; }
+        .history-game-label { color: rgba(255,255,255,0.6); margin-bottom: 3px; }
+        .history-num-display {
+            display: flex;
+            gap: 5px;
+            align-items: center;
+        }
+        .num-ball {
+            width: 28px;
+            height: 28px;
+            background: rgba(102, 126, 234, 0.3);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9em;
+        }
+        .num-arrow { color: rgba(255,255,255,0.5); }
+        .result-ball { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .result-ball.hit { background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%); }
+        
+        /* 空状态 */
+        .empty-state {
+            text-align: center;
+            padding: 50px 20px;
+            color: rgba(255,255,255,0.5);
+        }
+        .empty-icon { font-size: 4em; margin-bottom: 15px; }
+        
+        /* 刷新按钮 */
+        .refresh-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            padding: 12px;
+            background: rgba(255,255,255,0.1);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-size: 0.95em;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 15px;
+        }
+        .refresh-btn:hover { background: rgba(255,255,255,0.15); }
         
         /* 页脚 */
-        .footer { text-align: center; color: rgba(255,255,255,0.5); font-size: 0.75em; margin-top: 20px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); }
+        .footer { text-align: center; color: rgba(255,255,255,0.5); font-size: 0.8em; margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); }
         
-        /* 加载状态 */
-        .loading { text-align: center; padding: 20px; color: rgba(255,255,255,0.5); }
-        .loading-spinner { display: inline-block; width: 25px; height: 25px; border: 3px solid rgba(255,255,255,0.1); border-top-color: #667eea; border-radius: 50%; animation: spin 1s linear infinite; }
-        @keyframes spin { to { transform: rotate(360deg); } }
+        /* 移动端 */
+        @media (max-width: 600px) {
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .history-content { flex-direction: column; align-items: flex-start; }
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>📈 智能回溯系统</h1>
-
+        <h1>📈 历史追踪</h1>
+        <div class="subtitle">查看往期推荐与开奖结果对比</div>
+        
         <!-- 导航 -->
         <div class="nav-menu">
             <a href="index.html" class="nav-item">📊 今日分析</a>
-            <a href="tracking.html" class="nav-item active">📈 回溯系统</a>
+            <a href="tracking.html" class="nav-item active">📈 历史追踪</a>
             <a href="automation.html" class="nav-item">🤖 自动生成</a>
+            <a href="generator.html" class="nav-item">🎲 生成器</a>
         </div>
-
-        <!-- ========== 当前推荐状态 ========== -->
-        <div class="card">
-            <div class="card-title">📍 当前推荐状态 <span style="font-size:0.8em;color:rgba(255,255,255,0.5);">| 实时更新</span></div>
-            <div id="currentRecommendation">
-                <div class="loading"><div class="loading-spinner"></div></div>
+        
+        <!-- 刷新 -->
+        <button class="refresh-btn" onclick="loadHistory()">🔄 刷新历史记录</button>
+        
+        <!-- 统计 -->
+        <div class="stats-grid" id="statsGrid">
+            <div class="stat-card">
+                <div class="stat-value neutral" id="totalCount">--</div>
+                <div class="stat-label">总期数</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value hit" id="hitCount">--</div>
+                <div class="stat-label">命中</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value miss" id="missCount">--</div>
+                <div class="stat-label">未中</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value neutral" id="hitRate">--%</div>
+                <div class="stat-label">命中率</div>
             </div>
         </div>
-
-        <!-- ========== 今日时间进度 ========== -->
-        <div class="card">
-            <div class="card-title">⏰ 今日时间进度</div>
-            <div class="progress-container">
-                <div class="progress-label">
-                    <span>00:00</span>
-                    <span id="currentTime">--:--</span>
-                    <span>24:00</span>
-                </div>
-                <div class="progress-bar">
-                    <div class="progress-fill" id="dayProgress" style="width: 0%;"></div>
-                </div>
-                <div class="progress-label" style="margin-top: 8px;">
-                    <span>09:00 生成推荐</span>
-                    <span>22:00 开奖更新</span>
-                </div>
+        
+        <!-- 筛选 -->
+        <div class="filter-bar">
+            <button class="filter-btn active" onclick="filterHistory('all')">全部</button>
+            <button class="filter-btn" onclick="filterHistory('hit')">仅看命中</button>
+            <button class="filter-btn" onclick="filterHistory('miss')">仅看未中</button>
+            <button class="filter-btn" onclick="filterHistory('pl3')">排列三</button>
+            <button class="filter-btn" onclick="filterHistory('fc3d')">3D</button>
+        </div>
+        
+        <!-- 历史列表 -->
+        <div class="history-list" id="historyList">
+            <div class="empty-state">
+                <div class="empty-icon">📭</div>
+                <div>暂无历史记录</div>
+                <div style="font-size:0.85em;margin-top:5px;">开奖后将自动记录</div>
             </div>
         </div>
-
-        <!-- ========== 战绩统计 ========== -->
-        <div class="card">
-            <div class="card-title">📊 累计战绩统计</div>
-            <div id="statsContainer">
-                <div class="stats-grid">
-                    <div class="stat-box">
-                        <div class="stat-label">总期数</div>
-                        <div class="stat-value" id="totalCount">0</div>
-                    </div>
-                    <div class="stat-box">
-                        <div class="stat-label">直中</div>
-                        <div class="stat-value green" id="directHits">0</div>
-                    </div>
-                    <div class="stat-box">
-                        <div class="stat-label">组中</div>
-                        <div class="stat-value green" id="groupHits">0</div>
-                    </div>
-                    <div class="stat-box">
-                        <div class="stat-label">命中率</div>
-                        <div class="stat-value" id="hitRate">0%</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- ========== 历史推荐记录 ========== -->
-        <div class="card">
-            <div class="card-title">📜 历史推荐记录</div>
-            <div id="historyContainer">
-                <div class="loading"><div class="loading-spinner"></div></div>
-            </div>
-        </div>
-
+        
         <div class="footer">
-            ⚠️ 彩票有风险，投注需谨慎 | 系统每天09:00生成推荐，22:00更新结果
+            ⚠️ 彩票有风险，投注需谨慎！<br>
+            本系统仅供学习研究，不构成投注建议
         </div>
     </div>
-
+    
     <script>
-        // ========== 时间和状态管理 ==========
-        let now = new Date();
-        let hour = now.getHours();
-        let todayData = null;
-        let historyData = [];
-
-        // 更新时间进度
-        function updateTimeProgress() {
-            now = new Date();
-            hour = now.getHours();
-            const minute = now.getMinutes();
+        let allHistory = [];
+        let currentFilter = 'all';
+        
+        // ===== 加载历史 =====
+        async function loadHistory() {
+            const list = document.getElementById('historyList');
+            list.innerHTML = '<div class="empty-state"><div class="empty-icon">⏳</div><div>加载中...</div></div>';
             
-            // 更新当前时间
-            document.getElementById('currentTime').textContent = 
-                `${String(hour).padStart(2,'0')}:${String(minute).padStart(2,'0')}`;
-            
-            // 更新进度条
-            const progress = ((hour * 60 + minute) / (24 * 60)) * 100;
-            document.getElementById('dayProgress').style.width = `${progress}%`;
-        }
-
-        // 获取推荐状态
-        function getRecommendationStatus() {
-            if (hour < 9) {
-                return {
-                    status: 'pending',
-                    label: '⏳ 待生成推荐',
-                    countdown: getCountdownToTime(9, 0),
-                    message: '今日推荐将于09:00生成'
-                };
-            } else if (hour < 22) {
-                return {
-                    status: 'active',
-                    label: '✅ 已生成推荐',
-                    message: '推荐已生成，等待开奖',
-                    drawMessage: '开奖结果：待开奖'
-                };
-            } else {
-                return {
-                    status: 'completed',
-                    label: '🎯 已开奖',
-                    message: '今日开奖已完成'
-                };
-            }
-        }
-
-        // 计算倒计时
-        function getCountdownToTime(targetHour, targetMin) {
-            const target = new Date(now);
-            target.setHours(targetHour, targetMin, 0, 0);
-            if (target <= now) target.setDate(target.getDate() + 1);
-            
-            const diff = target - now;
-            const hours = Math.floor(diff / (1000 * 60 * 60));
-            const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-            
-            return `${hours}小时${mins}分钟`;
-        }
-
-        // ========== 数据加载 ==========
-        async function loadAllData() {
-            await loadTodayRecommendation();
-            await loadHistoryData();
-            updateStats();
-        }
-
-        async function loadTodayRecommendation() {
             try {
-                const response = await fetch('today_result.json?t=' + Date.now());
-                if (response.ok) {
-                    todayData = await response.json();
-                }
-            } catch (e) {
-                console.log('今日推荐未生成');
-            }
-            renderCurrentRecommendation();
-        }
-
-        async function loadHistoryData() {
-            try {
-                const response = await fetch('history_records.json?t=' + Date.now());
-                if (response.ok) {
-                    historyData = await response.json();
-                }
-            } catch (e) {
-                historyData = [];
-            }
-            renderHistoryTable();
-        }
-
-        // ========== 渲染当前推荐 ==========
-        function renderCurrentRecommendation() {
-            const container = document.getElementById('currentRecommendation');
-            const status = getRecommendationStatus();
-            
-            let html = `
-                <div class="current-card ${status.status}">
-                    <div class="status-badge status-${status.status}">${status.label}</div>
-            `;
-            
-            if (status.status === 'pending') {
-                // 待生成状态
-                html += `
-                    <div class="countdown-label">距离生成推荐还有</div>
-                    <div class="countdown">${status.countdown}</div>
-                    <div style="text-align:center; color:rgba(255,255,255,0.5); font-size:0.85em;">${status.message}</div>
-                    
-                    <div class="game-card">
-                        <div class="game-title">🎯 排列三</div>
-                        <div class="game-numbers pending">— — —</div>
-                    </div>
-                    <div class="game-card">
-                        <div class="game-title">🎯 福彩3D</div>
-                        <div class="game-numbers pending">— — —</div>
-                    </div>
-                `;
-            } else if (status.status === 'active' && todayData) {
-                // 已生成推荐，待开奖
-                html += `
-                    <div style="text-align:center; margin-bottom:15px;">
-                        <span style="color:rgba(255,255,255,0.6); font-size:0.85em;">${status.message}</span>
-                    </div>
-                    
-                    <div class="game-card" style="border-left:3px solid #ef4444;">
-                        <div class="game-title">🎯 排列三 精选推荐</div>
-                        <div class="game-numbers active">
-                            ${renderNumberBalls(todayData.pl3?.selected_2 || ['---'])}
-                        </div>
-                        <div style="text-align:center; color:#fbbf24; font-size:0.85em; margin-top:8px;">
-                            ${status.drawMessage}
-                        </div>
-                    </div>
-                    
-                    <div class="game-card" style="border-left:3px solid #ef4444;">
-                        <div class="game-title">🎯 福彩3D 精选推荐</div>
-                        <div class="game-numbers active">
-                            ${renderNumberBalls(todayData.fc3d?.selected_2 || ['---'])}
-                        </div>
-                        <div style="text-align:center; color:#fbbf24; font-size:0.85em; margin-top:8px;">
-                            ${status.drawMessage}
-                        </div>
-                    </div>
-                    
-                    <div style="text-align:center; margin-top:15px;">
-                        <a href="index.html" class="action-btn">查看完整推荐 →</a>
-                    </div>
-                `;
-            } else if (status.status === 'completed' && todayData) {
-                // 已开奖
-                const pl3Result = historyData.find(r => r.game === '排列三' && r.period === todayData.period);
-                const fc3dResult = historyData.find(r => r.game === '福彩3D' && r.period === todayData.period);
+                const response = await fetch('history_records.json?_t=' + Date.now());
+                if (!response.ok) throw new Error('加载失败');
                 
-                html += `
-                    <div style="text-align:center; margin-bottom:15px;">
-                        <span style="color:rgba(255,255,255,0.6); font-size:0.85em;">${status.message}</span>
-                    </div>
-                    
-                    <div class="game-card" style="border-left:3px solid ${pl3Result?.status === '未中' ? '#f87171' : '#4ade80'};">
-                        <div class="game-title">🎯 排列三</div>
-                        <div style="display:flex; justify-content:space-around; align-items:center;">
-                            <div>
-                                <div style="font-size:0.75em; color:rgba(255,255,255,0.5);">推荐</div>
-                                <div class="game-numbers active">${(todayData.pl3?.selected_2 || ['--']).join(', ')}</div>
-                            </div>
-                            <div style="font-size:1.5em;">→</div>
-                            <div>
-                                <div style="font-size:0.75em; color:rgba(255,255,255,0.5);">开奖</div>
-                                <div class="game-numbers completed">${renderNumberBallsFromStr(pl3Result?.result || '---')}</div>
-                            </div>
-                        </div>
-                        <div style="text-align:center; margin-top:10px;">
-                            <span class="result-tag ${pl3Result?.status === '未中' ? 'result-miss' : 'result-hit'}">${pl3Result?.status || '待定'}</span>
-                        </div>
-                    </div>
-                    
-                    <div class="game-card" style="border-left:3px solid ${fc3dResult?.status === '未中' ? '#f87171' : '#4ade80'};">
-                        <div class="game-title">🎯 福彩3D</div>
-                        <div style="display:flex; justify-content:space-around; align-items:center;">
-                            <div>
-                                <div style="font-size:0.75em; color:rgba(255,255,255,0.5);">推荐</div>
-                                <div class="game-numbers active">${(todayData.fc3d?.selected_2 || ['--']).join(', ')}</div>
-                            </div>
-                            <div style="font-size:1.5em;">→</div>
-                            <div>
-                                <div style="font-size:0.75em; color:rgba(255,255,255,0.5);">开奖</div>
-                                <div class="game-numbers completed">${renderNumberBallsFromStr(fc3dResult?.result || '---')}</div>
-                            </div>
-                        </div>
-                        <div style="text-align:center; margin-top:10px;">
-                            <span class="result-tag ${fc3dResult?.status === '未中' ? 'result-miss' : 'result-hit'}">${fc3dResult?.status || '待定'}</span>
-                        </div>
-                    </div>
-                `;
+                allHistory = await response.json();
+                updateStats();
+                renderHistory();
+            } catch (error) {
+                console.error('加载失败:', error);
+                list.innerHTML = '<div class="empty-state"><div class="empty-icon">❌</div><div>加载失败</div></div>';
+            }
+        }
+        
+        // ===== 更新统计 =====
+        function updateStats() {
+            const total = allHistory.length;
+            const hits = allHistory.filter(h => h.status === '直中' || h.status === '组中').length;
+            const misses = allHistory.filter(h => h.status === '未中').length;
+            const rate = total > 0 ? ((hits / total) * 100).toFixed(1) : 0;
+            
+            document.getElementById('totalCount').textContent = total;
+            document.getElementById('hitCount').textContent = hits;
+            document.getElementById('missCount').textContent = misses;
+            document.getElementById('hitRate').textContent = rate + '%';
+        }
+        
+        // ===== 筛选 =====
+        function filterHistory(filter) {
+            currentFilter = filter;
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            renderHistory();
+        }
+        
+        // ===== 渲染历史 =====
+        function renderHistory() {
+            const list = document.getElementById('historyList');
+            
+            let filtered = allHistory;
+            if (currentFilter === 'hit') {
+                filtered = allHistory.filter(h => h.status === '直中' || h.status === '组中');
+            } else if (currentFilter === 'miss') {
+                filtered = allHistory.filter(h => h.status === '未中');
+            } else if (currentFilter === 'pl3') {
+                filtered = allHistory.filter(h => h.game === '排列三');
+            } else if (currentFilter === 'fc3d') {
+                filtered = allHistory.filter(h => h.game === '3D');
             }
             
-            html += '</div>';
-            container.innerHTML = html;
-        }
-
-        // 渲染号码球
-        function renderNumberBalls(numbers) {
-            if (!numbers || numbers.length === 0) return '— — —';
-            return numbers.map(num => {
-                const balls = num.split('').map(n => `<span class="number-ball selected">${n}</span>`).join('');
-                return `<div class="number-display">${balls}</div>`;
-            }).join('');
-        }
-
-        function renderNumberBallsFromStr(str) {
-            if (!str || str === '---') return '— — —';
-            return str.split('').map(n => `<span class="number-ball">${n}</span>`).join('');
-        }
-
-        // ========== 渲染历史表格 ==========
-        function renderHistoryTable() {
-            const container = document.getElementById('historyContainer');
-            
-            if (!historyData || historyData.length === 0) {
-                container.innerHTML = '<div style="text-align:center; color:rgba(255,255,255,0.5); padding:20px;">暂无历史记录</div>';
+            if (filtered.length === 0) {
+                list.innerHTML = '<div class="empty-state"><div class="empty-icon">📭</div><div>暂无符合条件的记录</div></div>';
                 return;
             }
             
-            // 按日期倒序排列
-            const sorted = [...historyData].reverse();
-            
-            let html = `
-                <table class="history-table">
-                    <thead>
-                        <tr>
-                            <th>日期</th>
-                            <th>期号</th>
-                            <th>彩种</th>
-                            <th>推荐号码</th>
-                            <th>开奖结果</th>
-                            <th>状态</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-            `;
-            
-            sorted.forEach(item => {
-                const statusClass = item.status === '直中' ? 'result-hit' : 
-                                   item.status === '组中' ? 'result-hit' : 
-                                   item.status === '未中' ? 'result-miss' : 'result-pending';
-                
-                html += `
-                    <tr>
-                        <td>${item.date || '-'}</td>
-                        <td>${item.period || '-'}</td>
-                        <td>${item.game || '-'}</td>
-                        <td style="color:#4ade80; font-weight:bold;">${item.recommendation || item.rec || '-'}</td>
-                        <td>${renderNumberBallsFromStr(item.result || '---')}</td>
-                        <td><span class="result-tag ${statusClass}">${item.status || '待定'}</span></td>
-                    </tr>
-                `;
+            // 按日期倒序
+            filtered.sort((a, b) => {
+                const dateA = new Date(a.date + 'T00:00:00');
+                const dateB = new Date(b.date + 'T00:00:00');
+                return dateB - dateA;
             });
             
-            html += '</tbody></table>';
-            container.innerHTML = html;
+            list.innerHTML = filtered.map(h => {
+                const isHit = h.status === '直中' || h.status === '组中';
+                const cardClass = h.status === '待开奖' ? '' : (isHit ? 'hit' : 'miss');
+                const statusClass = h.status === '待开奖' ? 'status-pending' : (isHit ? 'status-hit' : 'status-miss');
+                const resultClass = isHit ? 'hit' : '';
+                
+                return `
+                    <div class="history-card ${cardClass}">
+                        <div class="history-header">
+                            <div>
+                                <div class="history-period">第${h.period}期 · ${h.game}</div>
+                                <div class="history-date">${h.date}</div>
+                            </div>
+                            <div class="history-status ${statusClass}">${h.status}</div>
+                        </div>
+                        <div class="history-content">
+                            <div class="history-numbers">
+                                <div class="history-game">
+                                    <div class="history-game-label">推荐</div>
+                                    <div class="history-num-display">
+                                        ${h.recommendation.split(',').map(n => `<div class="num-ball">${n}</div>`).join('')}
+                                    </div>
+                                </div>
+                                <div class="num-arrow">→</div>
+                                <div class="history-game">
+                                    <div class="history-game-label">开奖</div>
+                                    <div class="history-num-display">
+                                        ${h.result.split('').map(n => `<div class="num-ball result-ball ${resultClass}">${n}</div>`).join('')}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
         }
-
-        // ========== 更新统计 ==========
-        function updateStats() {
-            const total = historyData.length;
-            const directHits = historyData.filter(r => r.status === '直中').length;
-            const groupHits = historyData.filter(r => r.status === '组中').length;
-            const hitRate = total > 0 ? ((directHits + groupHits) / total * 100).toFixed(1) : 0;
-            
-            document.getElementById('totalCount').textContent = total;
-            document.getElementById('directHits').textContent = directHits;
-            document.getElementById('groupHits').textContent = groupHits;
-            
-            const rateEl = document.getElementById('hitRate');
-            rateEl.textContent = hitRate + '%';
-            rateEl.className = 'stat-value ' + (hitRate >= 30 ? 'green' : hitRate >= 15 ? '' : 'red');
-        }
-
-        // ========== 初始化 ==========
-        document.addEventListener('DOMContentLoaded', async function() {
-            updateTimeProgress();
-            await loadAllData();
-            
-            // 每分钟更新时间
-            setInterval(updateTimeProgress, 60000);
-            
-            // 每5分钟刷新数据
-            setInterval(loadAllData, 300000);
-        });
+        
+        // ===== 初始化 =====
+        document.addEventListener('DOMContentLoaded', loadHistory);
     </script>
 </body>
 </html>
