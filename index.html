@@ -399,12 +399,19 @@
         function renderContent(data) {
             const content = document.getElementById('mainContent');
             
-            const pl3Nums = data.pl3?.selected_2 || [];
-            const fc3dNums = data.fc3d?.selected_2 || [];
-            const pl3Base = data.pl3?.base_10 || [];
-            const fc3dBase = data.fc3d?.base_10 || [];
-            const pl3Sums = data.pl3?.key_sum || [];
-            const fc3dSums = data.fc3d?.key_sum || [];
+            const pl3 = data.pl3 || {};
+            const fc3d = data.fc3d || {};
+            
+            const pl3Nums = pl3.selected_2 || [];
+            const fc3dNums = fc3d.selected_2 || [];
+            const pl3Base = pl3.base_5 || [];
+            const fc3dBase = fc3d.base_5 || [];
+            const pl3Sums = pl3.key_sum || [];
+            const fc3dSums = fc3d.key_sum || [];
+            const pl3Danma = pl3.danma || [];
+            const fc3dDanma = fc3d.danma || [];
+            const pl3Double = pl3.double_dan || [];
+            const fc3dDouble = fc3d.double_dan || [];
             
             content.innerHTML = `
                 <!-- 排列三 -->
@@ -417,7 +424,17 @@
                         <div class="rec-detail">重点和值：${pl3Sums.join(', ')}</div>
                     </div>
                     
-                    <div style="font-size:0.85em;color:rgba(255,255,255,0.6);margin-bottom:8px;">基础10注（点击复制）</div>
+                    <div style="background:rgba(251,191,36,0.1);border-radius:10px;padding:12px;margin:10px 0;">
+                        <div style="color:#fbbf24;font-weight:bold;margin-bottom:8px;">🔥 胆码推荐</div>
+                        <div style="display:flex;justify-content:space-around;text-align:center;">
+                            <div><div style="color:rgba(255,255,255,0.6);font-size:0.8em;">百位</div><div style="font-size:1.3em;font-weight:bold;">${pl3Danma[0]?.join('') || '---'}</div></div>
+                            <div><div style="color:rgba(255,255,255,0.6);font-size:0.8em;">十位</div><div style="font-size:1.3em;font-weight:bold;">${pl3Danma[1]?.join('') || '---'}</div></div>
+                            <div><div style="color:rgba(255,255,255,0.6);font-size:0.8em;">个位</div><div style="font-size:1.3em;font-weight:bold;">${pl3Danma[2]?.join('') || '---'}</div></div>
+                        </div>
+                        <div style="margin-top:8px;font-size:0.85em;">双胆：${pl3Double.join(' ')}</div>
+                    </div>
+                    
+                    <div style="font-size:0.85em;color:rgba(255,255,255,0.6);margin-bottom:8px;">精选5注（点击复制）</div>
                     <div class="base-grid">
                         ${pl3Base.map(n => `<div class="base-item" onclick="copyNumber(this, '${n}')">${n}</div>`).join('')}
                     </div>
@@ -433,7 +450,17 @@
                         <div class="rec-detail">重点和值：${fc3dSums.join(', ')}</div>
                     </div>
                     
-                    <div style="font-size:0.85em;color:rgba(255,255,255,0.6);margin-bottom:8px;">基础10注（点击复制）</div>
+                    <div style="background:rgba(251,191,36,0.1);border-radius:10px;padding:12px;margin:10px 0;">
+                        <div style="color:#fbbf24;font-weight:bold;margin-bottom:8px;">🔥 胆码推荐</div>
+                        <div style="display:flex;justify-content:space-around;text-align:center;">
+                            <div><div style="color:rgba(255,255,255,0.6);font-size:0.8em;">百位</div><div style="font-size:1.3em;font-weight:bold;">${fc3dDanma[0]?.join('') || '---'}</div></div>
+                            <div><div style="color:rgba(255,255,255,0.6);font-size:0.8em;">十位</div><div style="font-size:1.3em;font-weight:bold;">${fc3dDanma[1]?.join('') || '---'}</div></div>
+                            <div><div style="color:rgba(255,255,255,0.6);font-size:0.8em;">个位</div><div style="font-size:1.3em;font-weight:bold;">${fc3dDanma[2]?.join('') || '---'}</div></div>
+                        </div>
+                        <div style="margin-top:8px;font-size:0.85em;">双胆：${fc3dDouble.join(' ')}</div>
+                    </div>
+                    
+                    <div style="font-size:0.85em;color:rgba(255,255,255,0.6);margin-bottom:8px;">精选5注（点击复制）</div>
                     <div class="base-grid">
                         ${fc3dBase.map(n => `<div class="base-item" onclick="copyNumber(this, '${n}')">${n}</div>`).join('')}
                     </div>
