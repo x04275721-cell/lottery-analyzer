@@ -1,0 +1,18 @@
+{
+  "pl3": {
+    "name": "排列三",
+    "total": 5000,
+    "full_hit": 658,
+    "full_hit_rate": 13.16,
+    "at_least_2": 42.66,
+    "at_least_1": 87.18
+  },
+  "d3": {
+    "name": "3D",
+    "total": 5000,
+    "full_hit": 595,
+    "full_hit_rate": 11.899999999999999,
+    "at_least_2": 40.739999999999995,
+    "at_least_1": 86.98
+  }
+}
