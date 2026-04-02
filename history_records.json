@@ -1,18 +1,36 @@
-[
-  {
-    "date": "2026-04-01",
-    "period": "2026081",
-    "game": "排列三",
-    "recommendation": "715,170",
-    "result": "690",
-    "status": "未中"
-  },
-  {
-    "date": "2026-04-01",
-    "period": "2026081",
-    "game": "3D",
-    "recommendation": "234,583",
-    "result": "827",
-    "status": "未中"
-  }
-]
+{
+  "pl3": [
+    {
+      "period": "202692",
+      "date": "2026-04-02",
+      "last_draw": "690",
+      "recommend": [
+        "886",
+        "881",
+        "688",
+        "286",
+        "281"
+      ],
+      "hit": "miss",
+      "gold_dan": "8",
+      "silver_dan": "2"
+    }
+  ],
+  "fc3d": [
+    {
+      "period": "202692",
+      "date": "2026-04-02",
+      "last_draw": "827",
+      "recommend": [
+        "875",
+        "975",
+        "873",
+        "973",
+        "971"
+      ],
+      "hit": "partial",
+      "gold_dan": "7",
+      "silver_dan": "8"
+    }
+  ]
+}

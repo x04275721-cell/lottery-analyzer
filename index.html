@@ -17,11 +17,7 @@
             --text-muted: #94a3b8;
         }
         
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -29,12 +25,10 @@
             color: var(--text);
             min-height: 100vh;
             padding: 20px;
+            padding-bottom: 80px;
         }
         
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
-        }
+        .container { max-width: 600px; margin: 0 auto; }
         
         header {
             text-align: center;
@@ -54,10 +48,7 @@
             color: var(--text-muted);
         }
         
-        .countdown span {
-            color: var(--secondary);
-            font-weight: bold;
-        }
+        .countdown span { color: var(--secondary); font-weight: bold; }
         
         .tabs {
             display: flex;
@@ -77,10 +68,7 @@
             transition: all 0.3s;
         }
         
-        .tab.active {
-            background: var(--primary);
-            color: white;
-        }
+        .tab.active { background: var(--primary); color: white; }
         
         .card {
             background: var(--card);
@@ -123,22 +111,9 @@
             transition: transform 0.2s;
         }
         
-        .num-box:hover {
-            transform: scale(1.05);
-        }
-        
-        .num-box span {
-            font-size: 28px;
-            font-weight: bold;
-            letter-spacing: 4px;
-            color: white;
-        }
-        
-        .num-box .label {
-            font-size: 12px;
-            color: rgba(255,255,255,0.8);
-            margin-top: 4px;
-        }
+        .num-box:hover { transform: scale(1.05); }
+        .num-box span { font-size: 28px; font-weight: bold; letter-spacing: 4px; color: white; }
+        .num-box .label { font-size: 12px; color: rgba(255,255,255,0.8); margin-top: 4px; }
         
         /* 备选 */
         .backup {
@@ -157,35 +132,13 @@
             transition: all 0.2s;
         }
         
-        .backup-item:hover {
-            background: rgba(99, 102, 241, 0.2);
-            border-color: var(--primary);
-        }
-        
-        .backup-item span {
-            font-size: 20px;
-            font-weight: bold;
-            letter-spacing: 2px;
-        }
+        .backup-item:hover { background: rgba(99, 102, 241, 0.2); border-color: var(--primary); }
+        .backup-item span { font-size: 20px; font-weight: bold; letter-spacing: 2px; }
         
         /* 胆码 */
-        .danma {
-            display: flex;
-            gap: 16px;
-            margin-bottom: 16px;
-        }
-        
-        .danma-item {
-            flex: 1;
-            text-align: center;
-        }
-        
-        .danma-item .label {
-            font-size: 12px;
-            color: var(--text-muted);
-            margin-bottom: 8px;
-        }
-        
+        .danma { display: flex; gap: 16px; margin-bottom: 16px; }
+        .danma-item { flex: 1; text-align: center; }
+        .danma-item .label { font-size: 12px; color: var(--text-muted); margin-bottom: 8px; }
         .danma-item .num {
             font-size: 24px;
             font-weight: bold;
@@ -194,15 +147,8 @@
             display: inline-block;
         }
         
-        .gold {
-            background: linear-gradient(135deg, #fbbf24, #f59e0b);
-            color: #1e293b;
-        }
-        
-        .silver {
-            background: linear-gradient(135deg, #94a3b8, #64748b);
-            color: #1e293b;
-        }
+        .gold { background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #1e293b; }
+        .silver { background: linear-gradient(135deg, #94a3b8, #64748b); color: #1e293b; }
         
         .double-dan {
             text-align: center;
@@ -213,36 +159,23 @@
             color: var(--text-muted);
         }
         
-        .double-dan span {
-            color: var(--secondary);
-            font-weight: bold;
-        }
+        .double-dan span { color: var(--secondary); font-weight: bold; }
         
         /* 和值 */
-        .sum-list {
-            display: flex;
-            gap: 8px;
-        }
+        .sum-list { display: flex; gap: 8px; }
+        .sum-item { flex: 1; text-align: center; padding: 8px; background: rgba(16, 185, 129, 0.1); border-radius: 6px; font-size: 14px; }
+        .sum-item span { color: var(--success); font-weight: bold; }
         
-        .sum-item {
-            flex: 1;
-            text-align: center;
-            padding: 8px;
-            background: rgba(16, 185, 129, 0.1);
-            border-radius: 6px;
-            font-size: 14px;
-        }
-        
-        .sum-item span {
-            color: var(--success);
-            font-weight: bold;
-        }
+        /* 命中率统计 */
+        .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+        .stat-item { text-align: center; padding: 16px; background: rgba(99, 102, 241, 0.1); border-radius: 8px; }
+        .stat-item .value { font-size: 24px; font-weight: bold; color: var(--primary); }
+        .stat-item .label { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+        .stat-item.hit .value { color: var(--success); }
+        .stat-item.hit-2 .value { color: var(--secondary); }
         
         /* 历史记录 */
-        .history-list {
-            max-height: 300px;
-            overflow-y: auto;
-        }
+        .history-list { max-height: 400px; overflow-y: auto; }
         
         .history-item {
             display: flex;
@@ -250,85 +183,28 @@
             align-items: center;
             padding: 12px;
             border-bottom: 1px solid rgba(255,255,255,0.1);
-        }
-        
-        .history-item:last-child {
-            border-bottom: none;
-        }
-        
-        .history-item.hit {
-            background: rgba(16, 185, 129, 0.1);
-        }
-        
-        .history-period {
-            font-size: 14px;
-            color: var(--text-muted);
-        }
-        
-        .history-result {
-            font-size: 18px;
-            font-weight: bold;
-            letter-spacing: 4px;
-        }
-        
-        .history-hit {
-            color: var(--success);
-            font-size: 12px;
-        }
-        
-        /* 命中率统计 */
-        .stats {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
-        }
-        
-        .stat-item {
-            text-align: center;
-            padding: 16px;
-            background: rgba(99, 102, 241, 0.1);
-            border-radius: 8px;
-        }
-        
-        .stat-item .value {
-            font-size: 24px;
-            font-weight: bold;
-            color: var(--primary);
-        }
-        
-        .stat-item .label {
-            font-size: 12px;
-            color: var(--text-muted);
-            margin-top: 4px;
-        }
-        
-        /* 权重调节 */
-        .weight-sliders {
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
-        
-        .slider-item {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-        
-        .slider-header {
-            display: flex;
-            justify-content: space-between;
             font-size: 14px;
         }
         
-        .slider-name {
-            color: var(--text);
-        }
+        .history-item:last-child { border-bottom: none; }
+        .history-item.hit { background: rgba(16, 185, 129, 0.1); }
+        .history-item.partial { background: rgba(245, 158, 11, 0.1); }
         
-        .slider-value {
-            color: var(--primary);
-            font-weight: bold;
-        }
+        .history-period { color: var(--text-muted); font-size: 12px; }
+        .history-recommend { letter-spacing: 2px; margin-top: 4px; }
+        .history-draw { font-weight: bold; letter-spacing: 4px; }
+        .history-hit { font-size: 11px; padding: 2px 8px; border-radius: 4px; }
+        .history-hit.direct { background: var(--success); color: white; }
+        .history-hit.group { background: var(--success); color: white; }
+        .history-hit.partial { background: var(--secondary); color: #1e293b; }
+        .history-hit.miss { background: rgba(148, 163, 184, 0.3); color: var(--text-muted); }
+        
+        /* 权重滑块 */
+        .weight-sliders { display: flex; flex-direction: column; gap: 16px; }
+        .slider-item { display: flex; flex-direction: column; gap: 8px; }
+        .slider-header { display: flex; justify-content: space-between; font-size: 14px; }
+        .slider-name { color: var(--text); }
+        .slider-value { color: var(--primary); font-weight: bold; }
         
         input[type="range"] {
             width: 100%;
@@ -348,118 +224,44 @@
             cursor: pointer;
         }
         
+        .btn-generate {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 16px;
+        }
+        
         .btn-reset {
             width: 100%;
             padding: 12px;
-            background: var(--card);
+            background: transparent;
             border: 1px solid var(--primary);
             border-radius: 8px;
             color: var(--primary);
             font-size: 14px;
             cursor: pointer;
-            margin-top: 16px;
-            transition: all 0.3s;
-        }
-        
-        .btn-reset:hover {
-            background: var(--primary);
-            color: white;
-        }
-        
-        /* 生成按钮 */
-        .btn-generate {
-            width: 100%;
-            padding: 16px;
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            border: none;
-            border-radius: 12px;
-            color: white;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            margin-top: 16px;
-            transition: transform 0.2s;
-        }
-        
-        .btn-generate:hover {
-            transform: scale(1.02);
-        }
-        
-        .copy-hint {
-            text-align: center;
-            font-size: 12px;
-            color: var(--text-muted);
             margin-top: 8px;
         }
         
         /* 热号榜 */
-        .hot-list {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 8px;
-        }
-        
-        .hot-item {
-            text-align: center;
-            padding: 8px;
-            background: rgba(239, 68, 68, 0.1);
-            border-radius: 6px;
-        }
-        
-        .hot-item .num {
-            font-size: 20px;
-            font-weight: bold;
-            color: var(--danger);
-        }
-        
-        .hot-item .count {
-            font-size: 10px;
-            color: var(--text-muted);
-        }
+        .hot-list { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+        .hot-item { text-align: center; padding: 8px; background: rgba(239, 68, 68, 0.1); border-radius: 6px; }
+        .hot-item .num { font-size: 20px; font-weight: bold; color: var(--danger); }
+        .hot-item .count { font-size: 10px; color: var(--text-muted); }
         
         /* 柱状图 */
-        .chart {
-            margin-top: 12px;
-        }
-        
-        .chart-bar {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 8px;
-        }
-        
-        .chart-label {
-            width: 30px;
-            font-size: 12px;
-            color: var(--text-muted);
-        }
-        
-        .chart-bar-inner {
-            flex: 1;
-            height: 16px;
-            background: rgba(99, 102, 241, 0.2);
-            border-radius: 4px;
-            overflow: hidden;
-        }
-        
-        .chart-bar-fill {
-            height: 100%;
-            background: linear-gradient(90deg, var(--primary), var(--secondary));
-            border-radius: 4px;
-            transition: width 0.3s;
-        }
-        
-        .chart-count {
-            width: 40px;
-            font-size: 12px;
-            color: var(--text-muted);
-            text-align: right;
-        }
-        
-        .hidden {
-            display: none !important;
-        }
+        .chart { margin-top: 12px; }
+        .chart-bar { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+        .chart-label { width: 30px; font-size: 12px; color: var(--text-muted); }
+        .chart-bar-inner { flex: 1; height: 16px; background: rgba(99, 102, 241, 0.2); border-radius: 4px; overflow: hidden; }
+        .chart-bar-fill { height: 100%; background: linear-gradient(90deg, var(--primary), var(--secondary)); border-radius: 4px; }
+        .chart-count { width: 40px; font-size: 12px; color: var(--text-muted); text-align: right; }
         
         /* 底部导航 */
         .bottom-nav {
@@ -480,27 +282,24 @@
             align-items: center;
             gap: 4px;
             color: var(--text-muted);
-            text-decoration: none;
             font-size: 10px;
             cursor: pointer;
         }
         
-        .nav-item.active {
-            color: var(--primary);
-        }
+        .nav-item.active { color: var(--primary); }
+        .nav-item svg { width: 24px; height: 24px; }
         
-        .nav-item svg {
-            width: 24px;
-            height: 24px;
-        }
+        .copy-hint { text-align: center; font-size: 12px; color: var(--text-muted); margin-top: 8px; }
         
-        .main-content {
-            padding-bottom: 80px;
-        }
+        .hidden { display: none !important; }
+        
+        /* 页面 */
+        .page { display: none; }
+        .page.active { display: block; }
     </style>
 </head>
 <body>
-    <div class="container main-content">
+    <div class="container">
         <header>
             <h1>🎲 彩票智能分析</h1>
             <div class="countdown">
@@ -508,115 +307,123 @@
             </div>
         </header>
         
-        <div class="tabs">
-            <button class="tab active" onclick="switchTab('pl3')">排列三</button>
-            <button class="tab" onclick="switchTab('fc3d')">3D</button>
-        </div>
-        
-        <!-- 精选推荐 -->
-        <div class="card">
-            <div class="card-title">精选推荐</div>
-            <div class="selected">
-                <div class="num-box" onclick="copyNumber(this)">
-                    <span id="sel1">---</span>
-                    <div class="label">精选 1</div>
-                </div>
-                <div class="num-box" onclick="copyNumber(this)">
-                    <span id="sel2">---</span>
-                    <div class="label">精选 2</div>
-                </div>
+        <!-- 首页 -->
+        <div id="page-home" class="page active">
+            <div class="tabs">
+                <button class="tab active" onclick="switchTab('pl3')">排列三</button>
+                <button class="tab" onclick="switchTab('fc3d')">3D</button>
             </div>
-            <div class="backup">
-                <div class="backup-item" onclick="copyNumber(this)"><span id="bak1">-</span></div>
-                <div class="backup-item" onclick="copyNumber(this)"><span id="bak2">-</span></div>
-                <div class="backup-item" onclick="copyNumber(this)"><span id="bak3">-</span></div>
-            </div>
-            <div class="copy-hint">点击号码即可复制</div>
-        </div>
-        
-        <!-- 胆码 -->
-        <div class="card">
-            <div class="card-title">胆码推荐</div>
-            <div class="danma">
-                <div class="danma-item">
-                    <div class="label">金胆</div>
-                    <div class="num gold" id="goldDan">-</div>
-                </div>
-                <div class="danma-item">
-                    <div class="label">银胆</div>
-                    <div class="num silver" id="silverDan">-</div>
-                </div>
-            </div>
-            <div class="double-dan">
-                双胆：<span id="doubleDan">--</span>
-            </div>
-        </div>
-        
-        <!-- 和值 -->
-        <div class="card">
-            <div class="card-title">热和值</div>
-            <div class="sum-list">
-                <div class="sum-item">和值 <span id="sum1">-</span></div>
-                <div class="sum-item">和值 <span id="sum2">-</span></div>
-                <div class="sum-item">和值 <span id="sum3">-</span></div>
-            </div>
-        </div>
-        
-        <!-- 历史追踪 -->
-        <div class="card">
-            <div class="card-title">近期战绩</div>
-            <div class="stats">
-                <div class="stat-item">
-                    <div class="value" id="totalCount">0</div>
-                    <div class="label">已预测</div>
-                </div>
-                <div class="stat-item">
-                    <div class="value" id="hitCount">0</div>
-                    <div class="label">组选命中</div>
-                </div>
-                <div class="stat-item">
-                    <div class="value" id="hitRate">0%</div>
-                    <div class="label">命中率</div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- 号码生成器 -->
-        <div class="card">
-            <div class="card-title">号码生成器</div>
-            <div class="weight-sliders">
-                <div class="slider-item">
-                    <div class="slider-header">
-                        <span class="slider-name">马尔可夫链</span>
-                        <span class="slider-value" id="markovVal">50%</span>
+            
+            <div class="card">
+                <div class="card-title">精选推荐</div>
+                <div class="selected">
+                    <div class="num-box" onclick="copyNumber(this)">
+                        <span id="sel1">---</span>
+                        <div class="label">精选 1</div>
                     </div>
-                    <input type="range" id="markov" min="0" max="100" value="50" oninput="updateSlider()">
-                </div>
-                <div class="slider-item">
-                    <div class="slider-header">
-                        <span class="slider-name">随机生成</span>
-                        <span class="slider-value" id="randomVal">50%</span>
+                    <div class="num-box" onclick="copyNumber(this)">
+                        <span id="sel2">---</span>
+                        <div class="label">精选 2</div>
                     </div>
-                    <input type="range" id="random" min="0" max="100" value="50" oninput="updateSlider()">
+                </div>
+                <div class="backup">
+                    <div class="backup-item" onclick="copyNumber(this)"><span id="bak1">-</span></div>
+                    <div class="backup-item" onclick="copyNumber(this)"><span id="bak2">-</span></div>
+                    <div class="backup-item" onclick="copyNumber(this)"><span id="bak3">-</span></div>
+                </div>
+                <div class="copy-hint">点击号码即可复制</div>
+            </div>
+            
+            <div class="card">
+                <div class="card-title">胆码推荐</div>
+                <div class="danma">
+                    <div class="danma-item">
+                        <div class="label">金胆</div>
+                        <div class="num gold" id="goldDan">-</div>
+                    </div>
+                    <div class="danma-item">
+                        <div class="label">银胆</div>
+                        <div class="num silver" id="silverDan">-</div>
+                    </div>
+                </div>
+                <div class="double-dan">双胆：<span id="doubleDan">--</span></div>
+            </div>
+            
+            <div class="card">
+                <div class="card-title">热和值</div>
+                <div class="sum-list">
+                    <div class="sum-item">和值 <span id="sum1">-</span></div>
+                    <div class="sum-item">和值 <span id="sum2">-</span></div>
+                    <div class="sum-item">和值 <span id="sum3">-</span></div>
                 </div>
             </div>
-            <button class="btn-generate" onclick="regenerate()">重新生成</button>
-            <button class="btn-reset" onclick="resetSlider()">恢复默认</button>
-        </div>
-        
-        <!-- 热号榜 -->
-        <div class="card">
-            <div class="card-title">热号排行榜</div>
-            <div class="hot-list" id="hotList">
-                <!-- 动态生成 -->
+            
+            <div class="card">
+                <div class="card-title">近期战绩</div>
+                <div class="stats">
+                    <div class="stat-item">
+                        <div class="value" id="totalCount">0</div>
+                        <div class="label">已预测</div>
+                    </div>
+                    <div class="stat-item hit">
+                        <div class="value" id="hitCount">0</div>
+                        <div class="label">组选命中</div>
+                    </div>
+                    <div class="stat-item hit-2">
+                        <div class="value" id="hitRate">0%</div>
+                        <div class="label">命中率</div>
+                    </div>
+                </div>
             </div>
         </div>
         
-        <!-- 和值分布 -->
-        <div class="card">
-            <div class="card-title">和值分布</div>
-            <div class="chart" id="sumChart">
-                <!-- 动态生成 -->
+        <!-- 历史页 -->
+        <div id="page-history" class="page">
+            <div class="tabs">
+                <button class="tab active" onclick="switchHistoryTab('pl3')">排列三</button>
+                <button class="tab" onclick="switchHistoryTab('fc3d')">3D</button>
+            </div>
+            
+            <div class="card">
+                <div class="card-title">历史记录</div>
+                <div class="history-list" id="historyList">
+                    <!-- 动态生成 -->
+                </div>
+            </div>
+        </div>
+        
+        <!-- 设置页 -->
+        <div id="page-settings" class="page">
+            <div class="card">
+                <div class="card-title">号码生成器</div>
+                <div class="weight-sliders">
+                    <div class="slider-item">
+                        <div class="slider-header">
+                            <span class="slider-name">马尔可夫链</span>
+                            <span class="slider-value" id="markovVal">50%</span>
+                        </div>
+                        <input type="range" id="markov" min="0" max="100" value="50" oninput="updateSlider()">
+                    </div>
+                    <div class="slider-item">
+                        <div class="slider-header">
+                            <span class="slider-name">随机生成</span>
+                            <span class="slider-value" id="randomVal">50%</span>
+                        </div>
+                        <input type="range" id="random" min="0" max="100" value="50" oninput="updateSlider()">
+                    </div>
+                </div>
+                <button class="btn-generate" onclick="regenerate()">重新生成</button>
+                <button class="btn-reset" onclick="resetSlider()">恢复默认</button>
+            </div>
+            
+            <div class="card">
+                <div class="card-title">热号排行榜</div>
+                <div class="hot-list" id="hotList"></div>
+            </div>
+            
+            <div class="card">
+                <div class="card-title">和值分布</div>
+                <div class="chart" id="sumChart"></div>
             </div>
         </div>
     </div>
@@ -631,7 +438,7 @@
             <svg viewBox="0 0 24 24" fill="currentColor"><path d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/></svg>
             <span>历史</span>
         </div>
-        <div class="nav-item" onclick="showPage('generator')">
+        <div class="nav-item" onclick="showPage('settings')">
             <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.14 12.94c.04-.31.06-.63.06-.94 0-.31-.02-.63-.06-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.04.31-.06.63-.06.94s.02.63.06.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
             <span>设置</span>
         </div>
@@ -639,20 +446,31 @@
     
     <script>
         let currentLottery = 'pl3';
+        let currentHistoryLottery = 'pl3';
         let data = null;
+        let historyData = null;
         
-        // 加载数据
         async function loadData() {
             try {
                 const res = await fetch('today_result.json');
                 data = await res.json();
                 updateUI();
             } catch (e) {
-                console.log('使用默认数据');
+                console.log('Loading default data');
             }
+            
+            try {
+                const res2 = await fetch('stats.json');
+                historyData = await res2.json();
+                updateStats();
+            } catch (e) {
+                console.log('No stats data');
+            }
+            
+            updateHotList();
+            updateSumChart();
         }
         
-        // 更新UI
         function updateUI() {
             if (!data) return;
             
@@ -671,23 +489,73 @@
             document.getElementById('sum1').textContent = info.key_sum[0];
             document.getElementById('sum2').textContent = info.key_sum[1];
             document.getElementById('sum3').textContent = info.key_sum[2];
-            
-            // 更新热号榜
-            updateHotList();
-            
-            // 更新和值图
-            updateSumChart();
         }
         
-        // 切换彩种
+        function updateStats() {
+            if (!historyData || !historyData.stats) return;
+            
+            const stats = historyData.stats[currentLottery];
+            if (!stats) return;
+            
+            document.getElementById('totalCount').textContent = stats.total || 0;
+            document.getElementById('hitCount').textContent = stats.group || 0;
+            document.getElementById('hitRate').textContent = (stats.group_rate || 0).toFixed(1) + '%';
+        }
+        
+        function updateHistoryList() {
+            const list = document.getElementById('historyList');
+            
+            if (!historyData || !historyData.history) {
+                list.innerHTML = '<div style="text-align:center;color:var(--text-muted);padding:20px;">暂无历史记录</div>';
+                return;
+            }
+            
+            const records = historyData.history[currentHistoryLottery] || [];
+            
+            if (records.length === 0) {
+                list.innerHTML = '<div style="text-align:center;color:var(--text-muted);padding:20px;">暂无历史记录</div>';
+                return;
+            }
+            
+            list.innerHTML = records.slice(0, 20).map(r => {
+                const hitClass = r.hit === 'miss' ? 'miss' : r.hit;
+                const hitText = r.hit === 'direct' ? '直选' : r.hit === 'group' ? '组选' : r.hit === 'partial' ? '2同' : '未中';
+                return '<div class="history-item ' + (r.hit !== 'miss' ? r.hit : '') + '">' +
+                    '<div><div class="history-period">第' + r.period + '期</div>' +
+                    '<div class="history-recommend">' + r.recommend.join(', ') + '</div></div>' +
+                    '<div><div class="history-draw">' + r.last_draw + '</div>' +
+                    '<div class="history-hit ' + hitClass + '">' + hitText + '</div></div>' +
+                    '</div>';
+            }).join('');
+        }
+        
         function switchTab(lottery) {
             currentLottery = lottery;
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('#page-home .tab').forEach(t => t.classList.remove('active'));
             event.target.classList.add('active');
             updateUI();
+            updateStats();
         }
         
-        // 复制号码
+        function switchHistoryTab(lottery) {
+            currentHistoryLottery = lottery;
+            document.querySelectorAll('#page-history .tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            updateHistoryList();
+        }
+        
+        function showPage(page) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            
+            document.getElementById('page-' + page).classList.add('active');
+            event.target.closest('.nav-item').classList.add('active');
+            
+            if (page === 'history') {
+                updateHistoryList();
+            }
+        }
+        
         function copyNumber(el) {
             const num = el.querySelector('span').textContent;
             if (num.length === 3) {
@@ -696,38 +564,32 @@
             }
         }
         
-        // 更新滑块
         function updateSlider() {
             const markov = document.getElementById('markov').value;
             const random = document.getElementById('random').value;
-            
             document.getElementById('markovVal').textContent = markov + '%';
             document.getElementById('randomVal').textContent = random + '%';
         }
         
-        // 重置滑块
         function resetSlider() {
             document.getElementById('markov').value = 50;
             document.getElementById('random').value = 50;
             updateSlider();
+            alert('已恢复默认比例');
         }
         
-        // 重新生成
         function regenerate() {
             alert('重新生成功能开发中...');
         }
         
-        // 更新热号榜
         function updateHotList() {
             const hotList = document.getElementById('hotList');
-            // 模拟数据
             const hotNums = [7, 3, 8, 5, 2];
             hotList.innerHTML = hotNums.map(n => 
                 '<div class="hot-item"><div class="num">'+n+'</div><div class="count">98次</div></div>'
             ).join('');
         }
         
-        // 更新和值图
         function updateSumChart() {
             const chart = document.getElementById('sumChart');
             const sums = [
@@ -735,27 +597,20 @@
                 {label: 14, count: 72, max: 100},
                 {label: 16, count: 65, max: 100}
             ];
-            
             chart.innerHTML = sums.map(s => 
                 '<div class="chart-bar">' +
                 '<div class="chart-label">'+s.label+'</div>' +
-                '<div class="chart-bar-inner">' +
-                '<div class="chart-bar-fill" style="width:'+(s.count/s.max*100)+'%"></div>' +
-                '</div>' +
+                '<div class="chart-bar-inner"><div class="chart-bar-fill" style="width:'+(s.count/s.max*100)+'%"></div></div>' +
                 '<div class="chart-count">'+s.count+'</div>' +
                 '</div>'
             ).join('');
         }
         
-        // 倒计时
         function updateCountdown() {
             const now = new Date();
             let target = new Date();
             target.setHours(21, 15, 0, 0);
-            
-            if (now > target) {
-                target.setDate(target.getDate() + 1);
-            }
+            if (now > target) target.setDate(target.getDate() + 1);
             
             const diff = target - now;
             const hours = Math.floor(diff / 3600000);
@@ -763,13 +618,9 @@
             const seconds = Math.floor((diff % 60000) / 1000);
             
             document.getElementById('countdown').textContent = 
-                `${hours.toString().padStart(2,'0')}:${minutes.toString().padStart(2,'0')}:${seconds.toString().padStart(2,'0')}`;
-        }
-        
-        // 页面切换
-        function showPage(page) {
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            event.target.closest('.nav-item').classList.add('active');
+                hours.toString().padStart(2,'0') + ':' +
+                minutes.toString().padStart(2,'0') + ':' +
+                seconds.toString().padStart(2,'0');
         }
         
         // 初始化

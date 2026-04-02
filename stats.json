@@ -1,0 +1,26 @@
+{
+  "stats": {
+    "pl3": {
+      "total": 1,
+      "direct": 0,
+      "group": 0,
+      "partial": 0,
+      "direct_rate": 0.0,
+      "group_rate": 0.0,
+      "partial_rate": 0.0,
+      "recent10_group": 0,
+      "recent10_partial": 0
+    },
+    "fc3d": {
+      "total": 1,
+      "direct": 0,
+      "group": 0,
+      "partial": 1,
+      "direct_rate": 0.0,
+      "group_rate": 0.0,
+      "partial_rate": 100.0,
+      "recent10_group": 0,
+      "recent10_partial": 1
+    }
+  }
+}
