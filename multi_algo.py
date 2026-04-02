@@ -121,10 +121,12 @@ def analyze(name, df, last_nums, period_num):
 pl3_last = (int(pl3.iloc[0]['num1']), int(pl3.iloc[0]['num2']), int(pl3.iloc[0]['num3']))
 fc3d_last = (int(fc3d.iloc[0]['num1']), int(fc3d.iloc[0]['num2']), int(fc3d.iloc[0]['num3']))
 
-# 获取当前期号
-base = datetime(2026, 1, 1)
-today = datetime.now()
-current_period = '2026%d' % ((today - base).days + 1)
+# 获取当前期号（每期从001开始，每隔3天开一次）
+from datetime import date
+start_date = date(2026, 1, 1)
+today = date.today()
+days = (today - start_date).days + 1
+current_period = '2026%03d' % days
 
 # 分析
 pl3_result = analyze('排列三', pl3, pl3_last, current_period)

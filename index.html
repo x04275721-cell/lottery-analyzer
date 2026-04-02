@@ -455,6 +455,7 @@
                 const res = await fetch('today_result.json');
                 data = await res.json();
                 updateUI();
+                updatePeriod();
             } catch (e) {
                 console.log('Loading default data');
             }
@@ -621,6 +622,12 @@
                 hours.toString().padStart(2,'0') + ':' +
                 minutes.toString().padStart(2,'0') + ':' +
                 seconds.toString().padStart(2,'0');
+        }
+        
+        function updatePeriod() {
+            if (data && data.period) {
+                document.getElementById('nextPeriod').textContent = data.period;
+            }
         }
         
         // 初始化

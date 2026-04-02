@@ -1,8 +1,8 @@
 {
   "date": "2026-04-02",
-  "period": "202692",
-  "generated_at": "2026-04-02T21:21:13.545965",
-  "algorithm": "Multi-Algo V7-Optimized",
+  "period": "2026092",
+  "generated_at": "2026-04-02",
+  "algorithm": "Multi-Algo V7.1",
   "weights": {
     "markov": 50,
     "random": 50
@@ -12,6 +12,7 @@
     "fc3d": "827"
   },
   "pl3": {
+    "period": "2026092",
     "gold_dan": 8,
     "silver_dan": 2,
     "double_dan": [
@@ -23,17 +24,87 @@
       "881"
     ],
     "backup_3": [
-      "688",
       "286",
-      "281"
+      "686",
+      "888"
     ],
     "key_sum": [
       14,
       16,
       15
-    ]
+    ],
+    "hot_list": [
+      [
+        {
+          "num": 7,
+          "count": 13
+        },
+        {
+          "num": 1,
+          "count": 13
+        },
+        {
+          "num": 4,
+          "count": 12
+        },
+        {
+          "num": 8,
+          "count": 12
+        },
+        {
+          "num": 0,
+          "count": 12
+        }
+      ],
+      [
+        {
+          "num": 1,
+          "count": 17
+        },
+        {
+          "num": 9,
+          "count": 13
+        },
+        {
+          "num": 3,
+          "count": 13
+        },
+        {
+          "num": 7,
+          "count": 9
+        },
+        {
+          "num": 8,
+          "count": 9
+        }
+      ],
+      [
+        {
+          "num": 5,
+          "count": 15
+        },
+        {
+          "num": 9,
+          "count": 13
+        },
+        {
+          "num": 0,
+          "count": 11
+        },
+        {
+          "num": 1,
+          "count": 11
+        },
+        {
+          "num": 7,
+          "count": 9
+        }
+      ]
+    ],
+    "last_draw": "690"
   },
   "fc3d": {
+    "period": "2026092",
     "gold_dan": 7,
     "silver_dan": 8,
     "double_dan": [
@@ -42,17 +113,86 @@
     ],
     "selected_2": [
       "875",
-      "975"
+      "873"
     ],
     "backup_3": [
-      "873",
-      "973",
-      "971"
+      "874",
+      "878",
+      "974"
     ],
     "key_sum": [
       17,
       10,
       9
-    ]
+    ],
+    "hot_list": [
+      [
+        {
+          "num": 2,
+          "count": 18
+        },
+        {
+          "num": 6,
+          "count": 16
+        },
+        {
+          "num": 4,
+          "count": 12
+        },
+        {
+          "num": 1,
+          "count": 11
+        },
+        {
+          "num": 5,
+          "count": 10
+        }
+      ],
+      [
+        {
+          "num": 4,
+          "count": 12
+        },
+        {
+          "num": 5,
+          "count": 12
+        },
+        {
+          "num": 1,
+          "count": 11
+        },
+        {
+          "num": 9,
+          "count": 11
+        },
+        {
+          "num": 0,
+          "count": 10
+        }
+      ],
+      [
+        {
+          "num": 2,
+          "count": 14
+        },
+        {
+          "num": 7,
+          "count": 12
+        },
+        {
+          "num": 4,
+          "count": 12
+        },
+        {
+          "num": 3,
+          "count": 11
+        },
+        {
+          "num": 9,
+          "count": 10
+        }
+      ]
+    ],
+    "last_draw": "827"
   }
 }
