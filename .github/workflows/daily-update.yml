@@ -1,4 +1,4 @@
-name: 彩票智能分析系统 V5
+name: 彩票智能分析系统 V6 - 三阶马尔可夫链
 
 on:
   schedule:
@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  # ========== 09:00 马尔可夫链分析生成推荐 ==========
+  # ========== 09:00 三阶马尔可夫链分析 ==========
   markov_analysis:
     runs-on: ubuntu-latest
     if: github.event.schedule == '0 1 * * *' || github.event_name == 'workflow_dispatch'
@@ -19,334 +19,260 @@ jobs:
         python-version: '3.11'
     
     - name: 安装依赖
-      run: pip install pandas numpy requests
+      run: pip install pandas numpy
     
     - name: 获取最新数据
       run: |
         python3 << 'PYEOF'
         import requests
         
-        print("📥 获取最新数据...")
+        print("获取最新数据...")
         
-        # 更新排列三
-        try:
-            resp = requests.get("http://data.17500.cn/pl3_asc.txt", timeout=10)
-            if resp.status_code == 200:
-                lines = resp.text.strip().split('\n')
-                existing = set()
-                try:
-                    with open('pl3_full.csv', 'r') as f:
-                        next(f)
-                        for line in f:
-                            p = line.strip().split(',')
-                            if p: existing.add(p[0])
-                except: pass
-                
-                new_data = []
-                for line in lines[:200]:
-                    parts = line.strip().split()
-                    if len(parts) >= 6 and parts[0].startswith('2026') and parts[0] not in existing:
-                        n1,n2,n3 = parts[1],parts[2],parts[3]
-                        s = int(n1)+int(n2)+int(n3)
-                        sp = max(int(n1),int(n2),int(n3))-min(int(n1),int(n2),int(n3))
-                        typ = '豹子' if n1==n2==n3 else ('组三' if n1==n2 or n1==n3 or n2==n3 else '组六')
-                        new_data.append(f"{parts[0]},{n1},{n2},{n3},{s},{sp},{typ}")
-                
-                if new_data:
-                    new_data.reverse()
-                    with open('pl3_full.csv', 'a') as f:
-                        for line in new_data: f.write(line+'\n')
-                    print(f"   ✅ 排列三：+{len(new_data)}条")
-                else:
-                    print(f"   ✅ 排列三：已是最新")
-        except Exception as e:
-            print(f"   ⚠️ {e}")
-        
-        # 更新3D
-        try:
-            resp = requests.get("http://data.17500.cn/3d_asc.txt", timeout=10)
-            if resp.status_code == 200:
-                lines = resp.text.strip().split('\n')
-                existing = set()
-                try:
-                    with open('fc3d_5years.csv', 'r') as f:
-                        next(f)
-                        for line in f:
-                            p = line.strip().split(',')
-                            if p: existing.add(p[0])
-                except: pass
-                
-                new_data = []
-                for line in lines[:200]:
-                    parts = line.strip().split()
-                    if len(parts) >= 6 and parts[0].startswith('2026') and parts[0] not in existing:
-                        n1,n2,n3 = parts[1],parts[2],parts[3]
-                        s = int(n1)+int(n2)+int(n3)
-                        sp = max(int(n1),int(n2),int(n3))-min(int(n1),int(n2),int(n3))
-                        typ = '豹子' if n1==n2==n3 else ('组三' if n1==n2 or n1==n3 or n2==n3 else '组六')
-                        new_data.append(f"{parts[0]},{n1},{n2},{n3},{s},{sp},{typ}")
-                
-                if new_data:
-                    new_data.reverse()
-                    with open('fc3d_5years.csv', 'a') as f:
-                        for line in new_data: f.write(line+'\n')
-                    print(f"   ✅ 3D：+{len(new_data)}条")
-                else:
-                    print(f"   ✅ 3D：已是最新")
-        except Exception as e:
-            print(f"   ⚠️ {e}")
+        for name, url, file in [
+            ("排列三", "http://data.17500.cn/pl3_asc.txt", "pl3_full.csv"),
+            ("3D", "http://data.17500.cn/3d_asc.txt", "fc3d_5years.csv")
+        ]:
+            try:
+                resp = requests.get(url, timeout=10)
+                if resp.status_code == 200:
+                    lines = resp.text.strip().split('\n')
+                    existing = set()
+                    try:
+                        with open(file, 'r') as f:
+                            next(f)
+                            for line in f:
+                                p = line.strip().split(',')
+                                if p: existing.add(p[0])
+                    except: pass
+                    
+                    new_data = []
+                    for line in lines[:200]:
+                        parts = line.strip().split()
+                        if len(parts) >= 6 and parts[0].startswith('2026') and parts[0] not in existing:
+                            n1,n2,n3 = parts[1],parts[2],parts[3]
+                            s = int(n1)+int(n2)+int(n3)
+                            sp = max(int(n1),int(n2),int(n3))-min(int(n1),int(n2),int(n3))
+                            typ = '豹子' if n1==n2==n3 else ('组三' if n1==n2 or n1==n3 or n2==n3 else '组六')
+                            new_data.append(f"{parts[0]},{n1},{n2},{n3},{s},{sp},{typ}")
+                    
+                    if new_data:
+                        new_data.reverse()
+                        with open(file, 'a') as f:
+                            for line in new_data: f.write(line+'\n')
+                        print(f"  {name}: +{len(new_data)}条")
+                    else:
+                        print(f"  {name}: 已是最新")
+            except Exception as e:
+                print(f"  {name}: {e}")
         
         PYEOF
     
-    - name: 马尔可夫链分析
+    - name: 三阶马尔可夫链分析
       id: markov
       run: |
         python3 << 'PYEOF'
         import pandas as pd
-        import json
-        import random
         from collections import Counter, defaultdict
         from datetime import datetime
+        import json
+        import random
         
-        print("\n" + "="*60)
-        print("🎰 彩票智能分析系统 V5 - 真正的马尔可夫链")
-        print("="*60)
+        print("\n" + "="*50)
+        print("三阶马尔可夫链分析 V6")
+        print("="*50)
         
-        # ===== 马尔可夫链分析器 =====
-        class MarkovAnalyzer:
-            def __init__(self, df, name):
-                self.name = name
-                self.df = df
-                self.nums = list(zip(df['num1'].astype(int), df['num2'].astype(int), df['num3'].astype(int)))
-                self.first_matrix = self._build_first_order()
-                self.second_matrix = self._build_second_order()
-                self.position_hot = self._build_position_hot()
-                self.sum_dist = Counter(df.head(100)['和值'].tolist())
-            
-            def _build_first_order(self):
-                """一阶马尔可夫：P(本期|上期)"""
+        # ===== 三阶马尔可夫类 =====
+        def build_third_order(df):
+            """构建三阶马尔可夫矩阵"""
+            matrices = []
+            for pos in range(3):
+                col = ['num1', 'num2', 'num3'][pos]
+                nums = df[col].astype(int).tolist()
+                
                 trans = defaultdict(lambda: defaultdict(int))
                 totals = defaultdict(int)
-                for i in range(len(self.nums)-1):
-                    for p, c in zip(self.nums[i], self.nums[i+1]):
-                        trans[p][c] += 1
-                        totals[p] += 1
-                matrix = {}
-                for p in range(10):
-                    matrix[p] = {c: trans[p][c]/totals[p] if totals[p]>0 else 0 for c in range(10)}
-                return matrix
-            
-            def _build_second_order(self):
-                """二阶马尔可夫：P(本期|前两期)"""
-                trans = defaultdict(lambda: defaultdict(int))
-                totals = defaultdict(int)
-                for i in range(len(self.nums)-2):
-                    for p2, p1, c in zip(self.nums[i], self.nums[i+1], self.nums[i+2]):
-                        key = (p2, p1)
-                        trans[key][c] += 1
-                        totals[key] += 1
+                
+                for i in range(len(nums) - 3):
+                    key = (nums[i], nums[i+1], nums[i+2])
+                    curr = nums[i+3]
+                    trans[key][curr] += 1
+                    totals[key] += 1
+                
+                # 转概率
                 matrix = {}
                 for key in totals:
-                    matrix[key] = {c: trans[key][c]/totals[key] for c in range(10)}
-                return matrix
-            
-            def _build_position_hot(self):
-                """各位置热号"""
-                hot = []
-                for col in ['num1', 'num2', 'num3']:
-                    hot.append([d for d,c in Counter(self.df.head(100)[col].tolist()).most_common(8)])
-                return hot
-            
-            def predict(self, last_nums):
-                """预测号码"""
-                candidates = []
+                    matrix[key] = {d: trans[key].get(d, 0) + 0.01 for d in range(10)}
+                    total = sum(matrix[key].values())
+                    for d in matrix[key]: matrix[key][d] /= total
                 
-                # 策略1：一阶马尔可夫 + 二阶马尔可夫
-                for _ in range(300):
-                    nums = []
-                    for i in range(3):
-                        if len(last_nums) >= 1:
-                            probs1 = self.first_matrix[last_nums[i]]
-                            if len(last_nums) >= 2:
-                                key = (last_nums[i-1], last_nums[i])
-                                probs2 = self.second_matrix.get(key, {j: 0.1 for j in range(10)})
-                                # 混合一阶和二阶
-                                probs = {j: probs1[j]*0.4 + probs2.get(j, 0.1)*0.6 for j in range(10)}
-                            else:
-                                probs = probs1
-                            nums.append(random.choices(range(10), weights=list(probs.values()))[0])
-                        else:
-                            nums.append(random.randint(0,9))
-                    candidates.append(nums)
+                if totals:
+                    best_key = max(totals.keys(), key=lambda k: totals[k])
+                    best_digit = max(range(10), key=lambda d: trans[best_key][d])
+                    prob = trans[best_key][best_digit] / totals[best_key]
+                    print(f"  位置{pos+1}最强: ({best_key}) -> {best_digit} ({prob:.1%})")
                 
-                # 策略2：位置热号组合
-                for _ in range(200):
-                    nums = [random.choice(self.position_hot[i]) for i in range(3)]
-                    candidates.append(nums)
-                
-                # 策略3：热和值区间
-                hot_sums = [s for s,c in self.sum_dist.most_common(8)]
-                for _ in range(200):
-                    s = random.choice(hot_sums)
-                    nums = [random.randint(0,9) for _ in range(2)]
-                    nums.append(s - nums[0] - nums[1])
-                    nums = [max(0, min(9, n)) for n in nums]
-                    candidates.append(nums)
-                
-                # 去重
-                seen = set()
-                unique = []
-                for n in candidates:
-                    t = tuple(n)
-                    if t not in seen:
-                        seen.add(t)
-                        unique.append(n)
-                
-                # 评分
-                scored = []
-                for nums in unique:
-                    score = self._score(nums, last_nums)
-                    scored.append((nums, score))
-                
-                scored.sort(key=lambda x: x[1], reverse=True)
-                return scored[:10]
-            
-            def _score(self, nums, last_nums):
-                """综合评分"""
-                score = 0
-                
-                # 一阶马尔可夫得分 (30%)
-                for i in range(3):
-                    if last_nums and len(last_nums) >= 1:
-                        score += self.first_matrix[last_nums[i]].get(nums[i], 0) * 30
-                
-                # 二阶马尔可夫得分 (25%)
-                if last_nums and len(last_nums) >= 2:
-                    for i in range(3):
-                        key = (last_nums[i-1], last_nums[i])
-                        if key in self.second_matrix:
-                            score += self.second_matrix[key].get(nums[i], 0) * 25 / 3
-                
-                # 位置热号得分 (25%)
-                for i, d in enumerate(nums):
-                    if d in self.position_hot[i][:5]:
-                        score += 5
-                
-                # 和值匹配得分 (15%)
-                total_sum = sum(nums)
-                for s, c in self.sum_dist.most_common(10):
-                    if s == total_sum:
-                        score += 15 * c / 100
-                        break
-                
-                # 全局热号 (5%)
-                all_hot = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9][:6]
-                for d in nums:
-                    if d in all_hot:
-                        score += 1.67
-                
-                return min(score, 100)
+                matrices.append(matrix)
+            return matrices
         
-        # ===== 加载数据 =====
-        print("\n📊 加载数据...")
+        def build_first_order(df):
+            """一阶马尔可夫"""
+            nums = list(zip(df['num1'].astype(int), df['num2'].astype(int), df['num3'].astype(int)))
+            matrix = defaultdict(lambda: defaultdict(int))
+            totals = defaultdict(int)
+            
+            for i in range(len(nums) - 1):
+                for p, c in zip(nums[i], nums[i+1]):
+                    matrix[p][c] += 1
+                    totals[p] += 1
+            
+            result = {}
+            for p in range(10):
+                result[p] = {c: (matrix[p][c] / totals[p] if totals[p] > 0 else 0.01) for c in range(10)}
+                total = sum(result[p].values())
+                for c in result[p]: result[p][c] /= total
+            return result
+        
+        def predict(markov3, markov1, history, pos):
+            """综合预测"""
+            if len(history) >= 3:
+                key = (history[-3][pos], history[-2][pos], history[-1][pos])
+            elif len(history) >= 2:
+                key = (history[-2][pos], history[-1][pos], 5)
+            elif len(history) >= 1:
+                key = (history[-1][pos], 5, 5)
+            else:
+                key = (5, 5, 5)
+            
+            probs3 = markov3[pos].get(key, {d: 0.1 for d in range(10)})
+            if history:
+                probs1 = markov1.get(history[-1][pos], {d: 0.1 for d in range(10)})
+            else:
+                probs1 = {d: 0.1 for d in range(10)}
+            
+            combined = {d: probs3.get(d, 0.1) * 0.6 + probs1.get(d, 0.1) * 0.4 for d in range(10)}
+            total = sum(combined.values())
+            for d in combined: combined[d] /= total
+            return combined
+        
+        def analyze(df, name, history):
+            """分析"""
+            print(f"\n{name}分析 ({len(df)}期):")
+            
+            # 构建矩阵
+            markov3 = build_third_order(df)
+            markov1 = build_first_order(df)
+            
+            # 位置热号
+            hot = []
+            for i, col in enumerate(['num1', 'num2', 'num3']):
+                counter = Counter(df.head(100)[col].tolist())
+                hot.append([d for d, c in counter.most_common(8)])
+            
+            # 和值
+            sums = Counter(df.head(100)['和值'].tolist())
+            hot_sums = [s for s, c in sums.most_common(8)]
+            
+            # 生成候选
+            candidates = []
+            for _ in range(500):
+                nums = []
+                for pos in range(3):
+                    probs = predict(markov3, markov1, history, pos)
+                    digit = random.choices(range(10), weights=[probs[d] for d in range(10)])[0]
+                    nums.append(digit)
+                candidates.append(tuple(nums))
+            
+            for _ in range(200):
+                nums = tuple(random.choice(hot[p]) for p in range(3))
+                candidates.append(nums)
+            
+            # 去重
+            seen = set(candidates)
+            candidates = list(seen)
+            
+            # 评分
+            def score(nums):
+                s = 0
+                for pos in range(3):
+                    probs = predict(markov3, markov1, history, pos)
+                    s += probs.get(nums[pos], 0.01) * 50
+                for pos, d in enumerate(nums):
+                    if d in hot[pos][:5]: s += 10
+                if sum(nums) in hot_sums[:5]: s += 15
+                span = max(nums) - min(nums)
+                if span in [3,4,5,6]: s += 10
+                return min(s, 100)
+            
+            candidates.sort(key=lambda x: score(x), reverse=True)
+            
+            results = []
+            for i, nums in enumerate(candidates[:10], 1):
+                num_str = ''.join(map(str, nums))
+                print(f"  {i}. {num_str} (和:{sum(nums)} 分:{score(nums):.1f})")
+                results.append(num_str)
+            
+            return results
+        
+        # ===== 主程序 =====
+        results = {}
+        
+        # 排列三
         try:
             pl3_df = pd.read_csv('pl3_full.csv')
-            fc3d_df = pd.read_csv('fc3d_5years.csv')
-            print(f"   排列三：{len(pl3_df)}期，3D：{len(fc3d_df)}期")
+            pl3_history = list(zip(pl3_df['num1'].astype(int), pl3_df['num2'].astype(int), pl3_df['num3'].astype(int)))
+            pl3_history = list(pl3_history[:5])
+            results['pl3'] = analyze(pl3_df, "排列三", pl3_history)
         except Exception as e:
-            print(f"   ⚠️ 数据加载失败：{e}")
-            exit(1)
+            print(f"排列三失败: {e}")
+            results['pl3'] = ['???', '???']
         
-        # ===== 计算期号 =====
+        # 3D
+        try:
+            fc3d_df = pd.read_csv('fc3d_5years.csv')
+            fc3d_history = list(zip(fc3d_df['num1'].astype(int), fc3d_df['num2'].astype(int), fc3d_df['num3'].astype(int)))
+            fc3d_history = list(fc3d_history[:5])
+            results['fc3d'] = analyze(fc3d_df, "3D", fc3d_history)
+        except Exception as e:
+            print(f"3D失败: {e}")
+            results['fc3d'] = ['???', '???']
+        
+        # 保存
         base = datetime(2026, 1, 1)
         today = datetime.now()
         period = f"2026{str((today-base).days+1).zfill(3)}"
-        today_str = today.strftime('%Y-%m-%d')
-        print(f"\n📅 期号：{period}，日期：{today_str}")
         
-        # ===== 获取上期开奖 =====
-        last_pl3 = tuple(pl3_df.head(1)[['num1','num2','num3']].values[0])
-        last_fc3d = tuple(fc3d_df.head(1)[['num1','num2','num3']].values[0])
-        print(f"   上期排列三：{last_pl3}")
-        print(f"   上期3D：{last_fc3d}")
-        
-        # ===== 马尔可夫分析 =====
-        print("\n🔮 马尔可夫链分析...")
-        
-        print("\n📌 排列三分析：")
-        pl3_analyzer = MarkovAnalyzer(pl3_df, '排列三')
-        pl3_results = pl3_analyzer.predict(last_pl3)
-        
-        print(f"\n   精选2注：")
-        selected_pl3 = [''.join(map(str, n)) for n, s in pl3_results[:2]]
-        for i, (nums, score) in enumerate(pl3_results[:2], 1):
-            print(f"   {i}. {''.join(map(str, nums))} (得分：{score:.1f})")
-        
-        print(f"\n   基础10注：")
-        base_pl3 = [''.join(map(str, n)) for n, s in pl3_results[:10]]
-        print(f"   {', '.join(base_pl3)}")
-        
-        print("\n📌 3D分析：")
-        fc3d_analyzer = MarkovAnalyzer(fc3d_df, '3D')
-        fc3d_results = fc3d_analyzer.predict(last_fc3d)
-        
-        print(f"\n   精选2注：")
-        selected_fc3d = [''.join(map(str, n)) for n, s in fc3d_results[:2]]
-        for i, (nums, score) in enumerate(fc3d_results[:2], 1):
-            print(f"   {i}. {''.join(map(str, nums))} (得分：{score:.1f})")
-        
-        print(f"\n   基础10注：")
-        base_fc3d = [''.join(map(str, n)) for n, s in fc3d_results[:10]]
-        print(f"   {', '.join(base_fc3d)}")
-        
-        # ===== 提取重点和值 =====
-        pl3_sums = sorted(list(set([sum(n) for n, s in pl3_results[:10]])))[:5]
-        fc3d_sums = sorted(list(set([sum(n) for n, s in fc3d_results[:10]])))[:5]
-        
-        # ===== 保存结果 =====
-        result = {
-            'date': today_str,
+        output = {
+            'date': today.strftime('%Y-%m-%d'),
             'period': period,
             'generated_at': today.isoformat(),
-            'algorithm': 'Markov Chain V5',
+            'algorithm': 'Third-Order Markov Chain V6',
             'locked': True,
-            'last_draw': {
-                'pl3': ''.join(map(str, last_pl3)),
-                'fc3d': ''.join(map(str, last_fc3d))
-            },
             'pl3': {
-                'key_sum': pl3_sums,
-                'selected_2': selected_pl3,
-                'base_10': base_pl3
+                'selected_2': results['pl3'][:2],
+                'base_10': results['pl3'][:10],
+                'key_sum': sorted(list(set([int(r[0])+int(r[1])+int(r[2]) for r in results['pl3'][:10]])))[:5]
             },
             'fc3d': {
-                'key_sum': fc3d_sums,
-                'selected_2': selected_fc3d,
-                'base_10': base_fc3d
+                'selected_2': results['fc3d'][:2],
+                'base_10': results['fc3d'][:10],
+                'key_sum': sorted(list(set([int(r[0])+int(r[1])+int(r[2]) for r in results['fc3d'][:10]])))[:5]
             }
         }
         
         with open('today_result.json', 'w') as f:
-            json.dump(result, f, ensure_ascii=False, indent=2)
+            json.dump(output, f, ensure_ascii=False, indent=2)
         
-        print("\n" + "="*60)
-        print("✅ 马尔可夫链分析完成！")
-        print("="*60)
-        
-        # 输出给GitHub
-        with open('GITHUB_OUTPUT', 'w') as f:
-            f.write(f"pl3_numbers={','.join(selected_pl3)}\n")
-            f.write(f"fc3d_numbers={','.join(selected_fc3d)}\n")
+        print("\n" + "="*50)
+        print("V6三阶马尔可夫分析完成!")
+        print("="*50)
         
         PYEOF
     
-    - name: 提交更新
+    - name: 提交
       run: |
-        git config user.name "Markov Bot"
+        git config user.name "Markov V6 Bot"
         git config user.email "bot@github.com"
-        git add .
-        git commit -m "🔮 V5马尔可夫链分析 - $(date +'%Y-%m-%d')" || echo "No changes"
-        git push || echo "Push skipped"
+        git add . && git commit -m "V6三阶马尔可夫链 $(date +'%Y-%m-%d')" && git push || echo "No changes"
 
   # ========== 22:00 更新历史 ==========
   update_history:
@@ -364,17 +290,14 @@ jobs:
         import json, requests
         from datetime import datetime, timedelta
         
-        print("📊 获取开奖结果...")
-        
         base = datetime(2026, 1, 1)
         yest = datetime.now() - timedelta(days=1)
         period = f"2026{str((yest-base).days).zfill(3)}"
         
         pl3_r, fc3d_r = '---', '---'
-        
-        try:
-            for url, name, ref in [("http://data.17500.cn/pl3_asc.txt","排列三",pl3_r),
-                                    ("http://data.17500.cn/3d_asc.txt","3D",fc3d_r)]:
+        for url, name, ref in [("http://data.17500.cn/pl3_asc.txt","排列三",pl3_r),
+                                ("http://data.17500.cn/3d_asc.txt","3D",fc3d_r)]:
+            try:
                 resp = requests.get(url, timeout=10)
                 if resp.status_code==200:
                     for line in resp.text.split('\n'):
@@ -382,24 +305,22 @@ jobs:
                         if len(parts)>=4 and parts[0]==period:
                             if name=="排列三": pl3_r=parts[3].zfill(3)
                             else: fc3d_r=parts[3].zfill(3)
-                            print(f"   ✅ {name}：{parts[3]}")
+                            print(f"  {name}: {parts[3]}")
                             break
-        except Exception as e:
-            print(f"   ⚠️ {e}")
+            except: pass
         
         with open('latest_results.json','w') as f:
             json.dump({'period':period,'pl3':pl3_r,'fc3d':fc3d_r},f)
-        
         PYEOF
     
-    - name: 更新历史记录
+    - name: 更新历史
       run: |
         python3 << 'PYEOF'
         import json
         
         try:
             with open('today_result.json') as f: today = json.load(f)
-        except: print("⚠️ 无数据"); exit(0)
+        except: exit(0)
         
         try:
             with open('latest_results.json') as f: results = json.load(f)
@@ -436,14 +357,13 @@ jobs:
             
             total = len(hist)
             hits = sum(1 for h in hist if h.get('status') in ['直中','组中'])
-            print(f"✅ 历史已更新：{total}期，命中{hits}次，{hits/total*100:.1f}%")
+            print(f"历史已更新: {total}期, 命中{hits}次 ({hits/total*100:.1f}%)")
         else:
-            print("ℹ️ 本期已记录")
-        
+            print("本期已记录")
         PYEOF
     
     - name: 提交
       run: |
-        git config user.name "Markov Bot"
+        git config user.name "Bot"
         git config user.email "bot@github.com"
-        git add . && git commit -m "📊 更新历史" && git push || echo "No changes"
+        git add . && git commit -m "更新历史 $(date +'%Y-%m-%d')" && git push || echo "No changes"
