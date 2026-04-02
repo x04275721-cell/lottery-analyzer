@@ -13,129 +13,207 @@ jobs:
     if: github.event.schedule == '0 1 * * *' || github.event_name == 'workflow_dispatch'
     steps:
     - uses: actions/checkout@v4
+    
     - uses: actions/setup-python@v5
       with:
         python-version: '3.11'
-    - run: pip install pandas numpy
-    - name: 生成推荐
+    
+    - run: pip install pandas numpy requests
+    
+    - name: 获取最新数据并生成推荐
+      id: generate
       run: |
         python3 << 'EOF'
         import pandas as pd
         import json
-        from datetime import datetime
+        import requests
+        from datetime import datetime, timedelta
         from collections import Counter
         import random
-        import numpy as np
         
-        print("🎯 生成今日推荐（全和值智能筛选）...")
+        print("=" * 50)
+        print("🎯 彩票智能分析系统 - 每日推荐生成")
+        print("=" * 50)
         
-        pl3 = pd.read_csv('pl3_full.csv')
-        fc3d = pd.read_csv('fc3d_5years.csv')
+        # ===== 1. 更新CSV数据 =====
+        def update_csv_data():
+            """从17500.cn获取最新数据"""
+            print("\n📥 正在获取最新数据...")
+            try:
+                # 更新排列三数据
+                pl3_url = "http://data.17500.cn/pl3_asc.txt"
+                resp = requests.get(pl3_url, timeout=10)
+                if resp.status_code == 200:
+                    lines = resp.text.strip().split('\n')
+                    existing = set()
+                    try:
+                        with open('pl3_full.csv', 'r', encoding='utf-8') as f:
+                            next(f)  # 跳过标题
+                            for line in f:
+                                parts = line.strip().split(',')
+                                if parts:
+                                    existing.add(parts[0])
+                    except:
+                        pass
+                    
+                    new_count = 0
+                    new_data = []
+                    for line in lines[:200]:  # 只取最新的200条
+                        parts = line.strip().split()
+                        if len(parts) >= 6 and parts[0].startswith('2026'):
+                            issue = parts[0]
+                            if issue not in existing:
+                                n1, n2, n3 = parts[1], parts[2], parts[3]
+                                s = int(n1) + int(n2) + int(n3)
+                                sp = max(int(n1),int(n2),int(n3)) - min(int(n1),int(n2),int(n3))
+                                typ = '豹子' if n1==n2==n3 else ('组三' if n1==n2 or n1==n3 or n2==n3 else '组六')
+                                new_data.append(f"{issue},{n1},{n2},{n3},{s},{sp},{typ}")
+                                new_count += 1
+                    
+                    if new_data:
+                        new_data.reverse()
+                        with open('pl3_full.csv', 'a', encoding='utf-8') as f:
+                            for line in new_data:
+                                f.write(line + '\n')
+                        print(f"   ✅ 新增 {new_count} 条排列三数据")
+                    else:
+                        print(f"   ✅ 数据已是最新")
+            except Exception as e:
+                print(f"   ⚠️ 数据更新失败：{e}")
         
-        # ========== 全和值智能分析（0-27）==========
-        def analyze_all_sums(df, recent_periods=100):
-            """分析所有和值0-27的出现概率"""
-            recent = df.head(recent_periods)
+        # ===== 2. 计算期号 =====
+        def calculate_period():
+            base_date = datetime(2026, 1, 1)
+            today = datetime.now()
+            days_diff = (today - base_date).days + 1
+            return f"2026{str(days_diff).zfill(3)}"
+        
+        period = calculate_period()
+        today_str = datetime.now().strftime('%Y-%m-%d')
+        print(f"\n📅 期号：{period}，日期：{today_str}")
+        
+        # ===== 3. 更新数据 =====
+        update_csv_data()
+        
+        # ===== 4. 加载数据 =====
+        print("\n📊 加载历史数据...")
+        try:
+            pl3 = pd.read_csv('pl3_full.csv')
+            fc3d = pd.read_csv('fc3d_5years.csv')
+            print(f"   排列三：{len(pl3)} 期，3D：{len(fc3d)} 期")
+        except Exception as e:
+            print(f"   ⚠️ 数据加载失败：{e}")
+            pl3 = pd.DataFrame()
+            fc3d = pd.DataFrame()
+        
+        # ===== 5. 分析和生成推荐 =====
+        def analyze_and_generate(df, recent=100, name="彩种"):
+            if df.empty:
+                return [], [], {}
             
-            # 统计所有和值出现次数
-            sum_counts = Counter(recent['和值'].tolist())
+            recent_data = df.head(recent)
             
-            # 计算0-27所有和值的概率
-            all_sums_prob = {}
-            for s in range(28):  # 0-27
+            # 和值分析
+            sum_counts = Counter(recent_data['和值'].tolist())
+            all_sums = {}
+            for s in range(28):
                 count = sum_counts.get(s, 0)
-                prob = count / recent_periods
-                all_sums_prob[s] = {
-                    'count': count,
-                    'prob': prob,
-                    'hot': prob > 0.05,
-                    'cold': prob < 0.02
-                }
+                prob = count / recent if recent > 0 else 0
+                all_sums[s] = {'count': count, 'prob': prob}
             
-            # 智能筛选
-            hot_sums = sorted([s for s, info in all_sums_prob.items() if info['hot']], 
-                            key=lambda x: all_sums_prob[x]['count'], reverse=True)[:3]
-            cold_sums = sorted([s for s, info in all_sums_prob.items() if info['cold']], 
-                              key=lambda x: all_sums_prob[x]['count'])[:1]
-            mid_sums = sorted([s for s, info in all_sums_prob.items() 
-                              if not info['hot'] and not info['cold']], 
-                             key=lambda x: all_sums_prob[x]['count'], reverse=True)[:1]
+            # 智能筛选重点和值
+            hot_sums = sorted([s for s,c in sum_counts.most_common(5)], reverse=True)[:3]
+            key_sums = hot_sums[:5]
             
-            key_sums = list(set(hot_sums + cold_sums + mid_sums))[:5]
-            
-            if len(key_sums) < 5:
-                all_sorted = sorted(range(28), key=lambda x: all_sums_prob[x]['count'], reverse=True)
-                for s in all_sorted:
+            while len(key_sums) < 5:
+                for s in range(27, -1, -1):
                     if s not in key_sums:
                         key_sums.append(s)
-                        if len(key_sums) >= 5:
-                            break
+                        break
             
-            print(f"   重点和值：{key_sums}")
-            return key_sums, all_sums_prob
-        
-        def get_hot(df, col, n=5):
-            return [x for x, c in Counter(df.head(50)[col].tolist()).most_common(n)]
-        
-        pl3_hot = [get_hot(pl3, c) for c in ['num1', 'num2', 'num3']]
-        fc3d_hot = [get_hot(fc3d, c) for c in ['num1', 'num2', 'num3']]
-        
-        pl3_sums, pl3_prob = analyze_all_sums(pl3, 100)
-        fc3d_sums, fc3d_prob = analyze_all_sums(fc3d, 200)
-        
-        def gen(hot, sums, all_prob):
-            selected, base = [], []
+            # 位置热号
+            hot_cols = ['num1', 'num2', 'num3']
+            hot_nums = []
+            for col in hot_cols:
+                if col in recent_data.columns:
+                    top = [str(x) for x, _ in Counter(recent_data[col].tolist()).most_common(8)]
+                    hot_nums.append(top)
+            
+            # 生成号码
             random.seed(datetime.now().timestamp())
-            attempts = 0
-            while len(base) < 10 and attempts < 1000:
-                attempts += 1
-                n = [random.choice(hot[i] + [random.randint(0,9)]) for i in range(3)]
-                s = sum(n)
-                if s in sums:
-                    if n not in base:
-                        base.append(n)
-                        if len(selected) < 2:
-                            selected.append(n)
-                elif len(base) >= 8 and n not in base:
-                    if all_prob.get(s, {}).get('cold', False):
-                        base.append(n)
+            selected = []
+            base = []
             
+            for _ in range(1000):
+                if len(base) >= 10:
+                    break
+                n = []
+                for i in range(3):
+                    if hot_nums and i < len(hot_nums):
+                        n.append(int(random.choice(hot_nums[i]) if random.random() > 0.3 else random.randint(0,9)))
+                    else:
+                        n.append(random.randint(0,9))
+                
+                s = sum(n)
+                if s in key_sums and n not in base:
+                    base.append(n)
+                    if len(selected) < 2:
+                        selected.append(n)
+            
+            # 如果不够10注，随机补充
             while len(base) < 10:
                 n = [random.randint(0,9) for _ in range(3)]
-                if sum(n) in sums and n not in base:
+                if sum(n) in key_sums and n not in base:
                     base.append(n)
             
-            return selected, base
+            print(f"   {name}：精选 {len(selected)} 注，和值 {key_sums[:3]}")
+            return selected[:2], base[:10], {'key_sum': sorted(key_sums)[:5]}
         
-        pl3_sel, pl3_base = gen(pl3_hot, pl3_sums, pl3_prob)
-        fc3d_sel, fc3d_base = gen(fc3d_hot, fc3d_sums, fc3d_prob)
+        print("\n🎲 生成推荐...")
+        pl3_sel, pl3_base, pl3_info = analyze_and_generate(pl3, 100, "排列三")
+        fc3d_sel, fc3d_base, fc3d_info = analyze_and_generate(fc3d, 200, "3D")
         
+        # ===== 6. 保存结果 =====
         result = {
-            'date': datetime.now().strftime('%Y-%m-%d'),
-            'period': '2026082',
+            'date': today_str,
+            'period': period,
             'generated_at': datetime.now().isoformat(),
             'locked': True,
             'pl3': {
-                'key_sum': pl3_sums,
-                'sum_analysis': '全和值0-27智能筛选',
-                'selected_2': [''.join(map(str, n)) for n in pl3_sel],
-                'base_10': [''.join(map(str, n)) for n in pl3_base]
+                'key_sum': pl3_info.get('key_sum', [10,11,12,13,14]),
+                'sum_analysis': '智能和值筛选',
+                'selected_2': [''.join(map(str, n)) for n in pl3_sel] if pl3_sel else ['---', '---'],
+                'base_10': [''.join(map(str, n)) for n in pl3_base] if pl3_base else []
             },
             'fc3d': {
-                'key_sum': fc3d_sums,
-                'sum_analysis': '全和值0-27智能筛选',
-                'selected_2': [''.join(map(str, n)) for n in fc3d_sel],
-                'base_10': [''.join(map(str, n)) for n in fc3d_base]
+                'key_sum': fc3d_info.get('key_sum', [10,11,12,13,14]),
+                'sum_analysis': '智能和值筛选',
+                'selected_2': [''.join(map(str, n)) for n in fc3d_sel] if fc3d_sel else ['---', '---'],
+                'base_10': [''.join(map(str, n)) for n in fc3d_base] if fc3d_base else []
             }
         }
         
-        with open('today_result.json', 'w') as f:
+        with open('today_result.json', 'w', encoding='utf-8') as f:
             json.dump(result, f, ensure_ascii=False, indent=2)
         
-        print("✅ 推荐已生成")
+        print(f"\n✅ 推荐已生成！")
+        print(f"   排列三：{result['pl3']['selected_2']}")
+        print(f"   3D：{result['fc3d']['selected_2']}")
+        
+        # 输出给GitHub Actions
+        with open('GITHUB_OUTPUT', 'w') as f:
+            f.write(f"pl3_numbers={','.join(result['pl3']['selected_2'])}\n")
+            f.write(f"fc3d_numbers={','.join(result['fc3d']['selected_2'])}\n")
+        
         EOF
-    - run: git config user.name "bot" && git config user.email "bot@github.com"
-    - run: git add . && git commit -m "🤖 每日推荐已生成（全和值智能筛选）" && git push || true
+    
+    - name: 提交更新
+      run: |
+        git config user.name "Lottery Analyzer Bot"
+        git config user.email "bot@github.com"
+        git add .
+        git commit -m "🤖 ${{ env.USE_DATE }} 每日推荐更新" || echo "No changes to commit"
+        git push || echo "Push skipped"
 
   # ========== 22:00 更新历史+反思优化 ==========
   update_and_learn:
@@ -143,73 +221,225 @@ jobs:
     if: github.event.schedule == '0 14 * * *'
     steps:
     - uses: actions/checkout@v4
+    
     - uses: actions/setup-python@v5
       with:
         python-version: '3.11'
-    - run: pip install pandas numpy
+    
+    - run: pip install pandas numpy requests
+    
+    - name: 获取真实开奖结果
+      id: fetch_results
+      run: |
+        python3 << 'EOF'
+        import requests
+        import json
+        from datetime import datetime, timedelta
+        
+        print("=" * 50)
+        print("📊 获取真实开奖结果")
+        print("=" * 50)
+        
+        base_date = datetime(2026, 1, 1)
+        yesterday = datetime.now() - timedelta(days=1)
+        days_diff = (yesterday - base_date).days
+        period = f"2026{str(days_diff).zfill(3)}"
+        
+        print(f"\n📅 查询期号：{period}")
+        
+        pl3_result = "---"
+        fc3d_result = "---"
+        
+        try:
+            # 从17500获取排列三
+            pl3_url = "http://data.17500.cn/pl3_asc.txt"
+            resp = requests.get(pl3_url, timeout=10)
+            if resp.status_code == 200:
+                lines = resp.text.strip().split('\n')
+                for line in lines:
+                    parts = line.strip().split()
+                    if len(parts) >= 4 and parts[0] == period:
+                        pl3_result = parts[3].zfill(3)
+                        print(f"   ✅ 排列三：{pl3_result}")
+                        break
+        except Exception as e:
+            print(f"   ⚠️ 排列三获取失败：{e}")
+        
+        try:
+            # 从17500获取3D
+            fc3d_url = "http://data.17500.cn/3d_asc.txt"
+            resp = requests.get(fc3d_url, timeout=10)
+            if resp.status_code == 200:
+                lines = resp.text.strip().split('\n')
+                for line in lines:
+                    parts = line.strip().split()
+                    if len(parts) >= 4 and parts[0] == period:
+                        fc3d_result = parts[3].zfill(3)
+                        print(f"   ✅ 3D：{fc3d_result}")
+                        break
+        except Exception as e:
+            print(f"   ⚠️ 3D获取失败：{e}")
+        
+        results = {
+            'period': period,
+            'pl3': pl3_result,
+            'fc3d': fc3d_result,
+            'updated_at': datetime.now().isoformat()
+        }
+        
+        with open('latest_results.json', 'w', encoding='utf-8') as f:
+            json.dump(results, f, ensure_ascii=False, indent=2)
+        
+        # 输出给GitHub
+        with open('GITHUB_OUTPUT', 'w') as f:
+            f.write(f"pl3_result={pl3_result}\n")
+            f.write(f"fc3d_result={fc3d_result}\n")
+        
+        EOF
+    
     - name: 更新历史记录
       run: |
         python3 << 'EOF'
         import json
         from datetime import datetime
+        import os
         
-        print("📊 更新历史记录...")
+        print("\n📝 更新历史记录...")
         
-        # 模拟开奖结果
-        draw_results = {
-            'pl3_2026081': '690',
-            'fc3d_2026081': '827'
-        }
-        
+        # 读取今日推荐
         try:
-            with open('today_result.json', 'r') as f:
+            with open('today_result.json', 'r', encoding='utf-8') as f:
                 today = json.load(f)
         except:
-            print("⚠️ 无今日推荐")
+            print("⚠️ 无今日推荐数据")
             exit(0)
         
+        # 读取开奖结果
         try:
-            with open('history_records.json', 'r') as f:
+            with open('latest_results.json', 'r', encoding='utf-8') as f:
+                results = json.load(f)
+        except:
+            results = {'pl3': '---', 'fc3d': '---'}
+        
+        # 读取历史记录
+        try:
+            with open('history_records.json', 'r', encoding='utf-8') as f:
                 history = json.load(f)
         except:
             history = []
         
-        pl3_rec = today['pl3']['selected_2']
-        fc3d_rec = today['fc3d']['selected_2']
+        # 检查是否已记录
+        period = today.get('period', '')
+        already_recorded = any(h.get('period') == period and h.get('game') == '排列三' for h in history)
         
-        def check_status(rec, draw):
-            for r in rec:
-                if r == draw:
-                    return '直中'
-                if sorted(r) == sorted(draw):
-                    return '组中'
-            return '未中'
+        if already_recorded:
+            print("   ℹ️ 本期已记录，跳过")
+        else:
+            pl3_rec = today['pl3']['selected_2']
+            fc3d_rec = today['fc3d']['selected_2']
+            pl3_draw = results.get('pl3', '---')
+            fc3d_draw = results.get('fc3d', '---')
+            
+            def check_status(rec, draw):
+                if draw == '---':
+                    return '待开奖'
+                for r in rec:
+                    if r == draw:
+                        return '直中'
+                    if sorted(r) == sorted(draw):
+                        return '组中'
+                return '未中'
+            
+            pl3_status = check_status(pl3_rec, pl3_draw)
+            fc3d_status = check_status(fc3d_rec, fc3d_draw)
+            
+            # 添加记录
+            history.append({
+                'date': today['date'],
+                'period': period,
+                'game': '排列三',
+                'recommendation': ','.join(pl3_rec),
+                'result': pl3_draw,
+                'status': pl3_status
+            })
+            
+            history.append({
+                'date': today['date'],
+                'period': period,
+                'game': '3D',
+                'recommendation': ','.join(fc3d_rec),
+                'result': fc3d_draw,
+                'status': fc3d_status
+            })
+            
+            # 保留最近100条
+            history = history[-100:]
+            
+            with open('history_records.json', 'w', encoding='utf-8') as f:
+                json.dump(history, f, ensure_ascii=False, indent=2)
+            
+            print(f"   ✅ 排列三：{pl3_status} ({pl3_rec} vs {pl3_draw})")
+            print(f"   ✅ 3D：{fc3d_status} ({fc3d_rec} vs {fc3d_draw})")
         
-        pl3_status = check_status(pl3_rec, draw_results.get('pl3_2026081', '---'))
-        fc3d_status = check_status(fc3d_rec, draw_results.get('fc3d_2026081', '---'))
+        # 统计
+        total = len(history)
+        hits = sum(1 for h in history if h.get('status') in ['直中', '组中'])
+        rate = (hits / total * 100) if total > 0 else 0
+        print(f"\n📊 累计统计：{total}期，命中{hits}次，命中率{rate:.1f}%")
         
-        history.append({
-            'date': today['date'],
-            'period': today['period'],
-            'game': '排列三',
-            'recommendation': ','.join(pl3_rec),
-            'result': draw_results.get('pl3_2026081', '---'),
-            'status': pl3_status
-        })
-        history.append({
-            'date': today['date'],
-            'period': today['period'],
-            'game': '福彩3D',
-            'recommendation': ','.join(fc3d_rec),
-            'result': draw_results.get('fc3d_2026081', '---'),
-            'status': fc3d_status
-        })
-        
-        with open('history_records.json', 'w') as f:
-            json.dump(history, f, ensure_ascii=False, indent=2)
-        
-        print(f"✅ 排列三：{pl3_status}")
-        print(f"✅ 福彩3D：{fc3d_status}")
         EOF
-    - run: git config user.name "bot" && git config user.email "bot@github.com"
-    - run: git add . && git commit -m "📊 更新历史记录" && git push || true
+    
+    - name: 生成智能反思
+      run: |
+        python3 << 'EOF'
+        import json
+        from datetime import datetime
+        from collections import Counter
+        
+        print("\n💭 生成智能反思...")
+        
+        try:
+            with open('history_records.json', 'r', encoding='utf-8') as f:
+                history = json.load(f)
+        except:
+            history = []
+        
+        if len(history) < 2:
+            suggestions = {
+                'status': '数据不足',
+                'message': '需要更多历史数据才能进行分析',
+                'last_period': None
+            }
+        else:
+            recent = [h for h in history[-10:] if h.get('status') != '待开奖']
+            
+            # 分析失败原因
+            misses = [h for h in recent if h.get('status') == '未中']
+            if misses:
+                # 简单分析
+                suggestion = "建议关注：1.近期热号回调 2.和值分布均衡化"
+            else:
+                suggestion = "近期表现良好，继续观察"
+            
+            suggestions = {
+                'status': '分析完成',
+                'message': suggestion,
+                'last_period': history[-1].get('period') if history else None,
+                'recent_hits': len([h for h in recent if h.get('status') in ['直中', '组中']]),
+                'recent_total': len(recent)
+            }
+        
+        with open('optimization_suggestions.json', 'w', encoding='utf-8') as f:
+            json.dump(suggestions, f, ensure_ascii=False, indent=2)
+        
+        print(f"   ✅ {suggestions.get('message', '反思已生成')}")
+        
+        EOF
+    
+    - name: 提交更新
+      run: |
+        git config user.name "Lottery Analyzer Bot"
+        git config user.email "bot@github.com"
+        git add .
+        git commit -m "📊 更新历史记录和反思分析" || echo "No changes"
+        git push || echo "Push skipped"
