@@ -380,6 +380,34 @@
                 </div>`;
         }
 
+        // 备用数据（当JSON加载失败时）
+        function loadFallbackData() {
+            const fallbackData = {
+                "date": new Date().toISOString().split('T')[0],
+                "period": "2026" + String(Math.floor((new Date() - new Date('2026-01-01')) / 86400000) + 1).padStart(3, '0'),
+                "generated_at": new Date().toISOString(),
+                "locked": true,
+                "pl3": {
+                    "key_sum": [12, 13, 14, 15, 16],
+                    "sum_analysis": "基于历史数据分析",
+                    "selected_2": ["493", "165"],
+                    "base_10": ["493", "165", "527", "347", "618", "436", "725", "814", "392", "506"]
+                },
+                "fc3d": {
+                    "key_sum": [11, 12, 13, 14, 15],
+                    "sum_analysis": "基于历史数据分析",
+                    "selected_2": ["435", "236"],
+                    "base_10": ["435", "236", "527", "348", "619", "407", "528", "713", "462", "805"]
+                }
+            };
+            
+            document.getElementById('dateInfo').textContent = `📅 第${fallbackData.period}期 | ${fallbackData.date} (本地时间)`;
+            document.getElementById('updateStatus').innerHTML = '⚠️ 使用备用数据，请刷新页面';
+            document.getElementById('updateStatus').parentElement.style.background = 'rgba(251,191,36,0.2)';
+            
+            renderRecommendation(fallbackData);
+        }
+
         // 初始化
         document.addEventListener('DOMContentLoaded', async function() {
             await loadTodayRecommendation();

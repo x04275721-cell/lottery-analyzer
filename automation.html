@@ -79,6 +79,14 @@
             text-align: center;
             margin-bottom: 20px;
         }
+        .status-box.warning {
+            border-color: #fbbf24;
+            background: linear-gradient(135deg, rgba(251, 191, 36, 0.2) 0%, rgba(245, 158, 11, 0.2) 100%);
+        }
+        .status-box.error {
+            border-color: #ef4444;
+            background: linear-gradient(135deg, rgba(248, 113, 113, 0.2) 0%, rgba(239, 68, 68, 0.2) 100%);
+        }
         .status-icon {
             font-size: 3em;
             margin-bottom: 10px;
@@ -88,6 +96,12 @@
             font-weight: bold;
             color: #4ade80;
             margin-bottom: 10px;
+        }
+        .status-box.warning .status-text {
+            color: #fbbf24;
+        }
+        .status-box.error .status-text {
+            color: #ef4444;
         }
         .status-detail {
             color: rgba(255,255,255,0.7);
@@ -307,8 +321,6 @@
 
         // 计算期号
         function calculatePeriod() {
-            // 假设2026年第一期是2026001
-            // 每天递增
             const baseDate = new Date('2026-01-01');
             const today = new Date();
             const daysDiff = Math.floor((today - baseDate) / (1000 * 60 * 60 * 24)) + 1;
@@ -321,8 +333,20 @@
             return weekdays[new Date().getDay()];
         }
 
+        // 格式化日期
+        function formatDate(dateStr) {
+            if (!dateStr) return '未知';
+            try {
+                const d = new Date(dateStr);
+                return `${d.getMonth()+1}月${d.getDate()}日 ${d.getHours()}:${String(d.getMinutes()).padStart(2,'0')}`;
+            } catch {
+                return dateStr;
+            }
+        }
+
         // 加载数据
         async function loadData() {
+            const statusBox = document.getElementById('statusBox');
             const statusIcon = document.getElementById('statusIcon');
             const statusText = document.getElementById('statusText');
             const statusDetail = document.getElementById('statusDetail');
@@ -330,32 +354,38 @@
             const loadingSection = document.getElementById('loadingSection');
 
             try {
-                // 获取 today_result.json
                 const response = await fetch('today_result.json?t=' + Date.now());
-                const data = await response.json();
+                if (!response.ok) throw new Error('Network response was not ok');
                 
+                const data = await response.json();
                 const today = getTodayString();
                 const weekday = getWeekday();
                 const period = calculatePeriod();
 
                 // 检查数据是否是今天的
-                if (data.date === today) {
+                const dataDate = data.date || (data.generated_at ? data.generated_at.split('T')[0] : null);
+                
+                if (dataDate === today) {
                     statusIcon.textContent = '✅';
                     statusText.textContent = '今日推荐已生成';
-                    statusDetail.textContent = `${weekday} · ${period}期 · ${data.generated_at.split('T')[0]}`;
-                    statusDetail.parentElement.style.borderColor = '#4ade80';
+                    statusDetail.textContent = `${weekday} · ${data.period || period}期 · ${formatDate(data.generated_at)}`;
+                    statusBox.className = 'status-box';
                 } else {
                     statusIcon.textContent = '⏳';
-                    statusText.textContent = '等待生成...';
-                    statusDetail.textContent = `数据日期：${data.date}，预计09:00更新`;
+                    statusText.textContent = '等待更新...';
+                    statusDetail.textContent = `数据日期：${dataDate || '未知'}，系统将在09:00自动更新`;
+                    statusBox.className = 'status-box warning';
                 }
 
                 // 显示推荐
-                document.getElementById('pl3Result').textContent = data.pl3.selected_2.join(', ');
-                document.getElementById('pl3Sums').textContent = '重点和值：' + data.pl3.key_sum.join(', ');
+                const pl3Nums = data.pl3?.selected_2 || [];
+                const fc3dNums = data.fc3d?.selected_2 || [];
                 
-                document.getElementById('fc3dResult').textContent = data.fc3d.selected_2.join(', ');
-                document.getElementById('fc3dSums').textContent = '重点和值：' + data.fc3d.key_sum.join(', ');
+                document.getElementById('pl3Result').textContent = pl3Nums.length > 0 ? pl3Nums.join(', ') : '---';
+                document.getElementById('pl3Sums').textContent = '重点和值：' + (data.pl3?.key_sum || []).join(', ');
+                
+                document.getElementById('fc3dResult').textContent = fc3dNums.length > 0 ? fc3dNums.join(', ') : '---';
+                document.getElementById('fc3dSums').textContent = '重点和值：' + (data.fc3d?.key_sum || []).join(', ');
 
                 // 显示结果区域
                 loadingSection.style.display = 'none';
@@ -365,8 +395,17 @@
                 console.error('加载失败:', error);
                 statusIcon.textContent = '❌';
                 statusText.textContent = '加载失败';
-                statusDetail.textContent = '请刷新页面重试';
-                loadingSection.innerHTML = '<p style="color:#ef4444;">数据加载失败，请刷新页面</p>';
+                statusDetail.textContent = '显示备用数据...';
+                statusBox.className = 'status-box error';
+                
+                // 使用备用数据
+                document.getElementById('pl3Result').textContent = '493, 165';
+                document.getElementById('pl3Sums').textContent = '重点和值：12,13,14,15,16';
+                document.getElementById('fc3dResult').textContent = '435, 236';
+                document.getElementById('fc3dSums').textContent = '重点和值：11,12,13,14,15';
+                
+                loadingSection.style.display = 'none';
+                resultSection.style.display = 'block';
             }
         }
 
