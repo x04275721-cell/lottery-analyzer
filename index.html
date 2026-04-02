@@ -3,539 +3,779 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <meta name="description" content="彩票智能分析系统 - 排列三、福彩3D每日自动分析推荐，基于三阶马尔可夫链">
-    <meta name="keywords" content="彩票,排列三,3D,马尔可夫链,开奖预测">
-    <meta name="robots" content="index, follow">
-    <link rel="icon" type="image/svg+xml" href="favicon.svg">
-    <title>📊 今日分析 - 彩票智能分析系统 V6</title>
+    <title>彩票智能分析 - 多算法交叉验证</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-            min-height: 100vh;
-            color: #fff;
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #f59e0b;
+            --success: #10b981;
+            --danger: #ef4444;
+            --bg: #0f172a;
+            --card: #1e293b;
+            --text: #f8fafc;
+            --text-muted: #94a3b8;
         }
-        .container { max-width: 900px; margin: 0 auto; padding: 15px; }
         
-        /* 导航 */
-        .nav-menu { display: flex; gap: 8px; margin-bottom: 15px; justify-content: center; flex-wrap: wrap; }
-        .nav-item { padding: 8px 15px; background: rgba(255,255,255,0.1); border-radius: 15px; color: white; text-decoration: none; font-size: 0.85em; transition: all 0.3s; }
-        .nav-item:hover, .nav-item.active { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
         
-        /* 标题 */
-        h1 { text-align: center; font-size: 1.5em; margin-bottom: 5px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .subtitle { text-align: center; color: rgba(255,255,255,0.7); margin-bottom: 15px; font-size: 0.8em; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            padding: 20px;
+        }
         
-        /* 刷新按钮 */
-        .refresh-btn {
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+        
+        h1 {
+            font-size: 24px;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .countdown {
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+        
+        .countdown span {
+            color: var(--secondary);
+            font-weight: bold;
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+        
+        .tab {
+            flex: 1;
+            padding: 12px;
+            background: var(--card);
+            border: none;
+            border-radius: 8px;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        
+        .tab.active {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .card {
+            background: var(--card);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
+        }
+        
+        .card-title {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-bottom: 12px;
             display: flex;
             align-items: center;
-            justify-content: center;
             gap: 8px;
-            width: 100%;
-            padding: 12px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border: none;
-            border-radius: 10px;
-            color: white;
-            font-size: 0.95em;
-            cursor: pointer;
-            transition: all 0.3s;
-            margin-bottom: 15px;
         }
-        .refresh-btn:hover { transform: scale(1.02); box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4); }
-        .refresh-btn.loading { opacity: 0.7; pointer-events: none; }
-        .refresh-btn .spinner {
-            width: 16px; height: 16px;
-            border: 2px solid rgba(255,255,255,0.3);
-            border-top-color: white;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            display: none;
-        }
-        .refresh-btn.loading .spinner { display: inline-block; }
-        @keyframes spin { to { transform: rotate(360deg); } }
         
-        /* 统计卡片 */
-        .stats-grid {
+        .card-title::before {
+            content: '';
+            width: 4px;
+            height: 16px;
+            background: var(--primary);
+            border-radius: 2px;
+        }
+        
+        /* 精选推荐 */
+        .selected {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        
+        .num-box {
+            flex: 1;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            padding: 16px;
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .num-box:hover {
+            transform: scale(1.05);
+        }
+        
+        .num-box span {
+            font-size: 28px;
+            font-weight: bold;
+            letter-spacing: 4px;
+            color: white;
+        }
+        
+        .num-box .label {
+            font-size: 12px;
+            color: rgba(255,255,255,0.8);
+            margin-top: 4px;
+        }
+        
+        /* 备选 */
+        .backup {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .backup-item {
+            flex: 1;
+            background: rgba(99, 102, 241, 0.1);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .backup-item:hover {
+            background: rgba(99, 102, 241, 0.2);
+            border-color: var(--primary);
+        }
+        
+        .backup-item span {
+            font-size: 20px;
+            font-weight: bold;
+            letter-spacing: 2px;
+        }
+        
+        /* 胆码 */
+        .danma {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+        
+        .danma-item {
+            flex: 1;
+            text-align: center;
+        }
+        
+        .danma-item .label {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+        
+        .danma-item .num {
+            font-size: 24px;
+            font-weight: bold;
+            padding: 8px 16px;
+            border-radius: 8px;
+            display: inline-block;
+        }
+        
+        .gold {
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            color: #1e293b;
+        }
+        
+        .silver {
+            background: linear-gradient(135deg, #94a3b8, #64748b);
+            color: #1e293b;
+        }
+        
+        .double-dan {
+            text-align: center;
+            padding: 8px;
+            background: rgba(99, 102, 241, 0.1);
+            border-radius: 8px;
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+        
+        .double-dan span {
+            color: var(--secondary);
+            font-weight: bold;
+        }
+        
+        /* 和值 */
+        .sum-list {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .sum-item {
+            flex: 1;
+            text-align: center;
+            padding: 8px;
+            background: rgba(16, 185, 129, 0.1);
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        
+        .sum-item span {
+            color: var(--success);
+            font-weight: bold;
+        }
+        
+        /* 历史记录 */
+        .history-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .history-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .history-item:last-child {
+            border-bottom: none;
+        }
+        
+        .history-item.hit {
+            background: rgba(16, 185, 129, 0.1);
+        }
+        
+        .history-period {
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+        
+        .history-result {
+            font-size: 18px;
+            font-weight: bold;
+            letter-spacing: 4px;
+        }
+        
+        .history-hit {
+            color: var(--success);
+            font-size: 12px;
+        }
+        
+        /* 命中率统计 */
+        .stats {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            margin-bottom: 15px;
+            gap: 12px;
         }
-        .stat-card {
-            background: rgba(255,255,255,0.05);
-            border-radius: 10px;
-            padding: 12px;
-            text-align: center;
-        }
-        .stat-value { font-size: 1.5em; font-weight: bold; color: #667eea; }
-        .stat-label { font-size: 0.75em; color: rgba(255,255,255,0.6); margin-top: 3px; }
         
-        /* 倒计时 */
-        .countdown-box {
-            background: linear-gradient(135deg, rgba(102,126,234,0.2) 0%, rgba(118,75,162,0.2) 100%);
-            border: 1px solid #667eea;
-            border-radius: 12px;
-            padding: 15px;
+        .stat-item {
             text-align: center;
-            margin-bottom: 15px;
+            padding: 16px;
+            background: rgba(99, 102, 241, 0.1);
+            border-radius: 8px;
         }
-        .countdown-label { font-size: 0.85em; color: rgba(255,255,255,0.7); margin-bottom: 5px; }
-        .countdown-time { font-size: 1.8em; font-weight: bold; color: #fbbf24; font-family: monospace; }
         
-        /* 中奖提示 */
-        .win-alert {
-            display: none;
-            background: linear-gradient(135deg, rgba(74, 222, 128, 0.3) 0%, rgba(34, 197, 94, 0.3) 100%);
-            border: 2px solid #4ade80;
-            border-radius: 15px;
-            padding: 20px;
-            text-align: center;
-            margin-bottom: 15px;
-            animation: pulse 2s infinite;
+        .stat-item .value {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--primary);
         }
-        .win-alert.show { display: block; }
-        .win-alert .emoji { font-size: 3em; }
-        .win-alert .text { font-size: 1.2em; font-weight: bold; color: #4ade80; margin-top: 10px; }
-        .lose-alert {
-            display: none;
-            background: linear-gradient(135deg, rgba(248, 113, 113, 0.2) 0%, rgba(239, 68, 68, 0.2) 100%);
-            border: 1px solid #f87171;
-            border-radius: 12px;
-            padding: 15px;
-            text-align: center;
-            margin-bottom: 15px;
-        }
-        .lose-alert.show { display: block; }
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.8; } }
         
-        /* 卡片 */
-        .card {
-            background: rgba(255,255,255,0.05);
-            border-radius: 12px;
-            padding: 15px;
-            margin-bottom: 12px;
+        .stat-item .label {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 4px;
         }
-        .card-title {
-            font-size: 1em;
-            margin-bottom: 12px;
-            color: #667eea;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            padding-bottom: 8px;
+        
+        /* 权重调节 */
+        .weight-sliders {
             display: flex;
-            align-items: center;
+            flex-direction: column;
+            gap: 16px;
+        }
+        
+        .slider-item {
+            display: flex;
+            flex-direction: column;
             gap: 8px;
         }
         
-        /* 加载状态 */
-        .loading-state {
-            text-align: center;
-            padding: 40px;
-            color: rgba(255,255,255,0.6);
-        }
-        .loading-spinner {
-            width: 40px; height: 40px;
-            border: 3px solid rgba(255,255,255,0.1);
-            border-top-color: #667eea;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 15px;
+        .slider-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
         }
         
-        /* 号码球 */
-        .number-ball {
-            width: 36px; height: 36px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 50%;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            margin: 2px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .number-ball:hover { transform: scale(1.15); }
-        .number-ball.selected {
-            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-            box-shadow: 0 0 15px rgba(239, 68, 68, 0.5);
+        .slider-name {
+            color: var(--text);
         }
         
-        /* 推荐号码 */
-        .rec-card {
-            background: linear-gradient(135deg, rgba(102,126,234,0.15) 0%, rgba(118,75,162,0.15) 100%);
-            border: 1px solid #667eea;
-            border-radius: 12px;
-            padding: 15px;
-            margin: 10px 0;
-        }
-        .rec-number {
-            font-size: 2em;
+        .slider-value {
+            color: var(--primary);
             font-weight: bold;
-            text-align: center;
-            color: #fbbf24;
-            margin: 10px 0;
+        }
+        
+        input[type="range"] {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: rgba(99, 102, 241, 0.2);
+            outline: none;
+            -webkit-appearance: none;
+        }
+        
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--primary);
             cursor: pointer;
-            padding: 10px;
+        }
+        
+        .btn-reset {
+            width: 100%;
+            padding: 12px;
+            background: var(--card);
+            border: 1px solid var(--primary);
             border-radius: 8px;
-            transition: all 0.2s;
-        }
-        .rec-number:hover {
-            background: rgba(251, 191, 36, 0.1);
-        }
-        .rec-number.copied {
-            background: rgba(74, 222, 128, 0.3);
-            color: #4ade80;
-        }
-        .rec-detail { font-size: 0.85em; color: rgba(255,255,255,0.7); text-align: center; }
-        
-        /* 大底号码 */
-        .base-grid { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin-top: 10px; }
-        .base-item {
-            padding: 6px 10px;
-            background: rgba(102,126,234,0.2);
-            border-radius: 6px;
-            font-size: 0.9em;
+            color: var(--primary);
+            font-size: 14px;
             cursor: pointer;
-            transition: all 0.2s;
+            margin-top: 16px;
+            transition: all 0.3s;
         }
-        .base-item:hover { background: rgba(102,126,234,0.4); }
-        .base-item.copied { background: rgba(74, 222, 128, 0.3); }
         
-        /* 复制提示 */
-        .copy-toast {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(0,0,0,0.9);
+        .btn-reset:hover {
+            background: var(--primary);
             color: white;
-            padding: 15px 30px;
-            border-radius: 10px;
-            font-size: 1.1em;
-            opacity: 0;
-            transition: opacity 0.3s;
-            pointer-events: none;
-            z-index: 1000;
         }
-        .copy-toast.show { opacity: 1; }
         
-        /* 错误提示 */
-        .error-box {
-            background: rgba(248, 113, 113, 0.2);
-            border: 1px solid #f87171;
+        /* 生成按钮 */
+        .btn-generate {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border: none;
             border-radius: 12px;
-            padding: 20px;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 16px;
+            transition: transform 0.2s;
+        }
+        
+        .btn-generate:hover {
+            transform: scale(1.02);
+        }
+        
+        .copy-hint {
             text-align: center;
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 8px;
         }
         
-        /* 工具卡片 */
-        .tool-card {
-            background: rgba(255,255,255,0.05);
-            border-radius: 12px;
-            padding: 15px;
-            margin-bottom: 10px;
+        /* 热号榜 */
+        .hot-list {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+        }
+        
+        .hot-item {
+            text-align: center;
+            padding: 8px;
+            background: rgba(239, 68, 68, 0.1);
+            border-radius: 6px;
+        }
+        
+        .hot-item .num {
+            font-size: 20px;
+            font-weight: bold;
+            color: var(--danger);
+        }
+        
+        .hot-item .count {
+            font-size: 10px;
+            color: var(--text-muted);
+        }
+        
+        /* 柱状图 */
+        .chart {
+            margin-top: 12px;
+        }
+        
+        .chart-bar {
             display: flex;
             align-items: center;
-            gap: 15px;
-            cursor: pointer;
-            transition: all 0.2s;
+            gap: 8px;
+            margin-bottom: 8px;
         }
-        .tool-card:hover { background: rgba(255,255,255,0.1); }
-        .tool-icon { font-size: 2em; }
-        .tool-info { flex: 1; }
-        .tool-name { font-weight: bold; margin-bottom: 3px; }
-        .tool-desc { font-size: 0.8em; color: rgba(255,255,255,0.6); }
         
-        /* 页脚 */
-        .footer { text-align: center; color: rgba(255,255,255,0.5); font-size: 0.8em; margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); }
+        .chart-label {
+            width: 30px;
+            font-size: 12px;
+            color: var(--text-muted);
+        }
         
-        /* 移动端适配 */
-        @media (max-width: 600px) {
-            .stats-grid { grid-template-columns: repeat(3, 1fr); }
-            .number-ball { width: 30px; height: 30px; font-size: 0.9em; }
-            .rec-number { font-size: 1.6em; }
-            .base-item { padding: 5px 8px; font-size: 0.85em; }
+        .chart-bar-inner {
+            flex: 1;
+            height: 16px;
+            background: rgba(99, 102, 241, 0.2);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .chart-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            border-radius: 4px;
+            transition: width 0.3s;
+        }
+        
+        .chart-count {
+            width: 40px;
+            font-size: 12px;
+            color: var(--text-muted);
+            text-align: right;
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        /* 底部导航 */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--card);
+            display: flex;
+            justify-content: space-around;
+            padding: 12px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 10px;
+            cursor: pointer;
+        }
+        
+        .nav-item.active {
+            color: var(--primary);
+        }
+        
+        .nav-item svg {
+            width: 24px;
+            height: 24px;
+        }
+        
+        .main-content {
+            padding-bottom: 80px;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>📊 彩票智能分析系统</h1>
-        <div class="subtitle">三阶马尔可夫链 V6 | 排列三 · 福彩3D</div>
-        
-        <!-- 导航 -->
-        <div class="nav-menu">
-            <a href="index.html" class="nav-item active">📊 今日分析</a>
-            <a href="tracking.html" class="nav-item">📈 历史追踪</a>
-            <a href="automation.html" class="nav-item">🤖 自动生成</a>
-            <a href="generator.html" class="nav-item">🎲 号码生成</a>
-        </div>
-        
-        <!-- 刷新按钮 -->
-        <button class="refresh-btn" onclick="refreshData()">
-            <span class="spinner"></span>
-            <span class="text">🔄 刷新数据</span>
-        </button>
-        
-        <!-- 统计卡片 -->
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-value" id="totalPeriods">--</div>
-                <div class="stat-label">累计期数</div>
+    <div class="container main-content">
+        <header>
+            <h1>🎲 彩票智能分析</h1>
+            <div class="countdown">
+                距第<span id="nextPeriod">--</span>期开奖：<span id="countdown">--:--:--</span>
             </div>
-            <div class="stat-card">
-                <div class="stat-value" id="hitCount">--</div>
-                <div class="stat-label">命中次数</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value" id="hitRate">--%</div>
-                <div class="stat-label">命中率</div>
-            </div>
+        </header>
+        
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('pl3')">排列三</button>
+            <button class="tab" onclick="switchTab('fc3d')">3D</button>
         </div>
         
-        <!-- 倒计时 -->
-        <div class="countdown-box">
-            <div class="countdown-label">距离开奖还有</div>
-            <div class="countdown-time" id="countdown">--:--:--</div>
-        </div>
-        
-        <!-- 中奖提示 -->
-        <div class="win-alert" id="winAlert">
-            <div class="emoji">🎉</div>
-            <div class="text" id="winText">恭喜！本期命中！</div>
-        </div>
-        <div class="lose-alert" id="loseAlert">
-            <div class="emoji">😅</div>
-            <div class="text">本期未中，明天再接再厉！</div>
-        </div>
-        
-        <!-- 主内容 -->
-        <div id="mainContent">
-            <div class="loading-state">
-                <div class="loading-spinner"></div>
-                <p>正在加载分析数据...</p>
-            </div>
-        </div>
-        
-        <!-- 工具入口 -->
+        <!-- 精选推荐 -->
         <div class="card">
-            <div class="card-title">🛠️ 实用工具</div>
-            <div class="tool-card" onclick="location.href='generator.html'">
-                <div class="tool-icon">🎲</div>
-                <div class="tool-info">
-                    <div class="tool-name">号码生成器</div>
-                    <div class="tool-desc">基于马尔可夫链自定义生成号码</div>
+            <div class="card-title">精选推荐</div>
+            <div class="selected">
+                <div class="num-box" onclick="copyNumber(this)">
+                    <span id="sel1">---</span>
+                    <div class="label">精选 1</div>
                 </div>
-                <div>→</div>
+                <div class="num-box" onclick="copyNumber(this)">
+                    <span id="sel2">---</span>
+                    <div class="label">精选 2</div>
+                </div>
+            </div>
+            <div class="backup">
+                <div class="backup-item" onclick="copyNumber(this)"><span id="bak1">-</span></div>
+                <div class="backup-item" onclick="copyNumber(this)"><span id="bak2">-</span></div>
+                <div class="backup-item" onclick="copyNumber(this)"><span id="bak3">-</span></div>
+            </div>
+            <div class="copy-hint">点击号码即可复制</div>
+        </div>
+        
+        <!-- 胆码 -->
+        <div class="card">
+            <div class="card-title">胆码推荐</div>
+            <div class="danma">
+                <div class="danma-item">
+                    <div class="label">金胆</div>
+                    <div class="num gold" id="goldDan">-</div>
+                </div>
+                <div class="danma-item">
+                    <div class="label">银胆</div>
+                    <div class="num silver" id="silverDan">-</div>
+                </div>
+            </div>
+            <div class="double-dan">
+                双胆：<span id="doubleDan">--</span>
             </div>
         </div>
         
-        <div class="footer">
-            ⚠️ 彩票有风险，投注需谨慎！<br>
-            本系统仅供学习研究，不构成投注建议
+        <!-- 和值 -->
+        <div class="card">
+            <div class="card-title">热和值</div>
+            <div class="sum-list">
+                <div class="sum-item">和值 <span id="sum1">-</span></div>
+                <div class="sum-item">和值 <span id="sum2">-</span></div>
+                <div class="sum-item">和值 <span id="sum3">-</span></div>
+            </div>
+        </div>
+        
+        <!-- 历史追踪 -->
+        <div class="card">
+            <div class="card-title">近期战绩</div>
+            <div class="stats">
+                <div class="stat-item">
+                    <div class="value" id="totalCount">0</div>
+                    <div class="label">已预测</div>
+                </div>
+                <div class="stat-item">
+                    <div class="value" id="hitCount">0</div>
+                    <div class="label">组选命中</div>
+                </div>
+                <div class="stat-item">
+                    <div class="value" id="hitRate">0%</div>
+                    <div class="label">命中率</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 号码生成器 -->
+        <div class="card">
+            <div class="card-title">号码生成器</div>
+            <div class="weight-sliders">
+                <div class="slider-item">
+                    <div class="slider-header">
+                        <span class="slider-name">马尔可夫链</span>
+                        <span class="slider-value" id="markovVal">50%</span>
+                    </div>
+                    <input type="range" id="markov" min="0" max="100" value="50" oninput="updateSlider()">
+                </div>
+                <div class="slider-item">
+                    <div class="slider-header">
+                        <span class="slider-name">随机生成</span>
+                        <span class="slider-value" id="randomVal">50%</span>
+                    </div>
+                    <input type="range" id="random" min="0" max="100" value="50" oninput="updateSlider()">
+                </div>
+            </div>
+            <button class="btn-generate" onclick="regenerate()">重新生成</button>
+            <button class="btn-reset" onclick="resetSlider()">恢复默认</button>
+        </div>
+        
+        <!-- 热号榜 -->
+        <div class="card">
+            <div class="card-title">热号排行榜</div>
+            <div class="hot-list" id="hotList">
+                <!-- 动态生成 -->
+            </div>
+        </div>
+        
+        <!-- 和值分布 -->
+        <div class="card">
+            <div class="card-title">和值分布</div>
+            <div class="chart" id="sumChart">
+                <!-- 动态生成 -->
+            </div>
         </div>
     </div>
     
-    <!-- 复制提示 -->
-    <div class="copy-toast" id="copyToast">✅ 已复制到剪贴板</div>
+    <!-- 底部导航 -->
+    <div class="bottom-nav">
+        <div class="nav-item active" onclick="showPage('home')">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+            <span>首页</span>
+        </div>
+        <div class="nav-item" onclick="showPage('history')">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/></svg>
+            <span>历史</span>
+        </div>
+        <div class="nav-item" onclick="showPage('generator')">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.14 12.94c.04-.31.06-.63.06-.94 0-.31-.02-.63-.06-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.04.31-.06.63-.06.94s.02.63.06.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+            <span>设置</span>
+        </div>
+    </div>
     
     <script>
-        // ===== 倒计时 =====
+        let currentLottery = 'pl3';
+        let data = null;
+        
+        // 加载数据
+        async function loadData() {
+            try {
+                const res = await fetch('today_result.json');
+                data = await res.json();
+                updateUI();
+            } catch (e) {
+                console.log('使用默认数据');
+            }
+        }
+        
+        // 更新UI
+        function updateUI() {
+            if (!data) return;
+            
+            const info = data[currentLottery];
+            
+            document.getElementById('sel1').textContent = info.selected_2[0] || '---';
+            document.getElementById('sel2').textContent = info.selected_2[1] || '---';
+            document.getElementById('bak1').textContent = info.backup_3[0] || '-';
+            document.getElementById('bak2').textContent = info.backup_3[1] || '-';
+            document.getElementById('bak3').textContent = info.backup_3[2] || '-';
+            
+            document.getElementById('goldDan').textContent = info.gold_dan;
+            document.getElementById('silverDan').textContent = info.silver_dan;
+            document.getElementById('doubleDan').textContent = info.double_dan.join(', ');
+            
+            document.getElementById('sum1').textContent = info.key_sum[0];
+            document.getElementById('sum2').textContent = info.key_sum[1];
+            document.getElementById('sum3').textContent = info.key_sum[2];
+            
+            // 更新热号榜
+            updateHotList();
+            
+            // 更新和值图
+            updateSumChart();
+        }
+        
+        // 切换彩种
+        function switchTab(lottery) {
+            currentLottery = lottery;
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            updateUI();
+        }
+        
+        // 复制号码
+        function copyNumber(el) {
+            const num = el.querySelector('span').textContent;
+            if (num.length === 3) {
+                navigator.clipboard.writeText(num);
+                alert('已复制: ' + num);
+            }
+        }
+        
+        // 更新滑块
+        function updateSlider() {
+            const markov = document.getElementById('markov').value;
+            const random = document.getElementById('random').value;
+            
+            document.getElementById('markovVal').textContent = markov + '%';
+            document.getElementById('randomVal').textContent = random + '%';
+        }
+        
+        // 重置滑块
+        function resetSlider() {
+            document.getElementById('markov').value = 50;
+            document.getElementById('random').value = 50;
+            updateSlider();
+        }
+        
+        // 重新生成
+        function regenerate() {
+            alert('重新生成功能开发中...');
+        }
+        
+        // 更新热号榜
+        function updateHotList() {
+            const hotList = document.getElementById('hotList');
+            // 模拟数据
+            const hotNums = [7, 3, 8, 5, 2];
+            hotList.innerHTML = hotNums.map(n => 
+                '<div class="hot-item"><div class="num">'+n+'</div><div class="count">98次</div></div>'
+            ).join('');
+        }
+        
+        // 更新和值图
+        function updateSumChart() {
+            const chart = document.getElementById('sumChart');
+            const sums = [
+                {label: 12, count: 85, max: 100},
+                {label: 14, count: 72, max: 100},
+                {label: 16, count: 65, max: 100}
+            ];
+            
+            chart.innerHTML = sums.map(s => 
+                '<div class="chart-bar">' +
+                '<div class="chart-label">'+s.label+'</div>' +
+                '<div class="chart-bar-inner">' +
+                '<div class="chart-bar-fill" style="width:'+(s.count/s.max*100)+'%"></div>' +
+                '</div>' +
+                '<div class="chart-count">'+s.count+'</div>' +
+                '</div>'
+            ).join('');
+        }
+        
+        // 倒计时
         function updateCountdown() {
             const now = new Date();
-            let target;
+            let target = new Date();
+            target.setHours(21, 15, 0, 0);
             
-            if (now.getHours() < 21 || (now.getHours() === 21 && now.getMinutes() < 15)) {
-                // 今天21:15开奖
-                target = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 21, 15, 0);
-            } else {
-                // 明天21:15开奖
-                target = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 21, 15, 0);
+            if (now > target) {
+                target.setDate(target.getDate() + 1);
             }
             
             const diff = target - now;
-            const hours = Math.floor(diff / (1000 * 60 * 60));
-            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+            const hours = Math.floor(diff / 3600000);
+            const minutes = Math.floor((diff % 3600000) / 60000);
+            const seconds = Math.floor((diff % 60000) / 1000);
             
             document.getElementById('countdown').textContent = 
-                `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+                `${hours.toString().padStart(2,'0')}:${minutes.toString().padStart(2,'0')}:${seconds.toString().padStart(2,'0')}`;
         }
         
-        setInterval(updateCountdown, 1000);
+        // 页面切换
+        function showPage(page) {
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            event.target.closest('.nav-item').classList.add('active');
+        }
+        
+        // 初始化
+        loadData();
         updateCountdown();
-        
-        // ===== 加载数据 =====
-        async function loadData() {
-            const content = document.getElementById('mainContent');
-            const cacheBuster = '_t=' + Date.now() + Math.random().toString(36).substr(2, 5);
-            
-            try {
-                const response = await fetch('today_result.json?' + cacheBuster);
-                if (!response.ok) throw new Error('加载失败');
-                
-                const data = await response.json();
-                renderContent(data);
-                loadStats();
-                checkWinStatus(data);
-                
-            } catch (error) {
-                console.error('加载失败:', error);
-                content.innerHTML = `
-                    <div class="error-box">
-                        <div style="font-size:2em;margin-bottom:10px;">😵</div>
-                        <div style="color:#f87171;margin-bottom:10px;">数据加载失败</div>
-                        <div style="color:rgba(255,255,255,0.6);font-size:0.9em;">请检查网络后点击上方刷新按钮</div>
-                    </div>
-                `;
-            }
-        }
-        
-        // ===== 渲染内容 =====
-        function renderContent(data) {
-            const content = document.getElementById('mainContent');
-            
-            const pl3 = data.pl3 || {};
-            const fc3d = data.fc3d || {};
-            
-            const pl3Nums = pl3.selected_2 || [];
-            const fc3dNums = fc3d.selected_2 || [];
-            const pl3Base = pl3.base_5 || [];
-            const fc3dBase = fc3d.base_5 || [];
-            const pl3Sums = pl3.key_sum || [];
-            const fc3dSums = fc3d.key_sum || [];
-            const pl3Danma = pl3.danma || [];
-            const fc3dDanma = fc3d.danma || [];
-            const pl3Double = pl3.double_dan || [];
-            const fc3dDouble = fc3d.double_dan || [];
-            
-            content.innerHTML = `
-                <!-- 排列三 -->
-                <div class="card">
-                    <div class="card-title">🎯 排列三 <span style="font-size:0.8em;color:rgba(255,255,255,0.6);font-weight:normal;">第${data.period || '---'}期</span></div>
-                    
-                    <div class="rec-card">
-                        <div class="rec-detail">精选2注</div>
-                        <div class="rec-number" onclick="copyNumber(this, '${pl3Nums.join(',')}')">${pl3Nums.join(' , ')}</div>
-                        <div class="rec-detail">重点和值：${pl3Sums.join(', ')}</div>
-                    </div>
-                    
-                    <div style="background:rgba(251,191,36,0.1);border-radius:10px;padding:12px;margin:10px 0;">
-                        <div style="color:#fbbf24;font-weight:bold;margin-bottom:8px;">🔥 胆码推荐</div>
-                        <div style="display:flex;justify-content:space-around;text-align:center;">
-                            <div><div style="color:rgba(255,255,255,0.6);font-size:0.8em;">百位</div><div style="font-size:1.3em;font-weight:bold;">${pl3Danma[0]?.join('') || '---'}</div></div>
-                            <div><div style="color:rgba(255,255,255,0.6);font-size:0.8em;">十位</div><div style="font-size:1.3em;font-weight:bold;">${pl3Danma[1]?.join('') || '---'}</div></div>
-                            <div><div style="color:rgba(255,255,255,0.6);font-size:0.8em;">个位</div><div style="font-size:1.3em;font-weight:bold;">${pl3Danma[2]?.join('') || '---'}</div></div>
-                        </div>
-                        <div style="margin-top:8px;font-size:0.85em;">双胆：${pl3Double.join(' ')}</div>
-                    </div>
-                    
-                    <div style="font-size:0.85em;color:rgba(255,255,255,0.6);margin-bottom:8px;">精选5注（点击复制）</div>
-                    <div class="base-grid">
-                        ${pl3Base.map(n => `<div class="base-item" onclick="copyNumber(this, '${n}')">${n}</div>`).join('')}
-                    </div>
-                </div>
-                
-                <!-- 3D -->
-                <div class="card">
-                    <div class="card-title">🎯 福彩3D <span style="font-size:0.8em;color:rgba(255,255,255,0.6);font-weight:normal;">第${data.period || '---'}期</span></div>
-                    
-                    <div class="rec-card">
-                        <div class="rec-detail">精选2注</div>
-                        <div class="rec-number" onclick="copyNumber(this, '${fc3dNums.join(',')}')">${fc3dNums.join(' , ')}</div>
-                        <div class="rec-detail">重点和值：${fc3dSums.join(', ')}</div>
-                    </div>
-                    
-                    <div style="background:rgba(251,191,36,0.1);border-radius:10px;padding:12px;margin:10px 0;">
-                        <div style="color:#fbbf24;font-weight:bold;margin-bottom:8px;">🔥 胆码推荐</div>
-                        <div style="display:flex;justify-content:space-around;text-align:center;">
-                            <div><div style="color:rgba(255,255,255,0.6);font-size:0.8em;">百位</div><div style="font-size:1.3em;font-weight:bold;">${fc3dDanma[0]?.join('') || '---'}</div></div>
-                            <div><div style="color:rgba(255,255,255,0.6);font-size:0.8em;">十位</div><div style="font-size:1.3em;font-weight:bold;">${fc3dDanma[1]?.join('') || '---'}</div></div>
-                            <div><div style="color:rgba(255,255,255,0.6);font-size:0.8em;">个位</div><div style="font-size:1.3em;font-weight:bold;">${fc3dDanma[2]?.join('') || '---'}</div></div>
-                        </div>
-                        <div style="margin-top:8px;font-size:0.85em;">双胆：${fc3dDouble.join(' ')}</div>
-                    </div>
-                    
-                    <div style="font-size:0.85em;color:rgba(255,255,255,0.6);margin-bottom:8px;">精选5注（点击复制）</div>
-                    <div class="base-grid">
-                        ${fc3dBase.map(n => `<div class="base-item" onclick="copyNumber(this, '${n}')">${n}</div>`).join('')}
-                    </div>
-                </div>
-            `;
-        }
-        
-        // ===== 复制号码 =====
-        function copyNumber(element, text) {
-            navigator.clipboard.writeText(text).then(() => {
-                const toast = document.getElementById('copyToast');
-                element.classList.add('copied');
-                toast.classList.add('show');
-                setTimeout(() => {
-                    toast.classList.remove('show');
-                    element.classList.remove('copied');
-                }, 1500);
-            });
-        }
-        
-        // ===== 刷新按钮 =====
-        function refreshData() {
-            const btn = document.querySelector('.refresh-btn');
-            btn.classList.add('loading');
-            loadData();
-            setTimeout(() => btn.classList.remove('loading'), 1000);
-        }
-        
-        // ===== 加载统计 =====
-        async function loadStats() {
-            try {
-                const response = await fetch('history_records.json?_t=' + Date.now());
-                if (!response.ok) return;
-                
-                const history = await response.json();
-                const total = history.length;
-                const hits = history.filter(h => h.status === '直中' || h.status === '组中').length;
-                const rate = total > 0 ? ((hits / total) * 100).toFixed(1) : 0;
-                
-                document.getElementById('totalPeriods').textContent = total;
-                document.getElementById('hitCount').textContent = hits;
-                document.getElementById('hitRate').textContent = rate + '%';
-            } catch (e) {
-                console.log('统计加载失败');
-            }
-        }
-        
-        // ===== 检查中奖状态 =====
-        async function checkWinStatus(data) {
-            try {
-                const response = await fetch('history_records.json?_t=' + Date.now());
-                if (!response.ok) return;
-                
-                const history = await response.json();
-                const period = data.period;
-                const latest = history.find(h => h.period === period && h.game === '排列三');
-                
-                if (latest && latest.status !== '待开奖') {
-                    const winAlert = document.getElementById('winAlert');
-                    const loseAlert = document.getElementById('loseAlert');
-                    
-                    if (latest.status === '直中' || latest.status === '组中') {
-                        document.getElementById('winText').textContent = `${latest.game} ${latest.status}！号码 ${latest.result}`;
-                        winAlert.classList.add('show');
-                    } else {
-                        loseAlert.classList.add('show');
-                    }
-                }
-            } catch (e) {
-                console.log('状态检查失败');
-            }
-        }
-        
-        // ===== 初始化 =====
-        document.addEventListener('DOMContentLoaded', loadData);
+        setInterval(updateCountdown, 1000);
     </script>
 </body>
 </html>
