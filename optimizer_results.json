@@ -1,0 +1,434 @@
+[
+  {
+    "weights": {
+      "markov": 60,
+      "random": 30,
+      "missing": 10,
+      "span": 0,
+      "hot": 0,
+      "bayes": 0
+    },
+    "partial": 62.2,
+    "three": 8.200000000000001
+  },
+  {
+    "weights": {
+      "markov": 40,
+      "random": 70,
+      "missing": 0,
+      "span": 0,
+      "hot": 0,
+      "bayes": 0
+    },
+    "partial": 67.80000000000001,
+    "three": 6.800000000000001
+  },
+  {
+    "weights": {
+      "markov": 40,
+      "random": 50,
+      "missing": 10,
+      "span": 0,
+      "hot": 0,
+      "bayes": 0
+    },
+    "partial": 64.4,
+    "three": 7.3999999999999995
+  },
+  {
+    "weights": {
+      "markov": 20,
+      "random": 70,
+      "missing": 10,
+      "span": 0,
+      "hot": 0,
+      "bayes": 0
+    },
+    "partial": 64.60000000000001,
+    "three": 7.000000000000001
+  },
+  {
+    "weights": {
+      "markov": 70,
+      "random": 30,
+      "missing": 0,
+      "span": 0,
+      "hot": 0,
+      "bayes": 0
+    },
+    "partial": 65.4,
+    "three": 6.800000000000001
+  },
+  {
+    "weights": {
+      "markov": 30,
+      "random": 30,
+      "missing": 40,
+      "span": 0,
+      "hot": 0,
+      "bayes": 0
+    },
+    "partial": 61.0,
+    "three": 7.6
+  },
+  {
+    "weights": {
+      "markov": 60,
+      "random": 40,
+      "missing": 0,
+      "span": 0,
+      "hot": 0,
+      "bayes": 0
+    },
+    "partial": 68.0,
+    "three": 6.0
+  },
+  {
+    "weights": {
+      "markov": 70,
+      "random": 60,
+      "missing": 0,
+      "span": 0,
+      "hot": 0,
+      "bayes": 0
+    },
+    "partial": 67.80000000000001,
+    "three": 5.800000000000001
+  },
+  {
+    "weights": {
+      "markov": 60,
+      "random": 80,
+      "missing": 0,
+      "span": 0,
+      "hot": 0,
+      "bayes": 0
+    },
+    "partial": 65.0,
+    "three": 6.2
+  },
+  {
+    "weights": {
+      "markov": 40,
+      "random": 40,
+      "missing": 20,
+      "span": 0,
+      "hot": 0,
+      "bayes": 0
+    },
+    "partial": 63.0,
+    "three": 6.4
+  },
+  {
+    "weights": {
+      "markov": 60,
+      "random": 50,
+      "missing": 0,
+      "span": 0,
+      "hot": 0,
+      "bayes": 0
+    },
+    "partial": 63.4,
+    "three": 6.2
+  },
+  {
+    "weights": {
+      "markov": 50,
+      "random": 70,
+      "missing": 0,
+      "span": 0,
+      "hot": 0,
+      "bayes": 0
+    },
+    "partial": 63.6,
+    "three": 5.800000000000001
+  },
+  {
+    "weights": {
+      "markov": 70,
+      "random": 40,
+      "missing": 0,
+      "span": 0,
+      "hot": 0,
+      "bayes": 0
+    },
+    "partial": 62.4,
+    "three": 6.0
+  },
+  {
+    "weights": {
+      "markov": 70,
+      "random": 50,
+      "missing": 0,
+      "span": 0,
+      "hot": 0,
+      "bayes": 0
+    },
+    "partial": 63.0,
+    "three": 5.800000000000001
+  },
+  {
+    "weights": {
+      "markov": 50,
+      "random": 60,
+      "missing": 0,
+      "span": 0,
+      "hot": 0,
+      "bayes": 0
+    },
+    "partial": 62.6,
+    "three": 5.800000000000001
+  },
+  {
+    "weights": {
+      "markov": 40,
+      "random": 60,
+      "missing": 0,
+      "span": 0,
+      "hot": 0,
+      "bayes": 0
+    },
+    "partial": 60.199999999999996,
+    "three": 6.2
+  },
+  {
+    "weights": {
+      "markov": 70,
+      "random": 80,
+      "missing": 0,
+      "span": 0,
+      "hot": 0,
+      "bayes": 0
+    },
+    "partial": 63.0,
+    "three": 5.6000000000000005
+  },
+  {
+    "weights": {
+      "markov": 50,
+      "random": 30,
+      "missing": 20,
+      "span": 0,
+      "hot": 0,
+      "bayes": 0
+    },
+    "partial": 60.6,
+    "three": 6.0
+  },
+  {
+    "weights": {
+      "markov": 20,
+      "random": 40,
+      "missing": 40,
+      "span": 0,
+      "hot": 0,
+      "bayes": 0
+    },
+    "partial": 60.4,
+    "three": 6.0
+  },
+  {
+    "weights": {
+      "markov": 30,
+      "random": 70,
+      "missing": 0,
+      "span": 0,
+      "hot": 0,
+      "bayes": 0
+    },
+    "partial": 60.199999999999996,
+    "three": 5.800000000000001
+  },
+  {
+    "weights": {
+      "markov": 50,
+      "random": 80,
+      "missing": 0,
+      "span": 0,
+      "hot": 0,
+      "bayes": 0
+    },
+    "partial": 64.0,
+    "three": 5.0
+  },
+  {
+    "weights": {
+      "markov": 20,
+      "random": 80,
+      "missing": 0,
+      "span": 0,
+      "hot": 0,
+      "bayes": 0
+    },
+    "partial": 63.800000000000004,
+    "three": 5.0
+  },
+  {
+    "weights": {
+      "markov": 30,
+      "random": 40,
+      "missing": 30,
+      "span": 0,
+      "hot": 0,
+      "bayes": 0
+    },
+    "partial": 59.4,
+    "three": 5.6000000000000005
+  },
+  {
+    "weights": {
+      "markov": 40,
+      "random": 80,
+      "missing": 0,
+      "span": 0,
+      "hot": 0,
+      "bayes": 0
+    },
+    "partial": 64.0,
+    "three": 4.6
+  },
+  {
+    "weights": {
+      "markov": 50,
+      "random": 40,
+      "missing": 10,
+      "span": 0,
+      "hot": 0,
+      "bayes": 0
+    },
+    "partial": 63.0,
+    "three": 4.8
+  },
+  {
+    "weights": {
+      "markov": 40,
+      "random": 30,
+      "missing": 30,
+      "span": 0,
+      "hot": 0,
+      "bayes": 0
+    },
+    "partial": 60.8,
+    "three": 5.2
+  },
+  {
+    "weights": {
+      "markov": 60,
+      "random": 70,
+      "missing": 0,
+      "span": 0,
+      "hot": 0,
+      "bayes": 0
+    },
+    "partial": 62.8,
+    "three": 4.8
+  },
+  {
+    "weights": {
+      "markov": 30,
+      "random": 60,
+      "missing": 10,
+      "span": 0,
+      "hot": 0,
+      "bayes": 0
+    },
+    "partial": 60.8,
+    "three": 5.0
+  },
+  {
+    "weights": {
+      "markov": 20,
+      "random": 50,
+      "missing": 30,
+      "span": 0,
+      "hot": 0,
+      "bayes": 0
+    },
+    "partial": 61.199999999999996,
+    "three": 4.8
+  },
+  {
+    "weights": {
+      "markov": 50,
+      "random": 50,
+      "missing": 0,
+      "span": 0,
+      "hot": 0,
+      "bayes": 0
+    },
+    "partial": 62.0,
+    "three": 4.6
+  },
+  {
+    "weights": {
+      "markov": 60,
+      "random": 60,
+      "missing": 0,
+      "span": 0,
+      "hot": 0,
+      "bayes": 0
+    },
+    "partial": 62.0,
+    "three": 4.6
+  },
+  {
+    "weights": {
+      "markov": 70,
+      "random": 70,
+      "missing": 0,
+      "span": 0,
+      "hot": 0,
+      "bayes": 0
+    },
+    "partial": 62.0,
+    "three": 4.6
+  },
+  {
+    "weights": {
+      "markov": 20,
+      "random": 60,
+      "missing": 20,
+      "span": 0,
+      "hot": 0,
+      "bayes": 0
+    },
+    "partial": 61.8,
+    "three": 4.3999999999999995
+  },
+  {
+    "weights": {
+      "markov": 30,
+      "random": 50,
+      "missing": 20,
+      "span": 0,
+      "hot": 0,
+      "bayes": 0
+    },
+    "partial": 58.599999999999994,
+    "three": 5.0
+  },
+  {
+    "weights": {
+      "markov": 20,
+      "random": 30,
+      "missing": 50,
+      "span": 0,
+      "hot": 0,
+      "bayes": 0
+    },
+    "partial": 58.199999999999996,
+    "three": 4.8
+  },
+  {
+    "weights": {
+      "markov": 30,
+      "random": 80,
+      "missing": 0,
+      "span": 0,
+      "hot": 0,
+      "bayes": 0
+    },
+    "partial": 60.8,
+    "three": 4.2
+  }
+]

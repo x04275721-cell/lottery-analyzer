@@ -1,0 +1,96 @@
+{
+  "best_config": {
+    "name": "M50 B10 R40",
+    "markov": 0.5,
+    "book": 0.1,
+    "random": 0.4,
+    "partial": 58.050000000000004,
+    "three": 6.15
+  },
+  "all_results": [
+    {
+      "name": "M50 B10 R40",
+      "markov": 0.5,
+      "book": 0.1,
+      "random": 0.4,
+      "partial": 58.050000000000004,
+      "three": 6.15
+    },
+    {
+      "name": "M60 B20 R20",
+      "markov": 0.6,
+      "book": 0.2,
+      "random": 0.2,
+      "partial": 55.800000000000004,
+      "three": 5.35
+    },
+    {
+      "name": "M40 B20 R40",
+      "markov": 0.4,
+      "book": 0.2,
+      "random": 0.4,
+      "partial": 55.65,
+      "three": 5.1499999999999995
+    },
+    {
+      "name": "M10 B50 R40",
+      "markov": 0.1,
+      "book": 0.5,
+      "random": 0.4,
+      "partial": 55.25,
+      "three": 5.65
+    },
+    {
+      "name": "M30 B30 R40",
+      "markov": 0.3,
+      "book": 0.3,
+      "random": 0.4,
+      "partial": 54.900000000000006,
+      "three": 5.6000000000000005
+    },
+    {
+      "name": "M20 B40 R40",
+      "markov": 0.2,
+      "book": 0.4,
+      "random": 0.4,
+      "partial": 54.800000000000004,
+      "three": 5.949999999999999
+    },
+    {
+      "name": "M30 B50 R20",
+      "markov": 0.3,
+      "book": 0.5,
+      "random": 0.2,
+      "partial": 53.1,
+      "three": 6.35
+    },
+    {
+      "name": "M40 B40 R20",
+      "markov": 0.4,
+      "book": 0.4,
+      "random": 0.2,
+      "partial": 53.05,
+      "three": 6.2
+    },
+    {
+      "name": "M20 B60 R20",
+      "markov": 0.2,
+      "book": 0.6,
+      "random": 0.2,
+      "partial": 53.0,
+      "three": 6.1
+    },
+    {
+      "name": "M50 B30 R20",
+      "markov": 0.5,
+      "book": 0.3,
+      "random": 0.2,
+      "partial": 52.400000000000006,
+      "three": 6.05
+    }
+  ],
+  "final_5000": {
+    "partial": 56.46,
+    "three": 5.82
+  }
+}
