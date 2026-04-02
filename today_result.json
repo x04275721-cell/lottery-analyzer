@@ -1,198 +1,108 @@
 {
   "date": "2026-04-02",
-  "period": "2026092",
-  "generated_at": "2026-04-02",
-  "algorithm": "Multi-Algo V7.1",
+  "period": "2026082",
+  "generated_at": "2026-04-02T22:18:22.397273",
+  "algorithm": "Multi-Algo V9",
   "weights": {
-    "markov": 50,
-    "random": 50
+    "markov": 40,
+    "random": 60
   },
   "last_draw": {
     "pl3": "690",
     "fc3d": "827"
   },
   "pl3": {
-    "period": "2026092",
-    "gold_dan": 8,
-    "silver_dan": 2,
+    "period": "2026082",
+    "gold_dan": 1,
+    "gold_missing": 0,
+    "silver_dan": 4,
+    "silver_missing": 3,
     "double_dan": [
-      "82",
-      "28"
+      "14",
+      "41"
     ],
-    "selected_2": [
-      "886",
-      "881"
-    ],
-    "backup_3": [
-      "286",
-      "686",
-      "888"
+    "selected_5": [
+      "416",
+      "614",
+      "411",
+      "184",
+      "414"
     ],
     "key_sum": [
       14,
       16,
       15
     ],
-    "hot_list": [
-      [
-        {
-          "num": 7,
-          "count": 13
-        },
-        {
-          "num": 1,
-          "count": 13
-        },
-        {
-          "num": 4,
-          "count": 12
-        },
-        {
-          "num": 8,
-          "count": 12
-        },
-        {
-          "num": 0,
-          "count": 12
-        }
-      ],
-      [
-        {
-          "num": 1,
-          "count": 17
-        },
-        {
-          "num": 9,
-          "count": 13
-        },
-        {
-          "num": 3,
-          "count": 13
-        },
-        {
-          "num": 7,
-          "count": 9
-        },
-        {
-          "num": 8,
-          "count": 9
-        }
-      ],
-      [
-        {
-          "num": 5,
-          "count": 15
-        },
-        {
-          "num": 9,
-          "count": 13
-        },
-        {
-          "num": 0,
-          "count": 11
-        },
-        {
-          "num": 1,
-          "count": 11
-        },
-        {
-          "num": 7,
-          "count": 9
-        }
-      ]
+    "avg_span": 5.2,
+    "hot_spans": [
+      3,
+      5,
+      4
     ],
+    "hot_missing": [
+      1,
+      3,
+      4,
+      2,
+      7
+    ],
+    "cold_missing": [
+      4,
+      2,
+      7
+    ],
+    "repeat_rates": {
+      "repeat_0": 40.1,
+      "repeat_1": 41.6,
+      "repeat_2": 16.2
+    },
     "last_draw": "690"
   },
   "fc3d": {
-    "period": "2026092",
+    "period": "2026082",
     "gold_dan": 7,
-    "silver_dan": 8,
+    "gold_missing": 9,
+    "silver_dan": 3,
+    "silver_missing": 4,
     "double_dan": [
-      "78",
-      "87"
+      "73",
+      "37"
     ],
-    "selected_2": [
-      "875",
-      "873"
-    ],
-    "backup_3": [
-      "874",
-      "878",
-      "974"
+    "selected_5": [
+      "376",
+      "673",
+      "473",
+      "375",
+      "837"
     ],
     "key_sum": [
       17,
       10,
       9
     ],
-    "hot_list": [
-      [
-        {
-          "num": 2,
-          "count": 18
-        },
-        {
-          "num": 6,
-          "count": 16
-        },
-        {
-          "num": 4,
-          "count": 12
-        },
-        {
-          "num": 1,
-          "count": 11
-        },
-        {
-          "num": 5,
-          "count": 10
-        }
-      ],
-      [
-        {
-          "num": 4,
-          "count": 12
-        },
-        {
-          "num": 5,
-          "count": 12
-        },
-        {
-          "num": 1,
-          "count": 11
-        },
-        {
-          "num": 9,
-          "count": 11
-        },
-        {
-          "num": 0,
-          "count": 10
-        }
-      ],
-      [
-        {
-          "num": 2,
-          "count": 14
-        },
-        {
-          "num": 7,
-          "count": 12
-        },
-        {
-          "num": 4,
-          "count": 12
-        },
-        {
-          "num": 3,
-          "count": 11
-        },
-        {
-          "num": 9,
-          "count": 10
-        }
-      ]
+    "avg_span": 4.7,
+    "hot_spans": [
+      3,
+      5,
+      4
     ],
+    "hot_missing": [
+      3,
+      7,
+      2,
+      1,
+      4
+    ],
+    "cold_missing": [
+      2,
+      1,
+      4
+    ],
+    "repeat_rates": {
+      "repeat_0": 39.0,
+      "repeat_1": 41.9,
+      "repeat_2": 16.9
+    },
     "last_draw": "827"
   }
 }
