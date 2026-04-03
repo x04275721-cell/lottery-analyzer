@@ -1,0 +1,373 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+码和邻边法测试
+"""
+
+import pandas as pd
+import numpy as np
+from collections import Counter
+import random
+
+print('='*70)
+print('码和邻边法测试')
+print('='*70)
+
+df = pd.read_csv('pl3_full.csv')
+print('数据加载完成，共%d期' % len(df))
+
+# ============================================================
+# 码和邻边法
+# ============================================================
+def get_mahe_linbian(last_nums):
+    """
+    码和邻边法：
+    上期码和尾数±1，得到3个关注号码
+    例如：上期359，码和=17，尾数7
+    关注号码：6、7、8
+    
+    补充技巧：
+    三个开奖数字分别两两相加，得到3个和值尾数作为胆码
+    例如：123 → 1+2=3, 1+3=4, 2+3=5
+    胆码：3、4、5
+    """
+    n1, n2, n3 = last_nums
+    
+    # 方法1：码和尾数邻边
+    mahe = n1 + n2 + n3
+    mahe_tail = mahe % 10
+    
+    linbian = [mahe_tail]
+    if mahe_tail > 0: linbian.append(mahe_tail - 1)
+    if mahe_tail < 9: linbian.append(mahe_tail + 1)
+    
+    # 方法2：两两相加尾数
+    he12 = (n1 + n2) % 10
+    he13 = (n1 + n3) % 10
+    he23 = (n2 + n3) % 10
+    
+    lianghe = [he12, he13, he23]
+    
+    return linbian, lianghe
+
+def predict_mahe_linbian(df_train):
+    """
+    码和邻边预测：
+    1. 码和尾邻边（权重4）
+    2. 两两相加尾数（权重3）
+    """
+    scores = {d: 0 for d in range(10)}
+    
+    if len(df_train) < 2:
+        return scores
+    
+    # 上期号码
+    last = df_train.iloc[-1]
+    last_nums = [int(last['num1']), int(last['num2']), int(last['num3'])]
+    
+    linbian, lianghe = get_mahe_linbian(last_nums)
+    
+    # 邻边加分
+    for d in linbian:
+        scores[d] += 4
+    
+    # 两两相加尾数加分
+    for d in lianghe:
+        scores[d] += 3
+    
+    return scores
+
+# ============================================================
+# 基础方法
+# ============================================================
+def get_334_duanzu(last_nums):
+    n1, n2, n3 = last_nums
+    sum_tail = (n1 + n2 + n3) % 10
+    if sum_tail in [0, 5]: return [0,1,9], [4,5,6], [2,3,7,8]
+    elif sum_tail in [1, 6]: return [0,1,2], [5,6,7], [3,4,8,9]
+    elif sum_tail in [2, 7]: return [1,2,3], [6,7,8], [0,4,5,9]
+    elif sum_tail in [3, 8]: return [2,3,4], [7,8,9], [0,1,5,6]
+    else: return [3,4,5], [8,9,0], [1,2,6,7]
+
+def predict_334(df_train):
+    last = df_train.iloc[-1]
+    last_nums = (int(last['num1']), int(last['num2']), int(last['num3']))
+    g1, g2, g3 = get_334_duanzu(last_nums)
+    all_nums = []
+    for _, row in df_train.tail(10).iterrows():
+        all_nums.extend([int(row['num1']), int(row['num2']), int(row['num3'])])
+    g1_count = sum(1 for n in all_nums if n in g1)
+    g2_count = sum(1 for n in all_nums if n in g2)
+    g3_count = sum(1 for n in all_nums if n in g3)
+    counts = [(g1, g1_count), (g2, g2_count), (g3, g3_count)]
+    counts.sort(key=lambda x: x[1], reverse=True)
+    scores = {d: 0 for d in range(10)}
+    for d in counts[0][0]: scores[d] += 14
+    for d in counts[1][0]: scores[d] += 10
+    for d in counts[2][0]: scores[d] += 2
+    return scores
+
+def predict_55fenjie(df_train):
+    decompositions = [
+        ([0,1,2,3,4], [5,6,7,8,9]),
+        ([1,3,5,7,9], [0,2,4,6,8]),
+        ([2,3,5,7,0], [1,4,6,8,9]),
+        ([0,1,4,5,8], [2,3,6,7,9]),
+    ]
+    best_group, best_score = None, -1
+    for g1, g2 in decompositions:
+        all_nums = []
+        for _, row in df_train.tail(10).iterrows():
+            all_nums.extend([int(row['num1']), int(row['num2']), int(row['num3'])])
+        g1_count = sum(1 for n in all_nums if n in g1)
+        g2_count = sum(1 for n in all_nums if n in g2)
+        if g1_count > g2_count: score, group = g1_count, g1
+        else: score, group = g2_count, g2
+        if score > best_score: best_score, best_group = score, group
+    return {d: 9 for d in best_group}
+
+def predict_liangma(df_train):
+    last = df_train.iloc[-1]
+    n1, n2, n3 = int(last['num1']), int(last['num2']), int(last['num3'])
+    he12, he13, he23 = (n1+n2)%10, (n1+n3)%10, (n2+n3)%10
+    cha12, cha13, cha23 = abs(n1-n2), abs(n1-n3), abs(n2-n3)
+    jin12, jin13, jin23 = (n1+n2)//10, (n1+n3)//10, (n2+n3)//10
+    all_nums = [he12, he13, he23, cha12, cha13, cha23, jin12, jin13, jin23]
+    num_count = Counter(all_nums)
+    result = [n for n, c in num_count.most_common(3)]
+    return {d: 6 for d in result}
+
+def predict_012lu(df_train):
+    route_map = {0: [0,3,6,9], 1: [1,4,7], 2: [2,5,8]}
+    hot_nums = []
+    for pos in range(3):
+        nums = df_train['num%d' % (pos+1)].astype(int).tail(30).tolist()
+        route_count = {0: 0, 1: 0, 2: 0}
+        for n in nums: route_count[n % 3] += 1
+        hot_route = max(route_count, key=route_count.get)
+        hot_nums.extend(route_map[hot_route])
+    return {d: 6 for d in set(hot_nums)}
+
+def predict_jiou(df_train):
+    odd_count, even_count = 0, 0
+    for _, row in df_train.tail(30).iterrows():
+        for col in ['num1', 'num2', 'num3']:
+            if int(row[col]) % 2 == 1: odd_count += 1
+            else: even_count += 1
+    scores = {d: 0 for d in range(10)}
+    if odd_count > even_count:
+        for d in [1,3,5,7,9]: scores[d] += 14
+        for d in [0,2,4,6,8]: scores[d] += 2
+    else:
+        for d in [0,2,4,6,8]: scores[d] += 14
+        for d in [1,3,5,7,9]: scores[d] += 2
+    return scores
+
+def predict_xingtai(df_train):
+    all_nums = []
+    for _, row in df_train.tail(30).iterrows():
+        all_nums.extend([int(row['num1']), int(row['num2']), int(row['num3'])])
+    big_count = sum(1 for n in all_nums if n >= 5)
+    small_count = len(all_nums) - big_count
+    prime = [2, 3, 5, 7]
+    prime_count = sum(1 for n in all_nums if n in prime)
+    hot_nums = []
+    if big_count > small_count: hot_nums.extend([5, 6, 7, 8, 9])
+    else: hot_nums.extend([0, 1, 2, 3, 4])
+    if prime_count > len(all_nums) - prime_count: hot_nums.extend(prime)
+    else: hot_nums.extend([0, 1, 4, 6, 8, 9])
+    return {d: 4 for d in set(hot_nums)}
+
+def predict_sum_tail(df_train):
+    sums = []
+    for _, row in df_train.tail(30).iterrows():
+        s = int(row['num1']) + int(row['num2']) + int(row['num3'])
+        sums.append(s % 10)
+    sum_count = Counter(sums)
+    hot_sums = [n for n, c in sum_count.most_common(3)]
+    result = []
+    for tail in hot_sums:
+        result.append(tail)
+        result.append((tail + 5) % 10)
+    return {d: 7 for d in list(set(result))[:5]}
+
+def is_banshun(nums):
+    n1, n2, n3 = sorted(nums)
+    return abs(n1-n2) == 1 or abs(n2-n3) == 1 or abs(n1-n3) == 1
+
+def predict_banshun(df_train):
+    recent = df_train.tail(50)
+    consecutive_counts = Counter()
+    for _, row in recent.iterrows():
+        nums = sorted([int(row['num1']), int(row['num2']), int(row['num3'])])
+        for i in range(3):
+            for j in range(i+1, 3):
+                if abs(nums[j] - nums[i]) == 1:
+                    consecutive_counts[(min(nums[i], nums[j]), max(nums[i], nums[j]))] += 1
+    digit_counts = Counter()
+    for _, row in recent.iterrows():
+        nums = [int(row['num1']), int(row['num2']), int(row['num3'])]
+        if is_banshun(nums):
+            for d in nums: digit_counts[d] += 1
+    hot_pairs = [p[0] for p in consecutive_counts.most_common(3)]
+    hot_digits = [d[0] for d in digit_counts.most_common(3)]
+    result = []
+    for pair in hot_pairs: result.extend(pair)
+    result.extend(hot_digits)
+    return {d: 3 for d in set(result)}
+
+def predict_lin_gua_chuan(df_train):
+    scores = {d: 0 for d in range(10)}
+    if len(df_train) < 2: return scores
+    last = df_train.iloc[-1]
+    last_nums = [int(last['num1']), int(last['num2']), int(last['num3'])]
+    chuan = set(last_nums)
+    lin = set()
+    for n in last_nums:
+        if n > 0: lin.add(n - 1)
+        if n < 9: lin.add(n + 1)
+    gu = set(range(10)) - chuan - lin
+    for d in chuan: scores[d] += 3
+    for d in lin: scores[d] += 4
+    for d in gu: scores[d] += 1
+    return scores
+
+WAN_NENG_6 = [
+    [0,1,2,3,4,5],[0,1,2,3,6,7],[0,1,2,3,8,9],[0,1,4,5,6,7],[0,1,4,5,8,9],
+    [0,1,6,7,8,9],[2,3,4,5,6,7],[2,3,4,5,8,9],[2,3,6,7,8,9],[4,5,6,7,8,9],
+]
+
+def predict_wan_neng_6(df_train):
+    scores = {d: 0 for d in range(10)}
+    all_nums = []
+    for _, row in df_train.tail(10).iterrows():
+        all_nums.extend([int(row['num1']), int(row['num2']), int(row['num3'])])
+    counter = Counter(all_nums)
+    hot_nums = [d for d, c in counter.items() if c >= 3]
+    if not hot_nums:
+        hot_nums = [d for d, c in counter.most_common(2)]
+    best_group = None
+    best_score = -1
+    for group in WAN_NENG_6:
+        match = sum(1 for h in hot_nums if h in group)
+        if match > best_score:
+            best_score = match
+            best_group = group
+    if best_group:
+        for d in best_group:
+            scores[d] += 5
+    return scores
+
+# ============================================================
+# 综合预测
+# ============================================================
+def predict_10methods(df_train):
+    scores = {d: 0 for d in range(10)}
+    for d, s in predict_334(df_train).items(): scores[d] += s
+    for d, s in predict_55fenjie(df_train).items(): scores[d] += s
+    for d, s in predict_liangma(df_train).items(): scores[d] += s
+    for d, s in predict_012lu(df_train).items(): scores[d] += s
+    for d, s in predict_jiou(df_train).items(): scores[d] += s
+    for d, s in predict_xingtai(df_train).items(): scores[d] += s
+    for d, s in predict_sum_tail(df_train).items(): scores[d] += s
+    for d, s in predict_banshun(df_train).items(): scores[d] += s
+    for d, s in predict_lin_gua_chuan(df_train).items(): scores[d] += s
+    for d, s in predict_wan_neng_6(df_train).items(): scores[d] += s
+    sorted_nums = sorted(scores.items(), key=lambda x: x[1], reverse=True)
+    return [n for n, s in sorted_nums[:5]]
+
+def predict_11methods(df_train):
+    """10方法 + 码和邻边"""
+    scores = {d: 0 for d in range(10)}
+    for d, s in predict_334(df_train).items(): scores[d] += s
+    for d, s in predict_55fenjie(df_train).items(): scores[d] += s
+    for d, s in predict_liangma(df_train).items(): scores[d] += s
+    for d, s in predict_012lu(df_train).items(): scores[d] += s
+    for d, s in predict_jiou(df_train).items(): scores[d] += s
+    for d, s in predict_xingtai(df_train).items(): scores[d] += s
+    for d, s in predict_sum_tail(df_train).items(): scores[d] += s
+    for d, s in predict_banshun(df_train).items(): scores[d] += s
+    for d, s in predict_lin_gua_chuan(df_train).items(): scores[d] += s
+    for d, s in predict_wan_neng_6(df_train).items(): scores[d] += s
+    for d, s in predict_mahe_linbian(df_train).items(): scores[d] += s
+    sorted_nums = sorted(scores.items(), key=lambda x: x[1], reverse=True)
+    return [n for n, s in sorted_nums[:5]]
+
+# ============================================================
+# 测试码和邻边准确率
+# ============================================================
+print('\n测试码和邻边法单独准确率...')
+linbian_hits = 0
+linbian_total = 0
+linbian_atleast1 = 0
+
+for i in range(100, min(5000, len(df) - 600)):
+    last_nums = [int(df.iloc[i-1]['num1']), int(df.iloc[i-1]['num2']), int(df.iloc[i-1]['num3'])]
+    real = [int(df.iloc[i]['num1']), int(df.iloc[i]['num2']), int(df.iloc[i]['num3'])]
+    
+    linbian, lianghe = get_mahe_linbian(last_nums)
+    
+    # 检查邻边是否命中
+    real_set = set(real)
+    if any(d in real_set for d in linbian):
+        linbian_atleast1 += 1
+    
+    # 检查两两相加尾数
+    if any(d in real_set for d in lianghe):
+        linbian_atleast1 += 1
+    
+    linbian_total += 1
+
+print('码和邻边至少中1个: %.2f%% (理论应>60%%)' % (linbian_atleast1/linbian_total*100))
+
+# ============================================================
+# 测试综合
+# ============================================================
+def test_predict(predict_func, name, test_count=5000):
+    random.seed(42)
+    results = []
+    total = min(test_count, len(df) - 600)
+    for i in range(100, 100 + total):
+        df_train = df.iloc[max(0, i-500):i]
+        if len(df_train) < 100: continue
+        real = [int(df.iloc[i]['num1']), int(df.iloc[i]['num2']), int(df.iloc[i]['num3'])]
+        real_set = set(real)
+        top5_set = set(predict_func(df_train))
+        hit = len(real_set & top5_set) == len(real_set)
+        results.append(hit)
+    
+    total_hits = sum(results)
+    hit_rate = total_hits / len(results) * 100
+    max_streak, current_streak = 0, 0
+    max_miss, current_miss = 0, 0
+    for r in results:
+        if r:
+            current_streak += 1
+            max_streak = max(max_streak, current_streak)
+            current_miss = 0
+        else:
+            current_miss += 1
+            max_miss = max(max_miss, current_miss)
+            current_streak = 0
+    return {'name': name, 'total': len(results), 'hits': total_hits,
+            'hit_rate': hit_rate, 'max_streak': max_streak, 'max_miss': max_miss}
+
+print('\n测试10种方法...')
+r1 = test_predict(predict_10methods, '10种方法', 5000)
+print('10种方法: %.2f%% | 最大连中%d | 最大不中%d' % (r1['hit_rate'], r1['max_streak'], r1['max_miss']))
+
+print('\n测试11种方法（+码和邻边）...')
+r2 = test_predict(predict_11methods, '11种方法', 5000)
+print('11种方法: %.2f%% | 最大连中%d | 最大不中%d' % (r2['hit_rate'], r2['max_streak'], r2['max_miss']))
+
+print()
+print('='*70)
+print('结果对比')
+print('='*70)
+print()
+print('| 方法 | 命中率 | 提升 | 最大连中 | 最大不中 |')
+print('|------|--------|------|---------|---------|')
+print('| 10种方法 | %.2f%% | - | %d期 | %d期 |' % (r1['hit_rate'], r1['max_streak'], r1['max_miss']))
+print('| 11种方法 | %.2f%% | %+.2f%% | %d期 | %d期 |' % (r2['hit_rate'], r2['hit_rate']-r1['hit_rate'], r2['max_streak'], r2['max_miss']))
+print()
+print('='*70)

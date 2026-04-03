@@ -262,6 +262,64 @@ def method_sum_tail(df_train):
         'desc': '热尾%d%d%d' % tuple(hot_sums)
     }
 
+def is_banshun(nums):
+    """判断是否为半顺（任意两个数字相邻）"""
+    n1, n2, n3 = sorted(nums)
+    if abs(n1-n2) == 1 or abs(n2-n3) == 1 or abs(n1-n3) == 1:
+        return True
+    return False
+
+def method_banshun(df_train):
+    """方法8: 半顺细分技巧（辅助方法）
+    半顺开出率60.7%，平均1.6期开出1次
+    热态二连码：89、90、01最热
+    热态单码：8、9、0最热
+    """
+    # 获取近50期数据
+    recent = df_train.tail(50)
+    
+    # 统计二连码出现次数
+    consecutive_counts = Counter()
+    for _, row in recent.iterrows():
+        nums = sorted([int(row['num1']), int(row['num2']), int(row['num3'])])
+        for i in range(3):
+            for j in range(i+1, 3):
+                if abs(nums[j] - nums[i]) == 1:
+                    consecutive_counts[(min(nums[i], nums[j]), max(nums[i], nums[j]))] += 1
+    
+    # 统计含各数字的半顺次数
+    digit_counts = Counter()
+    for _, row in recent.iterrows():
+        nums = [int(row['num1']), int(row['num2']), int(row['num3'])]
+        if is_banshun(nums):
+            for d in nums:
+                digit_counts[d] += 1
+    
+    # 获取热门二连码和单码
+    hot_pairs = [p[0] for p in consecutive_counts.most_common(3)]
+    hot_digits = [d[0] for d in digit_counts.most_common(3)]
+    
+    # 构建结果
+    result = list(set(hot_pairs[0] + hot_pairs[1] + hot_pairs[2] + hot_digits)) if hot_pairs or hot_digits else []
+    
+    # 计算半顺开出比例
+    banshun_count = sum(1 for _, row in recent.iterrows() if is_banshun([int(row['num1']), int(row['num2']), int(row['num3'])]))
+    banshun_rate = banshun_count / len(recent) * 100
+    
+    # 获取最热的二连码类型
+    hot_pair_str = ''
+    if consecutive_counts:
+        top_pair = consecutive_counts.most_common(1)[0][0]
+        hot_pair_str = '%d%d型' % (top_pair[0], top_pair[1])
+    
+    return {
+        'name': '半顺',
+        'weight': '3%',
+        'result': sorted(list(set(result)))[:6] if result else list(range(10)),
+        'kill': [],
+        'desc': '半顺%d期出%d次(%d%%)，%s' % (len(recent), banshun_count, int(banshun_rate), hot_pair_str)
+    }
+
 # ============================================================
 # 综合预测
 # ============================================================
@@ -275,11 +333,12 @@ def predict_all_methods(df_train):
         method_jiou(df_train),
         method_xingtai(df_train),
         method_sum_tail(df_train),
+        method_banshun(df_train),  # 第8种：半顺技巧
     ]
     
-    # 综合评分 - 使用各方法返回的详细评分
+    # 综合评分 - 8种方法
     scores = {d: 0 for d in range(10)}
-    weights = [14, 9, 6, 6, 4, 4, 7]
+    weights = [14, 9, 6, 6, 4, 4, 7, 3]  # 半顺权重3%
     
     for i, m in enumerate(methods):
         # 如果方法返回了详细评分，使用详细评分
