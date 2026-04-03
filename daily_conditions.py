@@ -64,8 +64,8 @@ def method_334_duanzu(df_train):
         'name': '334断组',
         'weight': '14%',
         'result': sorted(result),
-        'kill': sorted(cold),
-        'desc': '和值尾%d，断组%s' % (sum_tail, ''.join(map(str, sorted(cold)))),
+        'kill': [],  # 不显示杀号
+        'desc': '和值尾%d，保留热组' % sum_tail,
         # 新增三组分开显示
         'groups': {
             'group1': {'nums': g1, 'count': g1_count, 'is_cold': cold_idx == 1},
@@ -108,7 +108,7 @@ def method_55fenjie(df_train):
         'name': '五五分解',
         'weight': '9%',
         'result': sorted(best_group),
-        'kill': sorted([d for d in range(10) if d not in best_group]),
+        'kill': [],  # 不显示杀号
         'desc': '%s分解热组' % best_name
     }
 
@@ -178,7 +178,7 @@ def method_jiou(df_train):
         'name': '奇偶',
         'weight': '4%',
         'result': result,
-        'kill': [d for d in range(10) if d not in result],
+        'kill': [],  # 不显示杀号
         'desc': '%s数过热' % hot
     }
 

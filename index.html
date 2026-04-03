@@ -850,10 +850,9 @@
                 document.getElementById('pl3-rec4').textContent = recommendations[3];
                 document.getElementById('pl3-rec5').textContent = recommendations[4];
                 
-                // 条件列表
+                // 条件列表 - 排列三
                 let conditionsHtml = '';
                 data.pl3.methods.forEach(m => {
-                    // 334断组特殊显示
                     if (m.name === '334断组' && m.groups) {
                         conditionsHtml += `
                             <div class="condition-item">
@@ -863,10 +862,9 @@
                                 </div>
                                 <div class="condition-right">
                                     <span class="condition-result">${m.result.join('')}</span>
-                                    <span class="condition-kill">杀${m.kill.join('')}</span>
                                 </div>
                             </div>
-                            <div class="condition-desc" style="padding-left:12px">和值尾${m.sum_tail}，断掉最冷组</div>
+                            <div class="condition-desc" style="padding-left:12px">和值尾${m.sum_tail}，保留热组</div>
                             <div class="duanzu-groups">
                                 <div class="duanzu-group ${m.groups.group1.is_cold ? 'cold' : 'hot'}">
                                     <div class="group-label">第一组(3个)</div>
@@ -894,10 +892,9 @@
                                 </div>
                                 <div class="condition-right">
                                     <span class="condition-result">${m.result.join('')}</span>
-                                    ${m.kill && m.kill.length > 0 ? `<span class="condition-kill">杀${m.kill.join('')}</span>` : ''}
                                 </div>
                             </div>
-                            ${m.desc ? `<div class="condition-desc" style="padding-left:12px">${m.desc}</div>` : ''}
+                            ${m.desc ? \`<div class="condition-desc" style="padding-left:12px">\${m.desc}</div>\` : ''}
                         `;
                     }
                 });
@@ -923,10 +920,9 @@
                 document.getElementById('d3-rec4').textContent = recommendations3d[3];
                 document.getElementById('d3-rec5').textContent = recommendations3d[4];
                 
-                // 条件列表
+                // 条件列表 - 3D
                 conditionsHtml = '';
                 data.d3.methods.forEach(m => {
-                    // 334断组特殊显示
                     if (m.name === '334断组' && m.groups) {
                         conditionsHtml += `
                             <div class="condition-item">
@@ -936,10 +932,9 @@
                                 </div>
                                 <div class="condition-right">
                                     <span class="condition-result">${m.result.join('')}</span>
-                                    <span class="condition-kill">杀${m.kill.join('')}</span>
                                 </div>
                             </div>
-                            <div class="condition-desc" style="padding-left:12px">和值尾${m.sum_tail}，断掉最冷组</div>
+                            <div class="condition-desc" style="padding-left:12px">和值尾${m.sum_tail}，保留热组</div>
                             <div class="duanzu-groups">
                                 <div class="duanzu-group ${m.groups.group1.is_cold ? 'cold' : 'hot'}">
                                     <div class="group-label">第一组(3个)</div>
@@ -967,10 +962,9 @@
                                 </div>
                                 <div class="condition-right">
                                     <span class="condition-result">${m.result.join('')}</span>
-                                    ${m.kill && m.kill.length > 0 ? `<span class="condition-kill">杀${m.kill.join('')}</span>` : ''}
                                 </div>
                             </div>
-                            ${m.desc ? `<div class="condition-desc" style="padding-left:12px">${m.desc}</div>` : ''}
+                            ${m.desc ? \`<div class="condition-desc" style="padding-left:12px">\${m.desc}</div>\` : ''}
                         `;
                     }
                 });
