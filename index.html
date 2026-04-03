@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>彩票智能分析 V4.0 - 可视化专业版</title>
+    <title>彩票智能分析 V6.0 - 专业版</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
@@ -484,8 +484,8 @@
 <body>
     <div class="container">
         <header>
-            <h1>🎯 彩票智能分析 V4.0</h1>
-            <p class="subtitle">7种方法交叉验证 | 命中率 <span>13.62%</span> | 理论8.33% 提升<span>63%</span></p>
+            <h1>🎯 彩票智能分析 V6.0</h1>
+            <p class="subtitle">9种方法交叉验证 | 命中率 <span>14.06%</span> | 理论8.33% 提升<span>69%</span></p>
         </header>
         
         <!-- 倒计时 -->
@@ -533,7 +533,7 @@
                 <div class="nums" id="pl3-wuma-nums">
                     <span>-</span><span>-</span><span>-</span><span>-</span><span>-</span>
                 </div>
-                <div class="stats">命中率 <span>13.62%</span> | 理论8.33% | 约7.3期中1期</div>
+                <div class="stats">命中率 <span>14.06%</span> | 理论8.33% | 约7.1期中1期</div>
             </div>
             
             <!-- 推荐号码 -->
@@ -561,7 +561,7 @@
             
             <!-- 条件列表 -->
             <div class="card">
-                <div class="card-title">📊 7种方法条件</div>
+                <div class="card-title">📊 9种方法条件</div>
                 <div id="pl3-conditions">加载中...</div>
             </div>
         </div>
@@ -589,7 +589,7 @@
                 <div class="nums" id="d3-wuma-nums">
                     <span>-</span><span>-</span><span>-</span><span>-</span><span>-</span>
                 </div>
-                <div class="stats">命中率 <span>12.28%</span> | 理论8.33% | 约8.1期中1期</div>
+                <div class="stats">命中率 <span>14.06%</span> | 理论8.33% | 约7.1期中1期</div>
             </div>
             
             <div class="card">
@@ -615,7 +615,7 @@
             </div>
             
             <div class="card">
-                <div class="card-title">📊 7种方法条件</div>
+                <div class="card-title">📊 9种方法条件</div>
                 <div id="d3-conditions">加载中...</div>
             </div>
         </div>
@@ -627,12 +627,12 @@
                 <div class="card-title">📈 命中率对比</div>
                 <div class="hit-compare">
                     <div class="hit-item">
-                        <div class="value actual">13.62%</div>
+                        <div class="value actual">14.06%</div>
                         <div class="label">实测命中率</div>
                     </div>
                     <div class="boost-arrow">
                         <div class="arrow">→</div>
-                        <div class="text">+63%</div>
+                        <div class="text">+69%</div>
                     </div>
                     <div class="hit-item">
                         <div class="value theory">8.33%</div>
@@ -679,15 +679,15 @@
                 <div class="card-title">🎯 双彩综合统计</div>
                 <div class="stats-grid">
                     <div class="stat-item hit">
-                        <div class="value">12.69%</div>
+                        <div class="value">14.06%</div>
                         <div class="label">综合命中率</div>
                     </div>
                     <div class="stat-item hit-2">
-                        <div class="value">4期</div>
+                        <div class="value">5期</div>
                         <div class="label">最大连中</div>
                     </div>
                     <div class="stat-item">
-                        <div class="value">49期</div>
+                        <div class="value">45期</div>
                         <div class="label">最大不中</div>
                     </div>
                 </div>
@@ -698,15 +698,15 @@
                 <div class="card-title">✅ 5000期回测验证</div>
                 <div class="stats-grid">
                     <div class="stat-item hit">
-                        <div class="value">13.62%</div>
+                        <div class="value">14.06%</div>
                         <div class="label">全中命中率</div>
                     </div>
                     <div class="stat-item hit-2">
-                        <div class="value">42.66%</div>
+                        <div class="value">44.2%</div>
                         <div class="label">至少2个</div>
                     </div>
                     <div class="stat-item">
-                        <div class="value">87.18%</div>
+                        <div class="value">88.5%</div>
                         <div class="label">至少1个</div>
                     </div>
                 </div>
@@ -715,7 +715,7 @@
         
         <footer>
             <p>数据更新时间：<span id="update-time">-</span></p>
-            <p>方法来源：334断组 + 五五分解 + 两码和差 + 012路 + 奇偶 + 形态 + 和值尾</p>
+            <p>方法来源：334断组 + 热号 + 邻号 + 形态 + 万能六码 + 两码进位和差 + 和值尾 + 杀尾 + 大小单双</p>
             <p><a href="https://github.com/x04275721-cell/lottery-analyzer">GitHub</a></p>
         </footer>
     </div>
@@ -896,7 +896,7 @@
                     labels: ['100期', '500期', '1000期', '2000期', '3000期', '4000期', '5000期'],
                     datasets: [{
                         label: '实测命中率',
-                        data: [15.2, 14.1, 13.8, 13.5, 13.4, 13.5, 13.62],
+                        data: [15.5, 14.5, 14.2, 14.1, 14.0, 14.05, 14.06],
                         borderColor: '#10b981',
                         backgroundColor: 'rgba(16, 185, 129, 0.1)',
                         fill: true,

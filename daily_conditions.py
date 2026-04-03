@@ -296,11 +296,18 @@ def method_banshun(df_train):
                 digit_counts[d] += 1
     
     # 获取热门二连码和单码
-    hot_pairs = [p[0] for p in consecutive_counts.most_common(3)]
+    hot_pairs_list = [p[0] for p in consecutive_counts.most_common(3)]
     hot_digits = [d[0] for d in digit_counts.most_common(3)]
     
     # 构建结果
-    result = list(set(hot_pairs[0] + hot_pairs[1] + hot_pairs[2] + hot_digits)) if hot_pairs or hot_digits else []
+    if hot_pairs_list:
+        result = []
+        for pair in hot_pairs_list:
+            result.extend(list(pair))
+        result.extend(hot_digits)
+        result = list(set(result))
+    else:
+        result = hot_digits if hot_digits else []
     
     # 计算半顺开出比例
     banshun_count = sum(1 for _, row in recent.iterrows() if is_banshun([int(row['num1']), int(row['num2']), int(row['num3'])]))
