@@ -54,14 +54,14 @@ def method_334_duanzu(df_train):
     mid_group = counts[1][0]  # 中等
     cold_group = counts[2][0]  # 最冷
     
-    # 权重：热组14分，中组9分，冷组3分（综合加权，不完全排除）
+    # 最佳权重：热组14分，中组10分，冷组2分
     result_scores = {d: 0 for d in range(10)}
     for d in hot_group:
         result_scores[d] += 14
     for d in mid_group:
-        result_scores[d] += 9
+        result_scores[d] += 10
     for d in cold_group:
-        result_scores[d] += 3  # 冷组也有机会，但权重低
+        result_scores[d] += 2  # 冷组保留低权重
     
     # 返回综合评分后的推荐数字
     sorted_nums = sorted(result_scores.items(), key=lambda x: x[1], reverse=True)
@@ -74,9 +74,9 @@ def method_334_duanzu(df_train):
         'kill': [],
         'desc': '和值尾%d，综合加权' % sum_tail,
         'groups': {
-            'group1': {'nums': g1, 'count': g1_count, 'weight': 14 if g1 == hot_group else (9 if g1 == mid_group else 3)},
-            'group2': {'nums': g2, 'count': g2_count, 'weight': 14 if g2 == hot_group else (9 if g2 == mid_group else 3)},
-            'group3': {'nums': g3, 'count': g3_count, 'weight': 14 if g3 == hot_group else (9 if g3 == mid_group else 3)}
+            'group1': {'nums': g1, 'count': g1_count, 'weight': 14 if g1 == hot_group else (10 if g1 == mid_group else 2)},
+            'group2': {'nums': g2, 'count': g2_count, 'weight': 14 if g2 == hot_group else (10 if g2 == mid_group else 2)},
+            'group3': {'nums': g3, 'count': g3_count, 'weight': 14 if g3 == hot_group else (10 if g3 == mid_group else 2)}
         },
         'sum_tail': sum_tail,
         'scores': result_scores  # 返回评分供综合计算使用
@@ -178,18 +178,18 @@ def method_jiou(df_train):
     result_scores = {d: 0 for d in range(10)}
     
     if odd_count > even_count:
-        # 奇数热
+        # 奇数热：热14，冷2
         for d in [1, 3, 5, 7, 9]:
-            result_scores[d] += 8  # 热权重
+            result_scores[d] += 14
         for d in [0, 2, 4, 6, 8]:
-            result_scores[d] += 3  # 冷权重（不排除）
+            result_scores[d] += 2
         hot = '奇'
     else:
-        # 偶数热
+        # 偶数热：热14，冷2
         for d in [0, 2, 4, 6, 8]:
-            result_scores[d] += 8  # 热权重
+            result_scores[d] += 14
         for d in [1, 3, 5, 7, 9]:
-            result_scores[d] += 3  # 冷权重（不排除）
+            result_scores[d] += 2
         hot = '偶'
     
     # 返回所有数字的评分
