@@ -26,7 +26,7 @@ print('3D数据: %d期' % len(d3_df))
 # ============================================================
 
 def method_334_duanzu(df_train):
-    """方法1: 334断组法"""
+    """方法1: 334断组法 - 综合加权"""
     last = df_train.iloc[-1]
     n1, n2, n3 = int(last['num1']), int(last['num2']), int(last['num3'])
     sum_tail = (n1 + n2 + n3) % 10
@@ -46,33 +46,40 @@ def method_334_duanzu(df_train):
     g2_count = sum(1 for n in all_nums if n in g2)
     g3_count = sum(1 for n in all_nums if n in g3)
     
-    # 断掉最冷的组
-    if g1_count <= g2_count and g1_count <= g3_count:
-        result = g2 + g3
-        cold = g1
-        cold_idx = 1
-    elif g2_count <= g1_count and g2_count <= g3_count:
-        result = g1 + g3
-        cold = g2
-        cold_idx = 2
-    else:
-        result = g1 + g2
-        cold = g3
-        cold_idx = 3
+    # 综合加权：按出现次数排序，热组权重高，冷组权重低但不为0
+    counts = [(g1, g1_count, 1), (g2, g2_count, 2), (g3, g3_count, 3)]
+    counts.sort(key=lambda x: x[1], reverse=True)  # 按次数降序
+    
+    hot_group = counts[0][0]  # 最热
+    mid_group = counts[1][0]  # 中等
+    cold_group = counts[2][0]  # 最冷
+    
+    # 权重：热组14分，中组9分，冷组3分（综合加权，不完全排除）
+    result_scores = {d: 0 for d in range(10)}
+    for d in hot_group:
+        result_scores[d] += 14
+    for d in mid_group:
+        result_scores[d] += 9
+    for d in cold_group:
+        result_scores[d] += 3  # 冷组也有机会，但权重低
+    
+    # 返回综合评分后的推荐数字
+    sorted_nums = sorted(result_scores.items(), key=lambda x: x[1], reverse=True)
+    top_nums = [n for n, s in sorted_nums[:7]]  # 返回7个数字
     
     return {
         'name': '334断组',
         'weight': '14%',
-        'result': sorted(result),
-        'kill': [],  # 不显示杀号
-        'desc': '和值尾%d，保留热组' % sum_tail,
-        # 新增三组分开显示
+        'result': sorted(top_nums),
+        'kill': [],
+        'desc': '和值尾%d，综合加权' % sum_tail,
         'groups': {
-            'group1': {'nums': g1, 'count': g1_count, 'is_cold': cold_idx == 1},
-            'group2': {'nums': g2, 'count': g2_count, 'is_cold': cold_idx == 2},
-            'group3': {'nums': g3, 'count': g3_count, 'is_cold': cold_idx == 3}
+            'group1': {'nums': g1, 'count': g1_count, 'weight': 14 if g1 == hot_group else (9 if g1 == mid_group else 3)},
+            'group2': {'nums': g2, 'count': g2_count, 'weight': 14 if g2 == hot_group else (9 if g2 == mid_group else 3)},
+            'group3': {'nums': g3, 'count': g3_count, 'weight': 14 if g3 == hot_group else (9 if g3 == mid_group else 3)}
         },
-        'sum_tail': sum_tail
+        'sum_tail': sum_tail,
+        'scores': result_scores  # 返回评分供综合计算使用
     }
 
 def method_55fenjie(df_train):
@@ -157,7 +164,7 @@ def method_012lu(df_train):
     }
 
 def method_jiou(df_train):
-    """方法5: 奇偶分析"""
+    """方法5: 奇偶分析 - 综合加权"""
     odd_count, even_count = 0, 0
     
     for _, row in df_train.tail(30).iterrows():
@@ -167,19 +174,32 @@ def method_jiou(df_train):
             else:
                 even_count += 1
     
+    # 综合加权：热类型权重高，冷类型权重低但不为0
+    result_scores = {d: 0 for d in range(10)}
+    
     if odd_count > even_count:
-        result = [1, 3, 5, 7, 9]
+        # 奇数热
+        for d in [1, 3, 5, 7, 9]:
+            result_scores[d] += 8  # 热权重
+        for d in [0, 2, 4, 6, 8]:
+            result_scores[d] += 3  # 冷权重（不排除）
         hot = '奇'
     else:
-        result = [0, 2, 4, 6, 8]
+        # 偶数热
+        for d in [0, 2, 4, 6, 8]:
+            result_scores[d] += 8  # 热权重
+        for d in [1, 3, 5, 7, 9]:
+            result_scores[d] += 3  # 冷权重（不排除）
         hot = '偶'
     
+    # 返回所有数字的评分
     return {
         'name': '奇偶',
         'weight': '4%',
-        'result': result,
-        'kill': [],  # 不显示杀号
-        'desc': '%s数过热' % hot
+        'result': sorted([d for d, s in result_scores.items() if s >= 8]),  # 显示热类型
+        'kill': [],
+        'desc': '%s数过热(综合加权)' % hot,
+        'scores': result_scores
     }
 
 def method_xingtai(df_train):
@@ -257,13 +277,19 @@ def predict_all_methods(df_train):
         method_sum_tail(df_train),
     ]
     
-    # 综合评分
+    # 综合评分 - 使用各方法返回的详细评分
     scores = {d: 0 for d in range(10)}
     weights = [14, 9, 6, 6, 4, 4, 7]
     
     for i, m in enumerate(methods):
-        for d in m['result']:
-            scores[d] += weights[i]
+        # 如果方法返回了详细评分，使用详细评分
+        if 'scores' in m and m['scores']:
+            for d, s in m['scores'].items():
+                scores[d] += s * weights[i] / 10  # 归一化
+        else:
+            # 否则使用 result 列表
+            for d in m['result']:
+                scores[d] += weights[i]
     
     sorted_nums = sorted(scores.items(), key=lambda x: x[1], reverse=True)
     top5 = [n for n, s in sorted_nums[:5]]
