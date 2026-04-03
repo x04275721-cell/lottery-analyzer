@@ -905,7 +905,7 @@
         // 加载数据
         async function loadData() {
             try {
-                const response = await fetch('daily_conditions.json');
+                const response = await fetch('daily_conditions.json?v=' + Date.now());
                 const data = await response.json();
                 
                 // 更新时间
