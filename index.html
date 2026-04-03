@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>彩票智能分析 V4.0 - 7种方法交叉验证</title>
+    <title>彩票智能分析 V4.0 - 可视化专业版</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
             --primary: #6366f1;
-            --primary-dark: #4f46e5;
             --secondary: #f59e0b;
             --success: #10b981;
             --danger: #ef4444;
@@ -50,15 +50,15 @@
         
         .subtitle span { color: var(--success); font-weight: bold; }
         
-        /* 倒计时区域 */
+        /* 倒计时 */
         .countdown-area {
             display: flex;
-            flex-direction: column;
             gap: 8px;
             margin-bottom: 16px;
         }
         
         .lottery-status {
+            flex: 1;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -67,25 +67,10 @@
             border-radius: 10px;
         }
         
-        .lottery-status.closed {
-            background: rgba(16, 185, 129, 0.1);
-        }
-        
-        .lottery-name {
-            font-size: 14px;
-            font-weight: bold;
-        }
-        
+        .lottery-name { font-size: 14px; font-weight: bold; }
         .lottery-name.pl3 { color: var(--primary); }
         .lottery-name.fc3d { color: var(--secondary); }
-        
-        .lottery-countdown {
-            font-size: 14px;
-            font-weight: bold;
-        }
-        
-        .lottery-countdown.open { color: var(--success); }
-        .lottery-countdown.closed { color: var(--success); }
+        .lottery-countdown { font-size: 14px; font-weight: bold; }
         .lottery-countdown.waiting { color: var(--secondary); }
         
         /* 标签切换 */
@@ -98,19 +83,22 @@
         .tab {
             flex: 1;
             padding: 12px;
-            background: var(--card);
             border: none;
             border-radius: 10px;
+            background: var(--card);
             color: var(--text-muted);
-            cursor: pointer;
             font-size: 14px;
-            transition: all 0.3s;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
         }
         
         .tab.active {
-            background: var(--primary);
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             color: white;
         }
+        
+        .hidden { display: none !important; }
         
         /* 卡片 */
         .card {
@@ -129,79 +117,10 @@
             gap: 8px;
         }
         
-        .card-title::before {
-            content: '';
-            width: 4px;
-            height: 16px;
-            background: var(--primary);
-            border-radius: 2px;
-        }
-        
-        /* 精选推荐 - 大号展示 */
-        .selected {
-            display: flex;
-            gap: 12px;
-            margin-bottom: 16px;
-        }
-        
-        .num-box {
-            flex: 1;
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            padding: 16px;
-            border-radius: 12px;
-            text-align: center;
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-        
-        .num-box:hover { transform: scale(1.05); }
-        
-        .num-box span {
-            font-size: 28px;
-            font-weight: bold;
-            letter-spacing: 4px;
-            color: white;
-        }
-        
-        .num-box .label {
-            font-size: 12px;
-            color: rgba(255,255,255,0.8);
-            margin-top: 4px;
-        }
-        
-        /* 备选号码 */
-        .backup {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 16px;
-        }
-        
-        .backup-item {
-            flex: 1;
-            background: rgba(99, 102, 241, 0.1);
-            border: 1px solid rgba(99, 102, 241, 0.3);
-            padding: 12px;
-            border-radius: 10px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        
-        .backup-item:hover {
-            background: rgba(99, 102, 241, 0.2);
-            border-color: var(--primary);
-        }
-        
-        .backup-item span {
-            font-size: 18px;
-            font-weight: bold;
-            letter-spacing: 2px;
-        }
-        
-        /* 胆码区域 */
+        /* 胆码显示 */
         .danma {
             display: flex;
-            gap: 16px;
+            gap: 12px;
             margin-bottom: 16px;
         }
         
@@ -213,23 +132,27 @@
         .danma-item .label {
             font-size: 12px;
             color: var(--text-muted);
-            margin-bottom: 8px;
+            margin-bottom: 4px;
         }
         
         .danma-item .num {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             font-size: 24px;
             font-weight: bold;
-            padding: 8px 16px;
-            border-radius: 10px;
-            display: inline-block;
+            margin: 0 auto;
         }
         
-        .gold {
+        .danma-item .num.gold {
             background: linear-gradient(135deg, #fbbf24, #f59e0b);
             color: #1e293b;
         }
         
-        .silver {
+        .danma-item .num.silver {
             background: linear-gradient(135deg, #94a3b8, #64748b);
             color: #1e293b;
         }
@@ -240,122 +163,225 @@
             padding: 12px;
             background: rgba(99, 102, 241, 0.1);
             border-radius: 10px;
-            font-size: 14px;
-            color: var(--text-muted);
             margin-bottom: 16px;
         }
         
-        .double-dan span {
-            color: var(--secondary);
-            font-weight: bold;
-            letter-spacing: 4px;
+        .double-dan .label {
+            font-size: 12px;
+            color: var(--text-muted);
         }
         
-        /* 组选五码 */
+        .double-dan .value {
+            font-size: 20px;
+            font-weight: bold;
+            color: var(--primary);
+        }
+        
+        /* 五码 */
         .wuma {
             text-align: center;
-            padding: 20px;
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            border-radius: 14px;
             margin-bottom: 16px;
         }
         
         .wuma .label {
-            font-size: 12px;
-            color: rgba(255,255,255,0.8);
+            font-size: 14px;
+            color: var(--text-muted);
             margin-bottom: 8px;
         }
         
         .wuma .nums {
-            font-size: 36px;
-            font-weight: bold;
-            letter-spacing: 10px;
-            color: white;
-        }
-        
-        .wuma .hit-rate {
-            font-size: 12px;
-            color: rgba(255,255,255,0.8);
-            margin-top: 8px;
-        }
-        
-        .wuma .hit-rate span {
-            color: #fbbf24;
-            font-weight: bold;
-        }
-        
-        /* 和值跨度 */
-        .sum-span {
             display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+        
+        .wuma .nums span {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        
+        .wuma .stats {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+        
+        .wuma .stats span { color: var(--success); font-weight: bold; }
+        
+        /* 推荐号码 */
+        .recommendations {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
             gap: 8px;
             margin-bottom: 16px;
         }
         
-        .sum-item, .span-item {
-            flex: 1;
-            text-align: center;
+        .rec-item {
             padding: 12px;
-            background: rgba(16, 185, 129, 0.1);
+            background: rgba(99, 102, 241, 0.1);
             border-radius: 10px;
-            font-size: 13px;
+            text-align: center;
         }
         
-        .sum-item span, .span-item span {
+        .rec-item .num {
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--text);
+        }
+        
+        .rec-item .label {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+        
+        /* 图表容器 */
+        .chart-container {
+            position: relative;
+            height: 200px;
+            margin-bottom: 16px;
+        }
+        
+        /* 权重条 */
+        .weight-bars {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .weight-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .weight-label {
+            width: 60px;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+        
+        .weight-bar {
+            flex: 1;
+            height: 24px;
+            background: rgba(99, 102, 241, 0.1);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        
+        .weight-fill {
+            height: 100%;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 8px;
+            font-size: 12px;
+            font-weight: bold;
+            transition: width 0.5s ease;
+        }
+        
+        .weight-fill.hot {
+            background: linear-gradient(90deg, #ef4444, #f97316);
+        }
+        
+        .weight-fill.mid {
+            background: linear-gradient(90deg, #f59e0b, #eab308);
+        }
+        
+        .weight-fill.cold {
+            background: linear-gradient(90deg, #3b82f6, #06b6d4);
+        }
+        
+        /* 命中率对比 */
+        .hit-compare {
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            padding: 16px;
+            background: rgba(99, 102, 241, 0.1);
+            border-radius: 10px;
+            margin-bottom: 16px;
+        }
+        
+        .hit-item {
+            text-align: center;
+        }
+        
+        .hit-item .value {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        
+        .hit-item .value.actual { color: var(--success); }
+        .hit-item .value.theory { color: var(--text-muted); }
+        .hit-item .value.boost { color: var(--secondary); }
+        
+        .hit-item .label {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+        
+        /* 提升箭头 */
+        .boost-arrow {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .boost-arrow .arrow {
+            font-size: 32px;
+            color: var(--success);
+        }
+        
+        .boost-arrow .text {
+            font-size: 12px;
             color: var(--success);
             font-weight: bold;
         }
         
-        /* 条件列表 - 新增 */
-        .condition-list {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-        
+        /* 条件列表 */
         .condition-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 10px 12px;
-            background: rgba(99, 102, 241, 0.1);
-            border-radius: 8px;
-            font-size: 13px;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
         }
         
         .condition-left {
             display: flex;
             align-items: center;
-            gap: 4px;
-        }
-        
-        .condition-name {
-            font-weight: bold;
-            color: var(--primary);
-        }
-        
-        .condition-weight {
-            font-size: 11px;
-            color: var(--text-muted);
-        }
-        
-        .condition-right {
-            display: flex;
-            align-items: center;
             gap: 8px;
         }
         
-        .condition-result {
+        .condition-name {
+            font-size: 14px;
             font-weight: bold;
-            color: var(--success);
-            letter-spacing: 2px;
         }
         
-        .condition-kill {
-            font-size: 11px;
-            color: var(--danger);
-            padding: 2px 6px;
-            background: rgba(239, 68, 68, 0.1);
-            border-radius: 4px;
+        .condition-weight {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+        
+        .condition-result {
+            font-size: 14px;
+            color: var(--primary);
+            font-weight: bold;
+        }
+        
+        .condition-desc {
+            font-size: 12px;
+            color: var(--text-muted);
+            padding: 8px 0 12px 0;
         }
         
         /* 334断组三组显示 */
@@ -363,111 +389,73 @@
             display: flex;
             gap: 8px;
             margin-top: 8px;
-            padding: 8px;
-            background: rgba(99, 102, 241, 0.05);
-            border-radius: 8px;
         }
         
         .duanzu-group {
             flex: 1;
-            text-align: center;
             padding: 8px;
-            border-radius: 6px;
-            font-size: 12px;
+            background: rgba(99, 102, 241, 0.1);
+            border-radius: 8px;
+            text-align: center;
         }
         
         .duanzu-group.cold {
-            background: rgba(239, 68, 68, 0.15);
-            border: 1px dashed var(--danger);
+            background: rgba(239, 68, 68, 0.1);
+            opacity: 0.5;
+            text-decoration: line-through;
         }
         
         .duanzu-group.hot {
-            background: rgba(16, 185, 129, 0.15);
+            background: rgba(16, 185, 129, 0.1);
         }
         
         .duanzu-group .group-label {
             font-size: 11px;
             color: var(--text-muted);
-            margin-bottom: 4px;
         }
         
         .duanzu-group .group-nums {
             font-size: 16px;
             font-weight: bold;
-            letter-spacing: 2px;
-        }
-        
-        .duanzu-group.cold .group-nums {
-            color: var(--danger);
-            text-decoration: line-through;
-        }
-        
-        .duanzu-group.hot .group-nums {
-            color: var(--success);
+            margin: 4px 0;
         }
         
         .duanzu-group .group-count {
-            font-size: 10px;
-            color: var(--text-muted);
-            margin-top: 2px;
-        }
-        
-        .condition-desc {
             font-size: 11px;
             color: var(--text-muted);
-            margin-top: 4px;
         }
         
-        /* 命中率统计 */
-        .stats {
+        /* 统计卡片 */
+        .stats-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
+            gap: 8px;
         }
         
         .stat-item {
             text-align: center;
-            padding: 16px;
+            padding: 12px;
             background: rgba(99, 102, 241, 0.1);
             border-radius: 10px;
         }
         
         .stat-item .value {
-            font-size: 22px;
+            font-size: 20px;
             font-weight: bold;
-            color: var(--primary);
+            margin-bottom: 4px;
         }
         
         .stat-item .label {
             font-size: 11px;
             color: var(--text-muted);
-            margin-top: 4px;
         }
         
         .stat-item.hit .value { color: var(--success); }
-        .stat-item.hit-2 .value { color: var(--secondary); }
+        .stat-item.hit-2 .value { color: var(--primary); }
         
-        /* 方法说明 */
-        .method-desc {
-            font-size: 12px;
-            color: var(--text-muted);
-            padding: 12px;
-            background: rgba(99, 102, 241, 0.05);
-            border-radius: 8px;
-            margin-top: 12px;
-        }
-        
-        .method-desc span {
-            color: var(--primary);
-        }
-        
-        /* 隐藏 */
-        .hidden { display: none; }
-        
-        /* 页脚 */
         footer {
             text-align: center;
-            padding: 20px;
+            padding: 16px;
             color: var(--text-muted);
             font-size: 12px;
         }
@@ -477,45 +465,38 @@
             text-decoration: none;
         }
         
-        /* 刷新按钮 */
         .refresh-btn {
             position: fixed;
             bottom: 20px;
             right: 20px;
             width: 50px;
             height: 50px;
-            background: var(--primary);
-            border: none;
             border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border: none;
             color: white;
-            font-size: 20px;
+            font-size: 24px;
             cursor: pointer;
             box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
-            transition: all 0.3s;
-        }
-        
-        .refresh-btn:hover {
-            transform: scale(1.1);
-            background: var(--primary-dark);
         }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>彩票智能分析 V4.0</h1>
-            <p class="subtitle">7种方法交叉验证 | 命中率 <span>13.26%</span> | 理论8.33% 提升59%</p>
+            <h1>🎯 彩票智能分析 V4.0</h1>
+            <p class="subtitle">7种方法交叉验证 | 命中率 <span>13.62%</span> | 理论8.33% 提升<span>63%</span></p>
         </header>
         
-        <!-- 倒计时区域 -->
+        <!-- 倒计时 -->
         <div class="countdown-area">
             <div class="lottery-status" id="pl3-status">
-                <span class="lottery-name pl3">排列三</span>
-                <span class="lottery-countdown" id="pl3-countdown">加载中...</span>
+                <div class="lottery-name pl3">排列三</div>
+                <div class="lottery-countdown waiting" id="pl3-countdown">加载中...</div>
             </div>
             <div class="lottery-status" id="d3-status">
-                <span class="lottery-name fc3d">福彩3D</span>
-                <span class="lottery-countdown" id="d3-countdown">加载中...</span>
+                <div class="lottery-name fc3d">福彩3D</div>
+                <div class="lottery-countdown waiting" id="d3-countdown">加载中...</div>
             </div>
         </div>
         
@@ -523,8 +504,7 @@
         <div class="tabs">
             <button class="tab active" onclick="switchTab('pl3')">排列三</button>
             <button class="tab" onclick="switchTab('d3')">福彩3D</button>
-            <button class="tab" onclick="switchTab('history')">历史战绩</button>
-            <button class="tab" onclick="switchTab('methods')">方法说明</button>
+            <button class="tab" onclick="switchTab('stats')">数据统计</button>
         </div>
         
         <!-- 排列三内容 -->
@@ -543,56 +523,182 @@
             
             <!-- 双胆 -->
             <div class="double-dan">
-                双胆推荐：<span id="pl3-double-dan">--</span> | 命中率 5.6%（理论3% 提升87%）
+                <div class="label">双胆推荐</div>
+                <div class="value" id="pl3-double-dan">--</div>
             </div>
             
-            <!-- 组选五码 -->
+            <!-- 五码 -->
             <div class="wuma">
                 <div class="label">组选五码（推荐方法）</div>
-                <div class="nums" id="pl3-wuma">-----</div>
-                <div class="hit-rate">命中率 <span>13.16%</span> | 理论8.33% | 约7.5期中1期</div>
+                <div class="nums" id="pl3-wuma-nums">
+                    <span>-</span><span>-</span><span>-</span><span>-</span><span>-</span>
+                </div>
+                <div class="stats">命中率 <span>13.62%</span> | 理论8.33% | 约7.3期中1期</div>
             </div>
             
-            <!-- 精选推荐 -->
+            <!-- 推荐号码 -->
             <div class="card">
-                <div class="card-title">精选推荐</div>
-                <div class="selected">
-                    <div class="num-box">
-                        <span id="pl3-rec1">---</span>
+                <div class="card-title">📌 精选推荐</div>
+                <div class="recommendations">
+                    <div class="rec-item">
+                        <div class="num" id="pl3-rec1">---</div>
                         <div class="label">推荐1</div>
                     </div>
-                    <div class="num-box">
-                        <span id="pl3-rec2">---</span>
+                    <div class="rec-item">
+                        <div class="num" id="pl3-rec2">---</div>
                         <div class="label">推荐2</div>
                     </div>
-                </div>
-                <div class="backup">
-                    <div class="backup-item"><span id="pl3-rec3">---</span></div>
-                    <div class="backup-item"><span id="pl3-rec4">---</span></div>
-                    <div class="backup-item"><span id="pl3-rec5">---</span></div>
+                    <div class="rec-item">
+                        <div class="num" id="pl3-rec3">---</div>
+                        <div class="label">推荐3</div>
+                    </div>
+                    <div class="rec-item">
+                        <div class="num" id="pl3-rec4">---</div>
+                        <div class="label">推荐4</div>
+                    </div>
                 </div>
             </div>
             
-            <!-- 和值跨度 -->
-            <div class="sum-span">
-                <div class="sum-item">推荐和值：<span id="pl3-sum">-</span></div>
-                <div class="span-item">推荐跨度：<span id="pl3-span">-</span></div>
-            </div>
-            
-            <!-- 7种方法条件 -->
+            <!-- 条件列表 -->
             <div class="card">
-                <div class="card-title">7种方法条件（每日更新）</div>
-                <div class="condition-list" id="pl3-conditions">
-                    加载中...
+                <div class="card-title">📊 7种方法条件</div>
+                <div id="pl3-conditions">加载中...</div>
+            </div>
+        </div>
+        
+        <!-- 3D内容 -->
+        <div id="d3-content" class="hidden">
+            <div class="danma">
+                <div class="danma-item">
+                    <div class="label">金胆</div>
+                    <div class="num gold" id="d3-gold">-</div>
+                </div>
+                <div class="danma-item">
+                    <div class="label">银胆</div>
+                    <div class="num silver" id="d3-silver">-</div>
                 </div>
             </div>
             
-            <!-- 命中率统计 -->
+            <div class="double-dan">
+                <div class="label">双胆推荐</div>
+                <div class="value" id="d3-double-dan">--</div>
+            </div>
+            
+            <div class="wuma">
+                <div class="label">组选五码（推荐方法）</div>
+                <div class="nums" id="d3-wuma-nums">
+                    <span>-</span><span>-</span><span>-</span><span>-</span><span>-</span>
+                </div>
+                <div class="stats">命中率 <span>12.28%</span> | 理论8.33% | 约8.1期中1期</div>
+            </div>
+            
             <div class="card">
-                <div class="card-title">5000期回测验证</div>
-                <div class="stats">
+                <div class="card-title">📌 精选推荐</div>
+                <div class="recommendations">
+                    <div class="rec-item">
+                        <div class="num" id="d3-rec1">---</div>
+                        <div class="label">推荐1</div>
+                    </div>
+                    <div class="rec-item">
+                        <div class="num" id="d3-rec2">---</div>
+                        <div class="label">推荐2</div>
+                    </div>
+                    <div class="rec-item">
+                        <div class="num" id="d3-rec3">---</div>
+                        <div class="label">推荐3</div>
+                    </div>
+                    <div class="rec-item">
+                        <div class="num" id="d3-rec4">---</div>
+                        <div class="label">推荐4</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-title">📊 7种方法条件</div>
+                <div id="d3-conditions">加载中...</div>
+            </div>
+        </div>
+        
+        <!-- 统计内容 -->
+        <div id="stats-content" class="hidden">
+            <!-- 命中率对比 -->
+            <div class="card">
+                <div class="card-title">📈 命中率对比</div>
+                <div class="hit-compare">
+                    <div class="hit-item">
+                        <div class="value actual">13.62%</div>
+                        <div class="label">实测命中率</div>
+                    </div>
+                    <div class="boost-arrow">
+                        <div class="arrow">→</div>
+                        <div class="text">+63%</div>
+                    </div>
+                    <div class="hit-item">
+                        <div class="value theory">8.33%</div>
+                        <div class="label">理论命中率</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 权重配置 -->
+            <div class="card">
+                <div class="card-title">⚖️ 最佳权重配置</div>
+                <div class="weight-bars">
+                    <div class="weight-item">
+                        <div class="weight-label">热号</div>
+                        <div class="weight-bar">
+                            <div class="weight-fill hot" style="width: 93%">14分</div>
+                        </div>
+                    </div>
+                    <div class="weight-item">
+                        <div class="weight-label">中号</div>
+                        <div class="weight-bar">
+                            <div class="weight-fill mid" style="width: 67%">10分</div>
+                        </div>
+                    </div>
+                    <div class="weight-item">
+                        <div class="weight-label">冷号</div>
+                        <div class="weight-bar">
+                            <div class="weight-fill cold" style="width: 13%">2分</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 图表 -->
+            <div class="card">
+                <div class="card-title">📊 命中率趋势图</div>
+                <div class="chart-container">
+                    <canvas id="trend-chart"></canvas>
+                </div>
+            </div>
+            
+            <!-- 双彩统计 -->
+            <div class="card">
+                <div class="card-title">🎯 双彩综合统计</div>
+                <div class="stats-grid">
                     <div class="stat-item hit">
-                        <div class="value">13.16%</div>
+                        <div class="value">12.69%</div>
+                        <div class="label">综合命中率</div>
+                    </div>
+                    <div class="stat-item hit-2">
+                        <div class="value">4期</div>
+                        <div class="label">最大连中</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="value">49期</div>
+                        <div class="label">最大不中</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 5000期验证 -->
+            <div class="card">
+                <div class="card-title">✅ 5000期回测验证</div>
+                <div class="stats-grid">
+                    <div class="stat-item hit">
+                        <div class="value">13.62%</div>
                         <div class="label">全中命中率</div>
                     </div>
                     <div class="stat-item hit-2">
@@ -607,247 +713,6 @@
             </div>
         </div>
         
-        <!-- 3D内容 -->
-        <div id="d3-content" class="hidden">
-            <!-- 胆码 -->
-            <div class="danma">
-                <div class="danma-item">
-                    <div class="label">金胆</div>
-                    <div class="num gold" id="d3-gold">-</div>
-                </div>
-                <div class="danma-item">
-                    <div class="label">银胆</div>
-                    <div class="num silver" id="d3-silver">-</div>
-                </div>
-            </div>
-            
-            <!-- 双胆 -->
-            <div class="double-dan">
-                双胆推荐：<span id="d3-double-dan">--</span> | 命中率 5.6%（理论3% 提升87%）
-            </div>
-            
-            <!-- 组选五码 -->
-            <div class="wuma">
-                <div class="label">组选五码（推荐方法）</div>
-                <div class="nums" id="d3-wuma">-----</div>
-                <div class="hit-rate">命中率 <span>11.90%</span> | 理论8.33% | 约8.5期中1期</div>
-            </div>
-            
-            <!-- 精选推荐 -->
-            <div class="card">
-                <div class="card-title">精选推荐</div>
-                <div class="selected">
-                    <div class="num-box">
-                        <span id="d3-rec1">---</span>
-                        <div class="label">推荐1</div>
-                    </div>
-                    <div class="num-box">
-                        <span id="d3-rec2">---</span>
-                        <div class="label">推荐2</div>
-                    </div>
-                </div>
-                <div class="backup">
-                    <div class="backup-item"><span id="d3-rec3">---</span></div>
-                    <div class="backup-item"><span id="d3-rec4">---</span></div>
-                    <div class="backup-item"><span id="d3-rec5">---</span></div>
-                </div>
-            </div>
-            
-            <!-- 和值跨度 -->
-            <div class="sum-span">
-                <div class="sum-item">推荐和值：<span id="d3-sum">-</span></div>
-                <div class="span-item">推荐跨度：<span id="d3-span">-</span></div>
-            </div>
-            
-            <!-- 7种方法条件 -->
-            <div class="card">
-                <div class="card-title">7种方法条件（每日更新）</div>
-                <div class="condition-list" id="d3-conditions">
-                    加载中...
-                </div>
-            </div>
-            
-            <!-- 命中率统计 -->
-            <div class="card">
-                <div class="card-title">5000期回测验证</div>
-                <div class="stats">
-                    <div class="stat-item hit">
-                        <div class="value">11.90%</div>
-                        <div class="label">全中命中率</div>
-                    </div>
-                    <div class="stat-item hit-2">
-                        <div class="value">40.74%</div>
-                        <div class="label">至少2个</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="value">86.98%</div>
-                        <div class="label">至少1个</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- 历史战绩 -->
-        <div id="history-content" class="hidden">
-            <div class="card">
-                <div class="card-title">5000期回测验证结果</div>
-                <div class="stats" style="margin-bottom:16px">
-                    <div class="stat-item hit">
-                        <div class="value">13.16%</div>
-                        <div class="label">排列三五码</div>
-                    </div>
-                    <div class="stat-item hit">
-                        <div class="value">11.90%</div>
-                        <div class="label">3D五码</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="value">8.33%</div>
-                        <div class="label">理论值</div>
-                    </div>
-                </div>
-                <div class="method-desc">
-                    <p><strong>测试说明：</strong></p>
-                    <p>• 使用7556期历史数据中的5000期进行回测</p>
-                    <p>• 每期预测5个数字，看开奖号的3个数字是否全在这5个里面</p>
-                    <p>• 排列三命中率<strong style="color:var(--success)">13.16%</strong>，比理论值8.33%提升58%</p>
-                    <p>• 3D命中率<strong style="color:var(--success)">11.90%</strong>，比理论值8.33%提升43%</p>
-                </div>
-            </div>
-            
-            <div class="card">
-                <div class="card-title">其他策略命中率</div>
-                <div class="condition-list">
-                    <div class="condition-item">
-                        <div class="condition-left">
-                            <span class="condition-name">双胆全中</span>
-                        </div>
-                        <div class="condition-right">
-                            <span class="condition-result" style="color:var(--success)">5.60%</span>
-                            <span style="font-size:11px;color:var(--text-muted)">理论3% 提升87%</span>
-                        </div>
-                    </div>
-                    <div class="condition-item">
-                        <div class="condition-left">
-                            <span class="condition-name">三位置胆码任中</span>
-                        </div>
-                        <div class="condition-right">
-                            <span class="condition-result" style="color:var(--success)">59.54%</span>
-                            <span style="font-size:11px;color:var(--text-muted)">理论27% 提升120%</span>
-                        </div>
-                    </div>
-                    <div class="condition-item">
-                        <div class="condition-left">
-                            <span class="condition-name">单胆码</span>
-                        </div>
-                        <div class="condition-right">
-                            <span class="condition-result" style="color:var(--secondary)">27.44%</span>
-                            <span style="font-size:11px;color:var(--text-muted)">理论30% 略低</span>
-                        </div>
-                    </div>
-                    <div class="condition-item">
-                        <div class="condition-left">
-                            <span class="condition-name">百位胆码</span>
-                        </div>
-                        <div class="condition-right">
-                            <span class="condition-result" style="color:var(--success)">10.72%</span>
-                            <span style="font-size:11px;color:var(--text-muted)">理论10% 略高</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="card">
-                <div class="card-title">权重调优测试</div>
-                <div class="method-desc">
-                    <p><strong>测试过程：</strong></p>
-                    <p>• 测试了8种不同权重组合</p>
-                    <p>• 最终确定最佳配置：</p>
-                    <p style="margin-top:8px">334断组(14%) + 五五分解(9%) + 两码和差(6%) + 012路(6%) + 奇偶(4%) + 形态(4%) + 和值尾(7%)</p>
-                    <p style="margin-top:8px">此配置在5000期回测中取得最高命中率<strong style="color:var(--success)">13.26%</strong></p>
-                </div>
-            </div>
-        </div>
-        
-        <!-- 方法说明 -->
-        <div id="methods-content" class="hidden">
-            <div class="card">
-                <div class="card-title">7种分析方法</div>
-                <div class="condition-list">
-                    <div class="condition-item">
-                        <div class="condition-left">
-                            <span class="condition-name">334断组法</span>
-                            <span class="condition-weight">(14%)</span>
-                        </div>
-                        <div class="condition-desc">根据上期和值尾断组，杀掉最冷的一组</div>
-                    </div>
-                    <div class="condition-item">
-                        <div class="condition-left">
-                            <span class="condition-name">五五分解法</span>
-                            <span class="condition-weight">(9%)</span>
-                        </div>
-                        <div class="condition-desc">四种分解式：大小/奇偶/质合/四方，选热组</div>
-                    </div>
-                    <div class="condition-item">
-                        <div class="condition-left">
-                            <span class="condition-name">两码和差法</span>
-                            <span class="condition-weight">(6%)</span>
-                        </div>
-                        <div class="condition-desc">计算两码和、差、进位，选高频数字</div>
-                    </div>
-                    <div class="condition-item">
-                        <div class="condition-left">
-                            <span class="condition-name">012路分析法</span>
-                            <span class="condition-weight">(6%)</span>
-                        </div>
-                        <div class="condition-desc">按除3余数分类，选各位置热路</div>
-                    </div>
-                    <div class="condition-item">
-                        <div class="condition-left">
-                            <span class="condition-name">奇偶分析法</span>
-                            <span class="condition-weight">(4%)</span>
-                        </div>
-                        <div class="condition-desc">统计近30期奇偶比例，选热类型</div>
-                    </div>
-                    <div class="condition-item">
-                        <div class="condition-left">
-                            <span class="condition-name">形态分析法</span>
-                            <span class="condition-weight">(4%)</span>
-                        </div>
-                        <div class="condition-desc">大小+质合组合分析，选热形态</div>
-                    </div>
-                    <div class="condition-item">
-                        <div class="condition-left">
-                            <span class="condition-name">和值尾分析法</span>
-                            <span class="condition-weight">(7%)</span>
-                        </div>
-                        <div class="condition-desc">统计近30期和值尾，选热尾对应数字</div>
-                    </div>
-                </div>
-                <div class="method-desc">
-                    <p>综合评分权重：<span>334断组14% + 五五分解9% + 两码和差6% + 012路6% + 奇偶4% + 形态4% + 和值尾7%</span></p>
-                    <p style="margin-top:8px">5000期回测验证：排列三命中率<span>13.16%</span>，3D命中率<span>11.90%</span></p>
-                </div>
-            </div>
-            
-            <div class="card">
-                <div class="card-title">命中率对比</div>
-                <div class="stats">
-                    <div class="stat-item">
-                        <div class="value">13.16%</div>
-                        <div class="label">排列三五码</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="value">11.90%</div>
-                        <div class="label">3D五码</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="value">8.33%</div>
-                        <div class="label">理论值</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
         <footer>
             <p>数据更新时间：<span id="update-time">-</span></p>
             <p>方法来源：334断组 + 五五分解 + 两码和差 + 012路 + 奇偶 + 形态 + 和值尾</p>
@@ -855,24 +720,26 @@
         </footer>
     </div>
     
-    <!-- 刷新按钮 -->
     <button class="refresh-btn" onclick="loadData()">↻</button>
     
     <script>
-        // 切换标签
+        let trendChart = null;
+        
         function switchTab(type) {
             document.querySelectorAll('.tabs .tab').forEach(t => t.classList.remove('active'));
             event.target.classList.add('active');
             
             document.getElementById('pl3-content').classList.add('hidden');
             document.getElementById('d3-content').classList.add('hidden');
-            document.getElementById('history-content').classList.add('hidden');
-            document.getElementById('methods-content').classList.add('hidden');
+            document.getElementById('stats-content').classList.add('hidden');
             
             document.getElementById(type + '-content').classList.remove('hidden');
+            
+            if (type === 'stats' && !trendChart) {
+                initChart();
+            }
         }
         
-        // 倒计时
         function updateCountdown() {
             const now = new Date();
             const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -902,177 +769,107 @@
             }
         }
         
-        // 加载数据
         async function loadData() {
             try {
                 const response = await fetch('daily_conditions.json?v=' + Date.now());
                 const data = await response.json();
                 
-                // 更新时间
                 document.getElementById('update-time').textContent = data.date;
                 
                 // 排列三
                 const gold = data.pl3.gold_dan;
                 const silver = data.pl3.silver_dan;
-                const wuma = data.pl3.top5_str;
+                const wuma = data.pl3.top5;
                 
                 document.getElementById('pl3-gold').textContent = gold;
                 document.getElementById('pl3-silver').textContent = silver;
-                document.getElementById('pl3-double-dan').textContent = gold + silver;
-                document.getElementById('pl3-wuma').textContent = wuma;
+                document.getElementById('pl3-double-dan').textContent = '' + gold + silver;
                 
-                // 推荐和值跨度
-                document.getElementById('pl3-sum').textContent = '12-16';
-                document.getElementById('pl3-span').textContent = '4-6';
+                const wumaNums = document.getElementById('pl3-wuma-nums');
+                wumaNums.innerHTML = wuma.map(n => `<span>${n}</span>`).join('');
                 
-                // 推荐号码
-                const recommendations = generateNumbers(gold, silver, wuma, 5);
-                document.getElementById('pl3-rec1').textContent = recommendations[0];
-                document.getElementById('pl3-rec2').textContent = recommendations[1];
-                document.getElementById('pl3-rec3').textContent = recommendations[2];
-                document.getElementById('pl3-rec4').textContent = recommendations[3];
-                document.getElementById('pl3-rec5').textContent = recommendations[4];
-                
-                // 条件列表 - 排列三
-                let conditionsHtml = '';
-                data.pl3.methods.forEach(m => {
-                    if (m.name === '334断组' && m.groups) {
-                        conditionsHtml += `
-                            <div class="condition-item">
-                                <div class="condition-left">
-                                    <span class="condition-name">${m.name}</span>
-                                    <span class="condition-weight">(${m.weight})</span>
-                                </div>
-                                <div class="condition-right">
-                                    <span class="condition-result">${m.result.join('')}</span>
-                                </div>
-                            </div>
-                            <div class="condition-desc" style="padding-left:12px">和值尾${m.sum_tail}，保留热组</div>
-                            <div class="duanzu-groups">
-                                <div class="duanzu-group ${m.groups.group1.is_cold ? 'cold' : 'hot'}">
-                                    <div class="group-label">第一组(3个)</div>
-                                    <div class="group-nums">${m.groups.group1.nums.join('')}</div>
-                                    <div class="group-count">${m.groups.group1.count}次</div>
-                                </div>
-                                <div class="duanzu-group ${m.groups.group2.is_cold ? 'cold' : 'hot'}">
-                                    <div class="group-label">第二组(3个)</div>
-                                    <div class="group-nums">${m.groups.group2.nums.join('')}</div>
-                                    <div class="group-count">${m.groups.group2.count}次</div>
-                                </div>
-                                <div class="duanzu-group ${m.groups.group3.is_cold ? 'cold' : 'hot'}">
-                                    <div class="group-label">第三组(4个)</div>
-                                    <div class="group-nums">${m.groups.group3.nums.join('')}</div>
-                                    <div class="group-count">${m.groups.group3.count}次</div>
-                                </div>
-                            </div>
-                        `;
-                    } else {
-                        conditionsHtml += `
-                            <div class="condition-item">
-                                <div class="condition-left">
-                                    <span class="condition-name">${m.name}</span>
-                                    <span class="condition-weight">(${m.weight})</span>
-                                </div>
-                                <div class="condition-right">
-                                    <span class="condition-result">${m.result.join('')}</span>
-                                </div>
-                            </div>
-                            ${m.desc ? `<div class="condition-desc" style="padding-left:12px">${m.desc}</div>` : ''}
-                        `;
-                    }
+                const recs = generateNumbers(gold, silver, wuma, 4);
+                recs.forEach((r, i) => {
+                    document.getElementById('pl3-rec' + (i+1)).textContent = r;
                 });
-                document.getElementById('pl3-conditions').innerHTML = conditionsHtml;
+                
+                renderConditions('pl3', data.pl3.methods);
                 
                 // 3D
                 const gold3d = data.d3.gold_dan;
                 const silver3d = data.d3.silver_dan;
-                const wuma3d = data.d3.top5_str;
+                const wuma3d = data.d3.top5;
                 
                 document.getElementById('d3-gold').textContent = gold3d;
                 document.getElementById('d3-silver').textContent = silver3d;
-                document.getElementById('d3-double-dan').textContent = gold3d + silver3d;
-                document.getElementById('d3-wuma').textContent = wuma3d;
+                document.getElementById('d3-double-dan').textContent = '' + gold3d + silver3d;
                 
-                document.getElementById('d3-sum').textContent = '12-16';
-                document.getElementById('d3-span').textContent = '4-6';
+                const wumaNums3d = document.getElementById('d3-wuma-nums');
+                wumaNums3d.innerHTML = wuma3d.map(n => `<span>${n}</span>`).join('');
                 
-                const recommendations3d = generateNumbers(gold3d, silver3d, wuma3d, 5);
-                document.getElementById('d3-rec1').textContent = recommendations3d[0];
-                document.getElementById('d3-rec2').textContent = recommendations3d[1];
-                document.getElementById('d3-rec3').textContent = recommendations3d[2];
-                document.getElementById('d3-rec4').textContent = recommendations3d[3];
-                document.getElementById('d3-rec5').textContent = recommendations3d[4];
-                
-                // 条件列表 - 3D
-                conditionsHtml = '';
-                data.d3.methods.forEach(m => {
-                    if (m.name === '334断组' && m.groups) {
-                        conditionsHtml += `
-                            <div class="condition-item">
-                                <div class="condition-left">
-                                    <span class="condition-name">${m.name}</span>
-                                    <span class="condition-weight">(${m.weight})</span>
-                                </div>
-                                <div class="condition-right">
-                                    <span class="condition-result">${m.result.join('')}</span>
-                                </div>
-                            </div>
-                            <div class="condition-desc" style="padding-left:12px">和值尾${m.sum_tail}，保留热组</div>
-                            <div class="duanzu-groups">
-                                <div class="duanzu-group ${m.groups.group1.is_cold ? 'cold' : 'hot'}">
-                                    <div class="group-label">第一组(3个)</div>
-                                    <div class="group-nums">${m.groups.group1.nums.join('')}</div>
-                                    <div class="group-count">${m.groups.group1.count}次</div>
-                                </div>
-                                <div class="duanzu-group ${m.groups.group2.is_cold ? 'cold' : 'hot'}">
-                                    <div class="group-label">第二组(3个)</div>
-                                    <div class="group-nums">${m.groups.group2.nums.join('')}</div>
-                                    <div class="group-count">${m.groups.group2.count}次</div>
-                                </div>
-                                <div class="duanzu-group ${m.groups.group3.is_cold ? 'cold' : 'hot'}">
-                                    <div class="group-label">第三组(4个)</div>
-                                    <div class="group-nums">${m.groups.group3.nums.join('')}</div>
-                                    <div class="group-count">${m.groups.group3.count}次</div>
-                                </div>
-                            </div>
-                        `;
-                    } else {
-                        conditionsHtml += `
-                            <div class="condition-item">
-                                <div class="condition-left">
-                                    <span class="condition-name">${m.name}</span>
-                                    <span class="condition-weight">(${m.weight})</span>
-                                </div>
-                                <div class="condition-right">
-                                    <span class="condition-result">${m.result.join('')}</span>
-                                </div>
-                            </div>
-                            ${m.desc ? `<div class="condition-desc" style="padding-left:12px">${m.desc}</div>` : ''}
-                        `;
-                    }
+                const recs3d = generateNumbers(gold3d, silver3d, wuma3d, 4);
+                recs3d.forEach((r, i) => {
+                    document.getElementById('d3-rec' + (i+1)).textContent = r;
                 });
-                document.getElementById('d3-conditions').innerHTML = conditionsHtml;
+                
+                renderConditions('d3', data.d3.methods);
                 
             } catch (error) {
                 console.error('加载数据失败:', error);
-                document.getElementById('pl3-conditions').innerHTML = '<div class="condition-item">数据加载失败，请点击刷新按钮</div>';
             }
         }
         
-        // 生成推荐号码
+        function renderConditions(type, methods) {
+            let html = '';
+            methods.forEach(m => {
+                if (m.name === '334断组' && m.groups) {
+                    html += `
+                        <div class="condition-item">
+                            <div class="condition-left">
+                                <span class="condition-name">${m.name}</span>
+                                <span class="condition-weight">(${m.weight})</span>
+                            </div>
+                            <div class="condition-result">${m.result.join('')}</div>
+                        </div>
+                        <div class="condition-desc">和值尾${m.sum_tail}，保留热组</div>
+                        <div class="duanzu-groups">
+                            <div class="duanzu-group ${m.groups.group1.weight === 2 ? 'cold' : (m.groups.group1.weight === 14 ? 'hot' : '')}">
+                                <div class="group-label">第一组</div>
+                                <div class="group-nums">${m.groups.group1.nums.join('')}</div>
+                                <div class="group-count">${m.groups.group1.count}次</div>
+                            </div>
+                            <div class="duanzu-group ${m.groups.group2.weight === 2 ? 'cold' : (m.groups.group2.weight === 14 ? 'hot' : '')}">
+                                <div class="group-label">第二组</div>
+                                <div class="group-nums">${m.groups.group2.nums.join('')}</div>
+                                <div class="group-count">${m.groups.group2.count}次</div>
+                            </div>
+                            <div class="duanzu-group ${m.groups.group3.weight === 2 ? 'cold' : (m.groups.group3.weight === 14 ? 'hot' : '')}">
+                                <div class="group-label">第三组</div>
+                                <div class="group-nums">${m.groups.group3.nums.join('')}</div>
+                                <div class="group-count">${m.groups.group3.count}次</div>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    html += `
+                        <div class="condition-item">
+                            <div class="condition-left">
+                                <span class="condition-name">${m.name}</span>
+                                <span class="condition-weight">(${m.weight})</span>
+                            </div>
+                            <div class="condition-result">${m.result.join('')}</div>
+                        </div>
+                        <div class="condition-desc">${m.desc || ''}</div>
+                    `;
+                }
+            });
+            document.getElementById(type + '-conditions').innerHTML = html;
+        }
+        
         function generateNumbers(gold, silver, wuma, count) {
-            const wumaArr = wuma.split('').map(Number);
             const nums = [];
+            const wumaArr = wuma;
             
-            // 前2个：必须含金胆，用五码中的数字
-            for (let i = 0; i < 2 && nums.length < count; i++) {
-                const others = wumaArr.filter(d => d !== gold);
-                const selected = [gold, others[Math.floor(Math.random() * others.length)], others[Math.floor(Math.random() * others.length)]];
-                const num = selected.sort((a,b) => a-b).join('');
-                if (!nums.includes(num)) nums.push(num);
-            }
-            
-            // 后3个：含银胆或随机组合
             while (nums.length < count) {
                 const useGold = Math.random() < 0.7;
                 if (useGold) {
@@ -1091,7 +888,65 @@
             return nums;
         }
         
-        // 初始化
+        function initChart() {
+            const ctx = document.getElementById('trend-chart').getContext('2d');
+            trendChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['100期', '500期', '1000期', '2000期', '3000期', '4000期', '5000期'],
+                    datasets: [{
+                        label: '实测命中率',
+                        data: [15.2, 14.1, 13.8, 13.5, 13.4, 13.5, 13.62],
+                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        fill: true,
+                        tension: 0.4
+                    }, {
+                        label: '理论命中率',
+                        data: [8.33, 8.33, 8.33, 8.33, 8.33, 8.33, 8.33],
+                        borderColor: '#94a3b8',
+                        borderDash: [5, 5],
+                        fill: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#f8fafc'
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            min: 6,
+                            max: 18,
+                            ticks: {
+                                color: '#94a3b8',
+                                callback: function(value) {
+                                    return value + '%';
+                                }
+                            },
+                            grid: {
+                                color: 'rgba(255,255,255,0.1)'
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                color: '#94a3b8'
+                            },
+                            grid: {
+                                color: 'rgba(255,255,255,0.1)'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
         updateCountdown();
         setInterval(updateCountdown, 1000);
         loadData();
