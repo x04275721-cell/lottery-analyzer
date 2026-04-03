@@ -50,19 +50,29 @@ def method_334_duanzu(df_train):
     if g1_count <= g2_count and g1_count <= g3_count:
         result = g2 + g3
         cold = g1
+        cold_idx = 1
     elif g2_count <= g1_count and g2_count <= g3_count:
         result = g1 + g3
         cold = g2
+        cold_idx = 2
     else:
         result = g1 + g2
         cold = g3
+        cold_idx = 3
     
     return {
         'name': '334断组',
         'weight': '14%',
         'result': sorted(result),
         'kill': sorted(cold),
-        'desc': '和值尾%d，断组%s' % (sum_tail, ''.join(map(str, sorted(cold))))
+        'desc': '和值尾%d，断组%s' % (sum_tail, ''.join(map(str, sorted(cold)))),
+        # 新增三组分开显示
+        'groups': {
+            'group1': {'nums': g1, 'count': g1_count, 'is_cold': cold_idx == 1},
+            'group2': {'nums': g2, 'count': g2_count, 'is_cold': cold_idx == 2},
+            'group3': {'nums': g3, 'count': g3_count, 'is_cold': cold_idx == 3}
+        },
+        'sum_tail': sum_tail
     }
 
 def method_55fenjie(df_train):

@@ -358,6 +358,60 @@
             border-radius: 4px;
         }
         
+        /* 334断组三组显示 */
+        .duanzu-groups {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+            padding: 8px;
+            background: rgba(99, 102, 241, 0.05);
+            border-radius: 8px;
+        }
+        
+        .duanzu-group {
+            flex: 1;
+            text-align: center;
+            padding: 8px;
+            border-radius: 6px;
+            font-size: 12px;
+        }
+        
+        .duanzu-group.cold {
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px dashed var(--danger);
+        }
+        
+        .duanzu-group.hot {
+            background: rgba(16, 185, 129, 0.15);
+        }
+        
+        .duanzu-group .group-label {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+        }
+        
+        .duanzu-group .group-nums {
+            font-size: 16px;
+            font-weight: bold;
+            letter-spacing: 2px;
+        }
+        
+        .duanzu-group.cold .group-nums {
+            color: var(--danger);
+            text-decoration: line-through;
+        }
+        
+        .duanzu-group.hot .group-nums {
+            color: var(--success);
+        }
+        
+        .duanzu-group .group-count {
+            font-size: 10px;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+        
         .condition-desc {
             font-size: 11px;
             color: var(--text-muted);
@@ -799,19 +853,53 @@
                 // 条件列表
                 let conditionsHtml = '';
                 data.pl3.methods.forEach(m => {
-                    conditionsHtml += `
-                        <div class="condition-item">
-                            <div class="condition-left">
-                                <span class="condition-name">${m.name}</span>
-                                <span class="condition-weight">(${m.weight})</span>
+                    // 334断组特殊显示
+                    if (m.name === '334断组' && m.groups) {
+                        conditionsHtml += `
+                            <div class="condition-item">
+                                <div class="condition-left">
+                                    <span class="condition-name">${m.name}</span>
+                                    <span class="condition-weight">(${m.weight})</span>
+                                </div>
+                                <div class="condition-right">
+                                    <span class="condition-result">${m.result.join('')}</span>
+                                    <span class="condition-kill">杀${m.kill.join('')}</span>
+                                </div>
                             </div>
-                            <div class="condition-right">
-                                <span class="condition-result">${m.result.join('')}</span>
-                                ${m.kill && m.kill.length > 0 ? `<span class="condition-kill">杀${m.kill.join('')}</span>` : ''}
+                            <div class="condition-desc" style="padding-left:12px">和值尾${m.sum_tail}，断掉最冷组</div>
+                            <div class="duanzu-groups">
+                                <div class="duanzu-group ${m.groups.group1.is_cold ? 'cold' : 'hot'}">
+                                    <div class="group-label">第一组(3个)</div>
+                                    <div class="group-nums">${m.groups.group1.nums.join('')}</div>
+                                    <div class="group-count">${m.groups.group1.count}次</div>
+                                </div>
+                                <div class="duanzu-group ${m.groups.group2.is_cold ? 'cold' : 'hot'}">
+                                    <div class="group-label">第二组(3个)</div>
+                                    <div class="group-nums">${m.groups.group2.nums.join('')}</div>
+                                    <div class="group-count">${m.groups.group2.count}次</div>
+                                </div>
+                                <div class="duanzu-group ${m.groups.group3.is_cold ? 'cold' : 'hot'}">
+                                    <div class="group-label">第三组(4个)</div>
+                                    <div class="group-nums">${m.groups.group3.nums.join('')}</div>
+                                    <div class="group-count">${m.groups.group3.count}次</div>
+                                </div>
                             </div>
-                        </div>
-                        ${m.desc ? `<div class="condition-desc" style="padding-left:12px">${m.desc}</div>` : ''}
-                    `;
+                        `;
+                    } else {
+                        conditionsHtml += `
+                            <div class="condition-item">
+                                <div class="condition-left">
+                                    <span class="condition-name">${m.name}</span>
+                                    <span class="condition-weight">(${m.weight})</span>
+                                </div>
+                                <div class="condition-right">
+                                    <span class="condition-result">${m.result.join('')}</span>
+                                    ${m.kill && m.kill.length > 0 ? `<span class="condition-kill">杀${m.kill.join('')}</span>` : ''}
+                                </div>
+                            </div>
+                            ${m.desc ? `<div class="condition-desc" style="padding-left:12px">${m.desc}</div>` : ''}
+                        `;
+                    }
                 });
                 document.getElementById('pl3-conditions').innerHTML = conditionsHtml;
                 
@@ -838,19 +926,53 @@
                 // 条件列表
                 conditionsHtml = '';
                 data.d3.methods.forEach(m => {
-                    conditionsHtml += `
-                        <div class="condition-item">
-                            <div class="condition-left">
-                                <span class="condition-name">${m.name}</span>
-                                <span class="condition-weight">(${m.weight})</span>
+                    // 334断组特殊显示
+                    if (m.name === '334断组' && m.groups) {
+                        conditionsHtml += `
+                            <div class="condition-item">
+                                <div class="condition-left">
+                                    <span class="condition-name">${m.name}</span>
+                                    <span class="condition-weight">(${m.weight})</span>
+                                </div>
+                                <div class="condition-right">
+                                    <span class="condition-result">${m.result.join('')}</span>
+                                    <span class="condition-kill">杀${m.kill.join('')}</span>
+                                </div>
                             </div>
-                            <div class="condition-right">
-                                <span class="condition-result">${m.result.join('')}</span>
-                                ${m.kill && m.kill.length > 0 ? `<span class="condition-kill">杀${m.kill.join('')}</span>` : ''}
+                            <div class="condition-desc" style="padding-left:12px">和值尾${m.sum_tail}，断掉最冷组</div>
+                            <div class="duanzu-groups">
+                                <div class="duanzu-group ${m.groups.group1.is_cold ? 'cold' : 'hot'}">
+                                    <div class="group-label">第一组(3个)</div>
+                                    <div class="group-nums">${m.groups.group1.nums.join('')}</div>
+                                    <div class="group-count">${m.groups.group1.count}次</div>
+                                </div>
+                                <div class="duanzu-group ${m.groups.group2.is_cold ? 'cold' : 'hot'}">
+                                    <div class="group-label">第二组(3个)</div>
+                                    <div class="group-nums">${m.groups.group2.nums.join('')}</div>
+                                    <div class="group-count">${m.groups.group2.count}次</div>
+                                </div>
+                                <div class="duanzu-group ${m.groups.group3.is_cold ? 'cold' : 'hot'}">
+                                    <div class="group-label">第三组(4个)</div>
+                                    <div class="group-nums">${m.groups.group3.nums.join('')}</div>
+                                    <div class="group-count">${m.groups.group3.count}次</div>
+                                </div>
                             </div>
-                        </div>
-                        ${m.desc ? `<div class="condition-desc" style="padding-left:12px">${m.desc}</div>` : ''}
-                    `;
+                        `;
+                    } else {
+                        conditionsHtml += `
+                            <div class="condition-item">
+                                <div class="condition-left">
+                                    <span class="condition-name">${m.name}</span>
+                                    <span class="condition-weight">(${m.weight})</span>
+                                </div>
+                                <div class="condition-right">
+                                    <span class="condition-result">${m.result.join('')}</span>
+                                    ${m.kill && m.kill.length > 0 ? `<span class="condition-kill">杀${m.kill.join('')}</span>` : ''}
+                                </div>
+                            </div>
+                            ${m.desc ? `<div class="condition-desc" style="padding-left:12px">${m.desc}</div>` : ''}
+                        `;
+                    }
                 });
                 document.getElementById('d3-conditions').innerHTML = conditionsHtml;
                 

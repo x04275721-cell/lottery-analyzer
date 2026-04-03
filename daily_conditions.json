@@ -19,7 +19,38 @@
           7,
           8
         ],
-        "desc": "和值尾2，断组678"
+        "desc": "和值尾2，断组678",
+        "groups": {
+          "group1": {
+            "nums": [
+              1,
+              2,
+              3
+            ],
+            "count": 13,
+            "is_cold": false
+          },
+          "group2": {
+            "nums": [
+              6,
+              7,
+              8
+            ],
+            "count": 7,
+            "is_cold": true
+          },
+          "group3": {
+            "nums": [
+              0,
+              4,
+              5,
+              9
+            ],
+            "count": 10,
+            "is_cold": false
+          }
+        },
+        "sum_tail": 2
       },
       {
         "name": "五五分解",
@@ -145,7 +176,38 @@
           5,
           6
         ],
-        "desc": "和值尾0，断组456"
+        "desc": "和值尾0，断组456",
+        "groups": {
+          "group1": {
+            "nums": [
+              0,
+              1,
+              9
+            ],
+            "count": 8,
+            "is_cold": false
+          },
+          "group2": {
+            "nums": [
+              4,
+              5,
+              6
+            ],
+            "count": 7,
+            "is_cold": true
+          },
+          "group3": {
+            "nums": [
+              2,
+              3,
+              7,
+              8
+            ],
+            "count": 15,
+            "is_cold": false
+          }
+        },
+        "sum_tail": 0
       },
       {
         "name": "五五分解",
